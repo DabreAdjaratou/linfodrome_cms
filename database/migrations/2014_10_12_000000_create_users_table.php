@@ -15,11 +15,16 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
+            $table->string('name')->nullable(false); 
+            $table->string('email',100)->nullable(false)->unique();
+            $table->string('password',100)->nullable(false);
             $table->rememberToken();
-            $table->timestamps();
+            $table->unsignedTinyInteger('is_active')->nullable(false)->default(1)->comment('0: inactive, 1:active');
+            $table->string('image',255);
+            $table->unsignedTinyInteger('require_reset')->nullable(false)->default(1)->comment('0: require to reset password at the next login');
+            $table->json('data')->comment('contains user title,facebook,twitter,google in a json format');
+            
+             
         });
     }
 
