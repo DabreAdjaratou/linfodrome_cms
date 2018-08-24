@@ -20,9 +20,9 @@ class CreateUsersTable extends Migration
             $table->string('password',100)->nullable(false);
             $table->rememberToken();
             $table->unsignedTinyInteger('is_active')->nullable(false)->default(1)->comment('0: inactive, 1:active');
-            $table->string('image',255);
+            $table->string('image',255)->nullable(true);
             $table->unsignedTinyInteger('require_reset')->nullable(false)->default(1)->comment('0: require to reset password at the next login');
-            $table->json('data')->comment('contains user title,facebook,twitter,google in a json format');
+            $table->json('data')->nullable(true)->comment('contains user title,facebook,twitter,google in a json format');
             
              
         });

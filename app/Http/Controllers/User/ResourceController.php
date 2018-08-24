@@ -4,6 +4,9 @@ namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\User\Resource;
+use App\Models\User\Action;
+
 
 class ResourceController extends Controller
 {
@@ -14,7 +17,10 @@ class ResourceController extends Controller
      */
     public function index()
     {
-        //
+        $resources = Resource::paginate(20);
+
+return view ('user.resources.index', ['resources'=>$resources]);
+
     }
 
     /**
@@ -24,7 +30,8 @@ class ResourceController extends Controller
      */
     public function create()
     {
-        //
+        $actions=Action::all();
+         return view ('user.resources.create',['actions'=>$actions]);
     }
 
     /**
@@ -35,7 +42,18 @@ class ResourceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+        'title' => 'required|unique:access_levels|max:100',
+        ]);
+
+        $resource= new Resource;
+
+        $resource->title = $request->title;
+       
+        $resource->Actions =json_encode($request->actions);
+
+        $resource->save();
+        return redirect()->route('resources.index');
     }
 
     /**

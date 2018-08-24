@@ -4,6 +4,8 @@ namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\User\Group;
+
 
 class GroupController extends Controller
 {
@@ -14,7 +16,9 @@ class GroupController extends Controller
      */
     public function index()
     {
-        //
+        $groups = Group::paginate(20);
+
+return view ('user.user-groups.index', ['groups'=>$groups]);
     }
 
     /**
@@ -24,7 +28,8 @@ class GroupController extends Controller
      */
     public function create()
     {
-        //
+        $parents = Group::all();
+     return view ('user.user-groups.create',['parents'=>$parents]);
     }
 
     /**
@@ -35,7 +40,15 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+        'title' => 'required|unique:user_groups|max:100',
+               ]);
+
+        $group = new Group;
+        $group->title = $request->title;
+        $group->parent_id = $request->parent;
+        $group->save();
+        return redirect()->route('user-groups.index');
     }
 
     /**

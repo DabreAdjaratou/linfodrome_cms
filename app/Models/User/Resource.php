@@ -14,4 +14,10 @@ class Resource extends Model
      * @var bool
      */
     public $timestamps = false;
+
+
+    public function actions()
+    {
+        return $this->hasMany('App\Models\User\Action', 'actions');
+    }
 }

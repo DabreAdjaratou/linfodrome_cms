@@ -19,4 +19,13 @@ class AccessLevel extends Model
      * @var bool
      */
     public $timestamps = false;
+
+
+
+
+    public function userGroups()
+    {
+        return $this->belongsToMany('App\Models\User\Group', 'userGroup_accessLevels_map','access_level_id','user_group_id');
+    }
+
 }

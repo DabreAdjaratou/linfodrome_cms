@@ -20,4 +20,16 @@ class Group extends Model
      * @var bool
      */
     public $timestamps = false;
+
+
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\User\Group', 'parent_id');
+    }
+
+
+     public function accessLevels()
+    {
+        return $this->belongsToMany('App\Models\User\AccessLevel');
+    }
 }

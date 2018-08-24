@@ -15,7 +15,7 @@ class CreateActionsTable extends Migration
     {
         Schema::create('actions', function (Blueprint $table) {
             $table->tinyIncrements('id');
-            $table->string('action',50)->nullable(false)->unique();      
+            $table->string('title',50)->nullable(false)->unique();      
             $table->string('display_name',100)->nullable(false);
         });
     }

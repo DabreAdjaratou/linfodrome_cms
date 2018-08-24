@@ -16,7 +16,7 @@ class CreateUserGroupsTable extends Migration
         Schema::create('user_groups', function (Blueprint $table) {
             $table->tinyIncrements('id');
             $table->string('title',100)->nullable(false)->unique();
-            $table->unsignedInteger('group_parent_id')->default(0)->nullable(false)->comment('reference the parent group using a reflexive relationship, the value is 0 when a group have not a group parent');
+            $table->unsignedInteger('parent_id')->default(0)->comment('reference the parent group using a reflexive relationship, the value is 0 when a group have not a group parent');
         });
     }
 

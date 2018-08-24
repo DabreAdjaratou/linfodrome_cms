@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\User\AccessLevel;
 
 class AccessLevelController extends Controller
 {
@@ -14,7 +15,9 @@ class AccessLevelController extends Controller
      */
     public function index()
     {
-        //
+        $accessLevels = AccessLevel::paginate(20);
+        
+return view ('user.access-levels.index', ['accessLevels'=>$accessLevels]);
     }
 
     /**
@@ -24,7 +27,7 @@ class AccessLevelController extends Controller
      */
     public function create()
     {
-        //
+         return view ('user.access-levels.create');
     }
 
     /**
@@ -34,8 +37,18 @@ class AccessLevelController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        //
+     {
+
+        $validatedData = $request->validate([
+        'title' => 'required|unique:access_levels|max:100',
+        ]);
+
+        $accessLevel = new AccessLevel;
+
+        $accessLevel->title = $request->title;
+
+        $accessLevel->save();
+        return redirect()->route('access-levels.index');
     }
 
     /**
