@@ -52,10 +52,10 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'is_active'=>'required',
-            'image'=>'nullable',
-            'require_reset'=>'required',
-            'data'=>'nullable',
+            'is_active'=>'required|integer',
+            'image'=>'nullable|image',
+            'require_reset'=>'required|integer',
+            'data'=>'nullable|json',
         ]);
     }
 
@@ -63,7 +63,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return \App\Models\User\User
      */
     protected function create(array $data)
     {
@@ -74,7 +74,7 @@ class RegisterController extends Controller
             'is_active' => $data['is_active'],
             'image' => $data['image'],
             'require_reset' => $data['require_reset'],
-            // 'data' => $data['data'],
+            'data' =>'{"title":"'.$data['title'].'","google":"'.$data['google-address'].'","twitter":"'.$data['twitter-address'].'","facebook":"'.$data['facebook-address'].'"}' ,
         ]);
     }
 }

@@ -7,7 +7,7 @@
 
                
                 <div>
-                    <form method="POST" action="{{ route('register') }}" aria-label="{{('Register') }}" class="">
+                    <form method="POST" action="{{ route('register') }}" aria-label="{{('Register') }}" enctype="multipart/form-data" class="">
                         @csrf
 
                         <div>
@@ -21,18 +21,18 @@
                         </div>
                         <div>
                             <label for="title">{{ ('Titre') }}</label>
-                            <input id="title" type="text" name="title" value="{{ old('title') }}" required>
+                            <input id="title" type="text" name="title" value="{{ old('title') }}" >
                         </div>
                          <div>
                             <label for="facebook-address">{{ ('Adresse facebook') }}</label>
-                            <input id="facebook-address" type="text" name="facebook-address" value="{{ old('facebook-address') }}" required>
+                            <input id="facebook-address" type="text" name="facebook-address" value="{{ old('facebook-address') }}" >
                         </div>
                         <div>
                             <label for="google-address">{{ ('Adresse google') }}</label>
-                            <input id="google-address" type="text" name="google-address" value="{{ old('google-address') }}" required>
+                            <input id="google-address" type="text" name="google-address" value="{{ old('google-address') }}" >
                             <div>
                             <label for="twitter-address">{{ ('Adresse twitter') }}</label>
-                            <input id="twitter-address" type="text" name="twitter-address" value="{{ old('twitter-address') }}" required>
+                            <input id="twitter-address" type="text" name="twitter-address" value="{{ old('twitter-address') }}" >
                         </div>
                         </div>
 
@@ -54,7 +54,7 @@
                         </div>
 <div>
                             <label for=image">{{('Photo') }}</label>
-                            <input id=image" type="file"  name="image" required>
+                            <input id=image" type="file"  name="image">
                         </div>
 
                            <div>

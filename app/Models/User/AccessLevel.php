@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User\Group;
 
 class AccessLevel extends Model
 {
@@ -20,12 +21,17 @@ class AccessLevel extends Model
      */
     public $timestamps = false;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+     protected $fillable = [
+        'title', 
+    ];
 
 
-
-    public function userGroups()
-    {
-        return $this->belongsToMany('App\Models\User\Group', 'userGroup_accessLevels_map','access_level_id','user_group_id');
+    public static function getGoup($id) {
+        return Group::find($id);
     }
-
 }

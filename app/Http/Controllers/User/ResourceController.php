@@ -17,8 +17,21 @@ class ResourceController extends Controller
      */
     public function index()
     {
-        $resources = Resource::paginate(20);
-
+        $resources = Resource::all();
+        foreach ($resources as $r) {
+          $actions= json_decode($r->actions);
+          $r->actions='';
+          
+          for($i=0; $i < count($actions);$i++){
+             if ($i+1 ==count($actions)) {
+                     $r->actions .= ucfirst(Resource::getAction($actions[$i])->title);   
+             } else {
+                                  $r->actions .= ucfirst(Resource::getAction($actions[$i])->title.', ');
+                 
+             }
+          }
+          $r->title= ucfirst($r->title);    
+        }
 return view ('user.resources.index', ['resources'=>$resources]);
 
     }
@@ -43,7 +56,7 @@ return view ('user.resources.index', ['resources'=>$resources]);
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-        'title' => 'required|unique:access_levels|max:100',
+        'title' => 'required|unique:resources|max:100',
         ]);
 
         $resource= new Resource;

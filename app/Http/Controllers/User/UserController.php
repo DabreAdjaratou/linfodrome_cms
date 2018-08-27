@@ -15,8 +15,18 @@ class UserController extends Controller
      */
     public function index()
     {
-       $users = User::paginate(20);
-       return view ('user.users.index', ['users'=>$users]);
+       $users = User::all();
+       foreach ($users as $u) {
+          $u->data=json_decode($u->data);
+                   if ($u->is_active==1) {
+              $u->is_active='<span class="uk-icon-button uk-margin-small-right" uk-icon="check"></span>';
+          } else {
+            $u->is_active='<span class="uk-icon-button uk-margin-small-right" uk-icon="close"></span>';
+             
+          }
+          $u->name= ucwords($u->name);
+       }
+           return view ('user.users.index', ['users'=>$users]);
     }
 
     /**

@@ -15,7 +15,7 @@
 	</div>
 
 	<div>	
-<label for="parent">Groupe parent</label>
+<label for="parent">{{('Groupe parent:') }}</label>
 <select name="parent">
 <option value="0"> </option>
 	@foreach ($parents as $parent)
@@ -25,8 +25,8 @@
 </select>
 	</div>
 
-<button type="submit">Enregistrer</button>
-<button type="reset">Annuler</button>
+<button type="submit">{{('Enregistrer') }}</button>
+<button type="reset">{{('Annuler') }}</button>
 
 
 </form>

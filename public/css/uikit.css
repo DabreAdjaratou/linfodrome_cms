@@ -4339,6 +4339,9 @@ ul.uk-nav-sub {
 /* Active */
 .uk-pagination > .uk-active > * {
   color: #666;
+  background-color: rgb(15, 110, 205);
+  width: 200%;
+  text-align: center;
 }
 /* Disabled */
 .uk-pagination > .uk-disabled > * {

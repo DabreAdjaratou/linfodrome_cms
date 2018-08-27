@@ -21,15 +21,19 @@ class Group extends Model
      */
     public $timestamps = false;
 
-
-    public function parent()
+/**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'title','parent_id',
+    ]; 
+    
+    public function childrens()
     {
-        return $this->belongsTo('App\Models\User\Group', 'parent_id');
+        return $this->hasMany('App\Models\User\Group', 'parent_id');
     }
-
-
-     public function accessLevels()
-    {
-        return $this->belongsToMany('App\Models\User\AccessLevel');
-    }
+    
+    
 }

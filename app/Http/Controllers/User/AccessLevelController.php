@@ -15,7 +15,23 @@ class AccessLevelController extends Controller
      */
     public function index()
     {
-        $accessLevels = AccessLevel::paginate(20);
+        
+        $accessLevels = AccessLevel::all();  
+        foreach ($accessLevels as $a) {
+          $groups= json_decode($a->groups);
+          $a->groups='';
+          
+          for($i=0; $i < count($groups);$i++){
+             if ($i+1 ==count($groups)) {
+                     $a->groups .=AccessLevel::getGoup($groups[$i])->title;   
+             } else {
+                                  $a->groups .=AccessLevel::getGoup($groups[$i])->title.', ';
+                 
+             }
+          }
+              
+        }
+        
         
 return view ('user.access-levels.index', ['accessLevels'=>$accessLevels]);
     }

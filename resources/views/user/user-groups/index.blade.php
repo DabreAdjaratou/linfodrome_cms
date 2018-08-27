@@ -1,53 +1,72 @@
 @extends('layouts.administrator.master')
-@section('title', 'Group list')
+@section('title', 'Groups list')
 @section('css')
 @endsection
 @section('content')
+@parent
 @section ('pageTitle')<h3>Liste des groupes</h3> @endsection 
-<table class="uk-table uk-table-striped uk-table-small">	
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-divider uk-table-small" style="width:100%">	
 <thead>
 	<tr>
+            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 		<th>Titre</th>
-		<th>id</th>
-
+                <th>id</th>
 	</tr>
-	
-
-</thead>
+	</thead>
 <tbody>
 
 @foreach($groups as $group)
-@isset($group->parent)
-@php
-
-
-@endphp
 <tr>
-		<td>{{ $group->parent['title'] }}</td>
-
-      	<td>{{ $group->parent['id'] }}</td>
-</tr>
+    <td><input type="checkbox" name="" class="uk-checkbox"></td>
+		<td>{{ '-'.$group->title }}</td>
+                <td> {{$group->id }}</td> </tr>
+                    @foreach($group->childrens as $child)
 <tr>
-<td>{{ '------'.$group->title }}</td>
-	
+    <td><input type="checkbox" name="" class="uk-checkbox"></td>
+    <td>{{'--'.ucfirst($child->title)}}</td>
+    <td>{{$child->id}}</td> </tr>
+    @foreach($child->childrens as $child2)
+    <tr>
+        <td><input type="checkbox" name="" class="uk-checkbox"></td>
+    <td>{{'----'.ucfirst($child2->title)}}</td>
+    <td>{{$child2->id}}</td>
+    </tr>
+     @foreach($child2->childrens as $child3)
+    <tr>
+        <td><input type="checkbox" name="" class="uk-checkbox"></td>
+    <td>{{'------'.ucfirst($child3->title)}}</td>
+    <td>{{$child3->id}}</td>
+    </tr>
+     @foreach($child3->childrens as $child4)
+    <tr>
+        <td><input type="checkbox" name="" class="uk-checkbox"></td>
+    <td>{{'--------'.ucfirst($child4->title)}}</td>
+    <td>{{$child4->id}}</td>
+    </tr>
+    @foreach($child4->childrens as $child5)
+    <tr>
+        <td><input type="checkbox" name="" class="uk-checkbox"></td>
+    <td>{{'-----------'.ucfirst($child5->title)}}</td>
+    <td>{{$child5->id}}</td>
+    </tr>
+    @endforeach
+     @endforeach
+     @endforeach
+     @endforeach
+           @endforeach
+   	
 </tr>
-@endisset
-
-
-
-
-
 @endforeach
+
 </tbody>
-
 <tfoot>
-	
-
-
-</tfoot>
+	</tfoot>
 
 </table>
+@section('sidebar')
+ @component('layouts.administrator.user-sidebar') @endcomponent 
+@endsection
 
-{{$groups->links()}}
-
+@section('js')
+@endsection
 @endsection

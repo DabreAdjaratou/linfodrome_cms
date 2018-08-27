@@ -16,7 +16,10 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::paginate(20);
+        $groups = Group::where('parent_id',0)->get();
+        foreach ($groups as $g) {
+            $g->title= ucfirst($g->title);
+        }        
 
 return view ('user.user-groups.index', ['groups'=>$groups]);
     }

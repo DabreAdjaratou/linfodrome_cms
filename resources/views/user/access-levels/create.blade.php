@@ -9,12 +9,12 @@
 <form method="POST" action="{{ route('access-levels.store') }}">
 	@csrf
 	<div>	
-<label for="title">Titre:</label>
+<label for="title">{{('Titre:')}}</label>
 <input type="text" name="title" placeholder="Titre du niveau d'acces" required autofocus>
 	</div>
 <div>	
-<button type="submit">Enregistrer</button>
-<button type="reset">Annuler</button>
+<button type="submit">{{('Enregistrer')}}</button>
+<button type="reset">{{('Annuler')}}</button>
 </div>
 
 

@@ -1,12 +1,14 @@
 @extends('layouts.administrator.master')
-@section('title', 'Action list')
+@section('title', 'Actions list')
 @section('css')
 @endsection
 @section('content')
+@parent
 @section ('pageTitle')<h3>  Liste des actions</h3> @endsection 
-<table>	
+<table id="dataTable" class="uk-table uk-table-striped uk-table-hover uk-table-small">	
 <thead>
 	<tr>
+            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 		<th>Titre</th>
 		<th> Display name</th>
 	<th>id</th>
@@ -21,6 +23,7 @@
 
 
 	<tr>
+            <td><input type="checkbox" name="" class="uk-checkbox"></td>
 		<td>{{ $action->title }}</td>
 		<td>{{ $action->display_name }}</td>
 		<td>{{ $action->id }}</td>
@@ -36,7 +39,12 @@
 </tfoot>
 
 </table>
+@section('sidebar')
+ @component('layouts.administrator.user-sidebar') @endcomponent 
+@endsection
+@section('js')
 
-{{$actions->links()}}
+@endsection
+
 
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User\Action;
 
 class Resource extends Model
 {
@@ -15,9 +16,16 @@ class Resource extends Model
      */
     public $timestamps = false;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'title',
+    ];
 
-    public function actions()
-    {
-        return $this->hasMany('App\Models\User\Action', 'actions');
+    public static function getAction($id) {
+        return Action::find($id);
     }
 }

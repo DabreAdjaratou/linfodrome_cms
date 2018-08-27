@@ -16,7 +16,12 @@ class ActionController extends Controller
      */
     public function index()
     {
-       $actions = Action::paginate(20);
+       $actions = Action::all();
+       foreach ($actions as $a) {
+           $a->title= ucfirst($a->title);
+           $a->display_name= ucfirst($a->display_name);    
+               
+       }
 
        return view ('user.actions.index', ['actions'=>$actions]);
    }
@@ -40,7 +45,7 @@ class ActionController extends Controller
     public function store(Request $request)
     {
        $validatedData = $request->validate([
-        'title' => 'required|unique:access_levels|max:100',
+        'title' => 'required|unique:actions|max:100',
         'display_name'=>'required|max:50',
     ]);
 

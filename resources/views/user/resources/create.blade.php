@@ -1,5 +1,5 @@
 @extends('layouts.administrator.master')
-@section('title', 'Creat a new ressources')
+@section('title', 'Create a new ressource')
 @section('css')
 @endsection
 @section('content')
@@ -9,14 +9,14 @@
 <form method="POST" action="{{ route('resources.store') }}">
 	@csrf
 	<div>	
-<label for="title">Titre:</label>
+<label for="title">{{('Titre:')}}</label>
 <input type="text" name="title" placeholder="Titre de la ressource" required autofocus>
 
 	</div>
 <div>	
 
-<label for="actions">Actions:</label>
-<select name="actions[]" multiple required> 
+<label for="actions">{{('Actions:')}}</label>
+<select name="actions[]" multiple required > 
 @foreach($actions as $action)
 <option value="{{ $action->id }}">{{ $action->title }}</option>
 @endforeach 
@@ -25,8 +25,8 @@
 
 </div>
 
-<button type="submit">Enregistrer</button>
-<button type="reset">Annuler</button>
+<button type="submit">{{('Enregistrer')}}</button>
+<button type="reset">{{('Annuler')}}</button>
 
 
 
