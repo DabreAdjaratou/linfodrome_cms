@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\AccessLevel;
+use App\Models\User\Group;
 
 class AccessLevelController extends Controller
 {
@@ -32,7 +33,7 @@ class AccessLevelController extends Controller
               
         }
         
-        
+       
 return view ('user.access-levels.index', ['accessLevels'=>$accessLevels]);
     }
 
@@ -43,7 +44,8 @@ return view ('user.access-levels.index', ['accessLevels'=>$accessLevels]);
      */
     public function create()
     {
-         return view ('user.access-levels.create');
+        $groups=Group::all();
+         return view ('user.access-levels.create',['groups'=>$groups]);
     }
 
     /**
@@ -62,8 +64,15 @@ return view ('user.access-levels.index', ['accessLevels'=>$accessLevels]);
         $accessLevel = new AccessLevel;
 
         $accessLevel->title = $request->title;
+        $accessLevel->groups= json_encode($request->groups);
 
-        $accessLevel->save();
+         if ($accessLevel->save()) {
+        $request->session()->flash('message.type', 'success');
+        $request->session()->flash('message.content', 'Niveau d\'acces ajouté avec succès!');
+    } else {
+        $request->session()->flash('message.type', 'danger');
+        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+    }
         return redirect()->route('access-levels.index');
     }
 

@@ -20,7 +20,7 @@
                             <input id="email" type="email" name="email" value="{{ old('email') }}" required>
                         </div>
                         <div>
-                            <label for="title">{{ ('Titre') }}</label>
+                            <label for="title">{{ ('Fonction') }}</label>
                             <input id="title" type="text" name="title" value="{{ old('title') }}" >
                         </div>
                          <div>

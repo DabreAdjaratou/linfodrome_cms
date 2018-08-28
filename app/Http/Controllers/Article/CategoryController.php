@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Article;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Article\Category;
 
 class CategoryController extends Controller
 {
@@ -14,7 +15,11 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories=Category::all();
+        foreach($categories as $c){
+$c->title=ucfirst($c->title);
+        }
+        return view('article.categories.index',['categories'=>$categories]);
     }
 
     /**

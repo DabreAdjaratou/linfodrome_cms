@@ -5,15 +5,14 @@
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  Liste des niveaux d'accès</h3> @endsection 
+<h3>  {{{ ('Liste des niveaux d\'accès') }}}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small">	
 	<thead>
             <tr>
-                <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-			<th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-			<th>Titre</th>
-			<th>groupes utilisateurs</th>
-			<th>id</th>
+            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
+			<th>{{ ('Titre') }}</th>
+			<th>{{ ('Groupes utilisateurs') }}</th>
+			<th>{{ ('Id') }}</th>
                        
 		</tr>
 	</thead>

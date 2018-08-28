@@ -1,11 +1,11 @@
 @extends('layouts.administrator.master')
-@section('title', 'Articles sources')
+@section('title', 'Articles categories')
 @section('css')
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  {{ ('Liste des sources d\'articles') }}</h3> @endsection 
+<h3>  {{ ('Liste des categories d\'articles') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small">	
 	<thead>
             <tr>
@@ -16,11 +16,11 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach($sources as $source)
+		@foreach($categories as $category)
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> {{ $source->title }}</td>
-			<td>{{ $source->id }}</td>
+			<td> {{ $category->title }}</td>
+			<td>{{ $category->id }}</td>
                 </tr>
 		@endforeach
 	</tbody>

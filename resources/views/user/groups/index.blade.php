@@ -4,13 +4,13 @@
 @endsection
 @section('content')
 @parent
-@section ('pageTitle')<h3>Liste des groupes</h3> @endsection 
+@section ('pageTitle')<h3>{{ ('Liste des groupes') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-divider uk-table-small" style="width:100%">	
 <thead>
 	<tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-		<th>Titre</th>
-                <th>id</th>
+		<th>{{ ('Titre') }}</th>
+                <th>{{ ('id') }}</th>
 	</tr>
 	</thead>
 <tbody>

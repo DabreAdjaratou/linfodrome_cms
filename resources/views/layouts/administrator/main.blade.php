@@ -4,9 +4,15 @@
     <div class="">  {{-- alerte --}}
         <ul>
             @foreach ($errors->all() as $error)
-            <li class="uk-alert uk-alert-danger">{{ $error }}</li>
+            <li class="uk-alert uk-alert-danger">{{ __($error) }}</li>
             @endforeach
         </ul>
+    </div>
+@endif
+
+@if(session()->has('message.content'))
+    <div class="uk-alert uk-alert-{{ session('message.type') }}"> 
+    {!! session('message.content') !!}
     </div>
 @endif
 <div class="uk-grid uk-margin-top">

@@ -11,6 +11,7 @@
 |
 */
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -19,12 +20,15 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+//redirections
+// Route::redirect('users/create', 'register', 301);
+
 // Route to Article
 Route::resource('article-archives','Article\ArchiveController');
 Route::resource('articles','Article\ArticleController');
 Route::resource('article-categories','Article\CategoryController');
 Route::resource('article-revisions','Article\RevisionController');
-Route::resource('sources','Article\SourceController');
+Route::resource('article-sources','Article\SourceController');
 
 
 // Route to Billet

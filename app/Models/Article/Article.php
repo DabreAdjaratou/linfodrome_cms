@@ -13,4 +13,14 @@ class Article extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    public function getCategory()
+    {
+        return $this->belongsTo('App\Models\Article\Category','category_id');
+    }
+
+public function getAuteur()
+    {
+        return $this->belongsTo('App\Models\User\User','created_by');
+    }
 }

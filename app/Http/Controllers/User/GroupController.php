@@ -21,7 +21,7 @@ class GroupController extends Controller
             $g->title= ucfirst($g->title);
         }        
 
-return view ('user.user-groups.index', ['groups'=>$groups]);
+return view ('user.groups.index', ['groups'=>$groups]);
     }
 
     /**
@@ -32,7 +32,7 @@ return view ('user.user-groups.index', ['groups'=>$groups]);
     public function create()
     {
         $parents = Group::all();
-     return view ('user.user-groups.create',['parents'=>$parents]);
+     return view ('user.groups.create',['parents'=>$parents]);
     }
 
     /**
@@ -50,7 +50,13 @@ return view ('user.user-groups.index', ['groups'=>$groups]);
         $group = new Group;
         $group->title = $request->title;
         $group->parent_id = $request->parent;
-        $group->save();
+        if ($group->save()) {
+        $request->session()->flash('message.type', 'success');
+        $request->session()->flash('message.content', 'Groupe ajouté avec succès!');
+    } else {
+        $request->session()->flash('message.type', 'danger');
+        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+    }
         return redirect()->route('user-groups.index');
     }
 

@@ -9,16 +9,22 @@
 <form method="POST" action="{{ route('access-levels.store') }}">
 	@csrf
 	<div>	
-<label for="title">{{('Titre:')}}</label>
-<input type="text" name="title" placeholder="Titre du niveau d'acces" required autofocus>
+		<label for="title">{{('Titre:')}}</label>
+		<input type="text" name="title" placeholder="Titre du niveau d'acces" required autofocus>
 	</div>
-<div>	
-<button type="submit">{{('Enregistrer')}}</button>
-<button type="reset">{{('Annuler')}}</button>
-</div>
+	<div>	
+		<label for="groups">{{('Groupes:')}}</label>
+		<select name="groups[]" multiple required > 
+			@foreach($groups as $group)
+			<option value="{{ $group->id }}">{{ $group->title }}</option>
+			@endforeach
+		</select>
+		</div>
+		<div>	
+			<button type="submit">{{('Enregistrer')}}</button>
+			<button type="reset">{{('Annuler')}}</button>
+		</div>
 
+	</form>
 
-
-</form>
-
-@endsection
+	@endsection

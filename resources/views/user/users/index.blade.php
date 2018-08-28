@@ -4,19 +4,19 @@
 @endsection
 @section('content')
 @parent
-@section ('pageTitle')<h3>Liste des utilisateurs</h3> @endsection 
+@section ('pageTitle')<h3>{{ ('Liste des utilisateurs') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-striped uk-table-small">	
 <thead>
 	<tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-		<th>Nom</th>
-		<th>Email</th>
-		<th>titre </th>
-		<th>Facebook</th>
-                <th>Google</th>
-                <th>twitter</th>
-                <th>Actif</th>
-                <th>id</th>
+		<th>{{ ('Nom') }}</th>
+		<th>{{ ('Email') }}</th>
+		<th>{{ ('titre') }} </th>
+		<th>{{ ('Facebook') }}</th>
+                <th>{{ ('Google') }}</th>
+                <th>{{ ('twitter') }}</th>
+                <th>{{ ('Actif') }}</th>
+                <th>{{ ('id') }}</th>
 
 	</tr>
 	
@@ -30,7 +30,7 @@
     <td>{{ $user->name}}
         
         @if($user->require_reset==0)
-        <div class="uk-text-smal uk-alert-danger">reinitialisation du mot de passe requis</div>
+        <div class="uk-text-smal uk-alert-danger">{{ ('reinitialisation du mot de passe requis') }}</div>
 @endif
     </td>
       	<td>{{ $user->email}}</td>

@@ -63,9 +63,15 @@ return view ('user.resources.index', ['resources'=>$resources]);
 
         $resource->title = $request->title;
        
-        $resource->Actions =json_encode($request->actions);
+        $resource->actions =json_encode($request->actions);
 
-        $resource->save();
+        if ($resource->save()) {
+        $request->session()->flash('message.type', 'success');
+        $request->session()->flash('message.content', 'Resource ajouté avec succès!');
+    } else {
+        $request->session()->flash('message.type', 'danger');
+        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+    }
         return redirect()->route('resources.index');
     }
 

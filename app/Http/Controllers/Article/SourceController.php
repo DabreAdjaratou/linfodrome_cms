@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Article;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Article\Source;
 
 class SourceController extends Controller
 {
@@ -14,7 +15,11 @@ class SourceController extends Controller
      */
     public function index()
     {
-        //
+        $sources=Source::all();
+        foreach ($sources as $s) {
+            $s->title=ucfirst($s->title);
+        }
+        return view ('article.sources.index',['sources'=>$sources]);
     }
 
     /**

@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-       $users = User::all();
+       $users = User::all('id','name','email','is_active','require_reset','data');
        foreach ($users as $u) {
           $u->data=json_decode($u->data);
                    if ($u->is_active==1) {
