@@ -29,7 +29,7 @@ class SourceController extends Controller
      */
     public function create()
     {
-        //
+        return view('article.sources.create');
     }
 
     /**
@@ -40,7 +40,22 @@ class SourceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        $validatedData = $request->validate([
+        'title' => 'required|unique:sources|max:100',
+        ]);
+
+       $source= new Source;
+       $source->title = $request->title;
+       if ($source->save()) {
+        $request->session()->flash('message.type', 'success');
+        $request->session()->flash('message.content', 'Source ajouté avec succès!');
+    } else {
+        $request->session()->flash('message.type', 'danger');
+        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+    }
+       
+       return redirect()->route('article-sources.index');
     }
 
     /**

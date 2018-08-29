@@ -6,7 +6,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des articles') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-hover  uk-table-striped uk-table-small responsive" >	
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify responsive" >	
 	<thead>
             <tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
@@ -25,16 +25,16 @@
 	</thead>
 	<tbody>
 		@foreach($articles as $article)
-		<tr >
-			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> {{ $article->title }}</td>
-			<td> {{ ($article->featured)}}</td>
-			<td> {{ $article->published }}</td>
-			<td class="uk-text-nowrap"> {{ $article->getCategory->title }}</td>
-			<td class="uk-text-nowrap"> {{ $article->getAuteur->name }}</td>
-			<td class="uk-text-nowrap"> </td>
-			<td class="uk-text-nowrap"> {{ $article->created_at }}</td>
-			<td class="uk-text-nowrap"> </td>
+		<tr class="uk-text-small">
+			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
+			<td class="uk-table-expand"> {{ $article->title }}</td>
+			<td> {!! ($article->featured)!!}</td>
+			<td> {!!$article->published !!}</td>
+			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
+			<td class="uk-table-expand"> {{ $article->getAutor->name }}</td>
+			<td class="uk-table-expand"> </td>
+			<td class="uk-table-expand"> {{ $article->created_at }}</td>
+			<td class="uk-table-expand"> </td>
 			<td> {{ $article->wiews }}</td>
 			<td> {{ $article->image }}</td>
 			<td>{{ $article->id }}</td>

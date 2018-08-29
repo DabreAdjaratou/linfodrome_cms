@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Billet;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
+use App\Models\Billet\Category;
 class categoryController extends Controller
 {
     /**
@@ -14,7 +14,8 @@ class categoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories=Category::all();
+        return view('billet.categories.index',['categories'=>$categories]);
     }
 
     /**
@@ -24,7 +25,7 @@ class categoryController extends Controller
      */
     public function create()
     {
-        //
+    return view('billet.categories.create');
     }
 
     /**
@@ -35,7 +36,21 @@ class categoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+        'title' => 'required|unique:billet_categories|max:100',
+        ]);
+
+       $categorie= new Category;
+       $categorie->title = $request->title;
+       if ($categorie->save()) {
+        $request->session()->flash('message.type', 'success');
+        $request->session()->flash('message.content', 'Categorie ajouté avec succès!');
+    } else {
+        $request->session()->flash('message.type', 'danger');
+        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+    }
+       
+       return redirect()->route('billet-categories.index');
     }
 
     /**

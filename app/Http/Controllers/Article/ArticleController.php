@@ -15,9 +15,39 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::all('id','title','category_id','published','featured','source_id','created_by','created_at','image','views');
-        return view('article.articles.index',['articles'=>$articles]);
+        // $articles = Article::all('id','title','category_id','published','featured','source_id','created_by','created_at','image','views');
+
+        $articles = Article::with('getRevision','getAutor:id,name')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        foreach ($articles as $a) {
+         if ($a->published==1) {
+          $a->published=' <span class="uk-border-circle uk-text-success uk-text-bold uk-margin-small-left icon-container">✔</span>';
+      } else {
+        $a->published='<span class="uk-border-circle uk-text-danger uk-text-bold uk-margin-small-left icon-container">✖</span>';
+
     }
+
+    if ($a->featured==1) {
+          $a->featured=' <span class="uk-border-circle uk-text-success uk-text-bold uk-margin-small-left icon-container">✔</span>';
+      } else {
+        $a->featured='<span class="uk-border-circle uk-text-danger uk-text-bold uk-margin-small-left icon-container">✖</span>';
+        
+    }
+}
+
+  //       foreach ($articles as $a) {
+
+  //      for ($i=0; $i <count($a->getRevision) ; $i++) { 
+  //       if($i==count($a->getRevision)-1){
+  //           $revised_at=$a->getRevision[$i]->revised_at;
+  //           echo $revised_at;
+  //       }
+  // $articles=('revised_at', $revised_at);           
+  //             } 
+  //         }
+
+// print_r($articles);
+return view('article.articles.index',['articles'=>$articles]);
+}
 
     /**
      * Show the form for creating a new resource.
@@ -26,7 +56,7 @@ class ArticleController extends Controller
      */
     public function create()
     {
-        //
+        return ('article.articles.create');
     }
 
     /**

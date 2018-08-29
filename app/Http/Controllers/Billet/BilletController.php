@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Billet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+
 class BilletController extends Controller
 {
     /**
@@ -14,7 +15,7 @@ class BilletController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**

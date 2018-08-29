@@ -60,8 +60,8 @@
                            <div>
                             <label for="require_reset">{{('Changer le mot de passe a la prochaine connexion') }}</label>
                             <select name="require_reset">
-                                <option value="{{ 1 }}">{{ ('Oui') }}</option>
-                                <option value="{{ 0 }}">{{ ('Non') }}</option>
+                                <option value="{{ 0 }}">{{ ('Oui') }}</option>
+                                <option value="{{ 1 }}">{{ ('Non') }}</option>
                             </select>
                         </div>
 

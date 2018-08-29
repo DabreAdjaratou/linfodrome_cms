@@ -30,7 +30,7 @@ class Group extends Model
         'title','parent_id',
     ]; 
     
-    public function childrens()
+    public function getChildrens()
     {
         return $this->hasMany('App\Models\User\Group', 'parent_id');
     }

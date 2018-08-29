@@ -20,30 +20,30 @@
     <td><input type="checkbox" name="" class="uk-checkbox"></td>
 		<td>{{ '-'.$group->title }}</td>
                 <td> {{$group->id }}</td> </tr>
-                    @foreach($group->childrens as $child)
+                    @foreach($group->getChildrens as $child)
 <tr>
     <td><input type="checkbox" name="" class="uk-checkbox"></td>
     <td>{{'--'.ucfirst($child->title)}}</td>
     <td>{{$child->id}}</td> </tr>
-    @foreach($child->childrens as $child2)
+    @foreach($child->getChildrens as $child2)
     <tr>
         <td><input type="checkbox" name="" class="uk-checkbox"></td>
     <td>{{'----'.ucfirst($child2->title)}}</td>
     <td>{{$child2->id}}</td>
     </tr>
-     @foreach($child2->childrens as $child3)
+     @foreach($child2->getChildrens as $child3)
     <tr>
         <td><input type="checkbox" name="" class="uk-checkbox"></td>
     <td>{{'------'.ucfirst($child3->title)}}</td>
     <td>{{$child3->id}}</td>
     </tr>
-     @foreach($child3->childrens as $child4)
+     @foreach($child3->getChildrens as $child4)
     <tr>
         <td><input type="checkbox" name="" class="uk-checkbox"></td>
     <td>{{'--------'.ucfirst($child4->title)}}</td>
     <td>{{$child4->id}}</td>
     </tr>
-    @foreach($child4->childrens as $child5)
+    @foreach($child4->getChildrens as $child5)
     <tr>
         <td><input type="checkbox" name="" class="uk-checkbox"></td>
     <td>{{'-----------'.ucfirst($child5->title)}}</td>

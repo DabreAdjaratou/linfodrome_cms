@@ -19,4 +19,13 @@ class Revision extends Model
      * @var bool
      */
     public $timestamps = false;
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'type','user_id','article_id','revised_at',
+    ];
+
 }

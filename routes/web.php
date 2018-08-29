@@ -21,7 +21,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 //redirections
-// Route::redirect('users/create', 'register', 301);
+// Route::redirect('/home', 'register', 301);
 
 // Route to Article
 Route::resource('article-archives','Article\ArchiveController');
