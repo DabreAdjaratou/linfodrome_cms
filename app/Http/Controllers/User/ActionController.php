@@ -17,12 +17,6 @@ class ActionController extends Controller
     public function index()
     {
        $actions = Action::all();
-       foreach ($actions as $a) {
-           $a->title= ucfirst($a->title);
-           $a->display_name= ucfirst($a->display_name);    
-               
-       }
-
        return view ('user.actions.index', ['actions'=>$actions]);
    }
 
@@ -59,8 +53,13 @@ class ActionController extends Controller
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
-       
-       return redirect()->route('actions.index');
+       if ($request->save_close) {
+           return redirect()->route('actions.index');
+       }else{
+        return redirect()->route('actions.create');
+
+    }
+    
    }
 
     /**

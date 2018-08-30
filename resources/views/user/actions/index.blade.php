@@ -24,8 +24,8 @@
 
 	<tr>
             <td><input type="checkbox" name="" class="uk-checkbox"></td>
-		<td>{{ $action->title }}</td>
-		<td>{{ $action->display_name }}</td>
+		<td>{{ ucfirst($action->title) }}</td>
+		<td>{{ ucfirst($action->display_name )}}</td>
 		<td>{{ $action->id }}</td>
 
 	</tr>

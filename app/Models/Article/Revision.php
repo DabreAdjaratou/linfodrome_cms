@@ -28,4 +28,10 @@ class Revision extends Model
         'type','user_id','article_id','revised_at',
     ];
 
+    public function getModifier()
+    {
+       return $this->belongsTo('App\Models\User\User','user_id');
+    }
+
+
 }

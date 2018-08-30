@@ -24,9 +24,9 @@ class AccessLevelController extends Controller
           
           for($i=0; $i < count($groups);$i++){
              if ($i+1 ==count($groups)) {
-                     $a->groups .=AccessLevel::getGoup($groups[$i])->title;   
+                     $a->groups .=ucfirst(AccessLevel::getGoup($groups[$i])->title);   
              } else {
-                                  $a->groups .=AccessLevel::getGoup($groups[$i])->title.', ';
+                                  $a->groups .=ucfirst(AccessLevel::getGoup($groups[$i])->title.', ');
                  
              }
           }
@@ -73,8 +73,13 @@ return view ('user.access-levels.index', ['accessLevels'=>$accessLevels]);
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
-        return redirect()->route('access-levels.index');
+    if ($request->save_close) {
+           return redirect()->route('access-levels.index');
+       }else{
+        return redirect()->route('access-levels.create');
+
     }
+        }
 
     /**
      * Display the specified resource.

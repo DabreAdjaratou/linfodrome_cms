@@ -19,7 +19,7 @@
 		@foreach($sources as $source)
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> {{ $source->title }}</td>
+			<td> {{ucfirst($source->title) }}</td>
 			<td>{{ $source->id }}</td>
                 </tr>
 		@endforeach

@@ -51,7 +51,12 @@ class CategoryController extends Controller
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
        
-       return redirect()->route('video-categories.index');
+        if ($request->save_close) {
+           return redirect()->route('video-categories.index');
+       }else{
+        return redirect()->route('video-categories.create');
+
+    }
     }
 
     /**

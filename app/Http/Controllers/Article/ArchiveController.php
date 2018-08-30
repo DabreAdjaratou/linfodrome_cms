@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Article;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
+use App\Models\Article\Archive;
 class ArchiveController extends Controller
 {
     /**
@@ -14,7 +14,25 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-        //
+        $articles = Archive::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      
+        foreach ($articles as $a) {
+              if ($a->published==1) {
+              $a->published=' <span class="uk-border-circle uk-text-success uk-text-bold uk-margin-small-left icon-container">✔</span>';
+          } else {
+            $a->published='<span class="uk-border-circle uk-text-danger uk-text-bold uk-margin-small-left icon-container">✖</span>';
+
+        } 
+
+        if ($a->featured==1) {
+          $a->featured=' <span class="uk-border-circle uk-text-success uk-text-bold uk-margin-small-left icon-container">✔</span>';
+      } else {
+        $a->featured='<span class="uk-border-circle uk-text-danger uk-text-bold uk-margin-small-left icon-container">✖</span>';
+        
+    }
+}
+
+return view('article.archives.index',['articles'=>$articles]);
     }
 
     /**

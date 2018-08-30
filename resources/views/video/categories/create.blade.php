@@ -8,17 +8,17 @@
 
 <form method="POST" action="{{ route('video-categories.store') }}">
 	@csrf
+	<div>
+		
+		<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
+		<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
+		<button type="reset">{{('Annuler')}}</button>
+	</div>
 	<div>	
 <label for="title">{{('Titre:')}}</label>
 <input type="text" name="title" placeholder="Titre de la Categorie" required autofocus>
 
 	</div>
-
-
-<button type="submit">{{('Enregistrer')}}</button>
-<button type="reset">{{('Annuler')}}</button>
-
-
 
 </form>
 

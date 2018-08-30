@@ -16,9 +16,6 @@ class CategoryController extends Controller
     public function index()
     {
         $categories=Category::all();
-        foreach($categories as $c){
-$c->title=ucfirst($c->title);
-        }
         return view('article.categories.index',['categories'=>$categories]);
     }
 
@@ -29,7 +26,7 @@ $c->title=ucfirst($c->title);
      */
     public function create()
     {
-    return view('article.categories.create');
+        return view('article.categories.create');
     }
 
     /**
@@ -41,21 +38,29 @@ $c->title=ucfirst($c->title);
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-        'title' => 'required|unique:article_categories|max:100',
+            'title' => 'required|unique:article_categories|max:100',
         ]);
 
-       $categorie= new Category;
-       $categorie->title = $request->title;
-       if ($categorie->save()) {
-        $request->session()->flash('message.type', 'success');
-        $request->session()->flash('message.content', 'Categorie ajouté avec succès!');
-    } else {
-        $request->session()->flash('message.type', 'danger');
-        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        $categorie= new Category;
+
+        $categorie->title = $request->title;
+        if ($categorie->save()) {
+            $request->session()->flash('message.type', 'success');
+            $request->session()->flash('message.content', 'Categorie ajouté avec succès!');
+        } else {
+            $request->session()->flash('message.type', 'danger');
+            $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        }
+
+        if ($request->save_close) {
+           return redirect()->route('article-categories.index');
+       }else{
+        return redirect()->route('article-categories.create');
+
     }
-       
-       return redirect()->route('article-categories.index');
-    }
+    
+    
+}
 
     /**
      * Display the specified resource.

@@ -17,20 +17,20 @@ class GroupController extends Controller
     public function index()
     {
         $groups = Group::with('getChildrens')->where('parent_id',0)->get();
-        foreach ($groups as $g) {
-            $g->title= ucfirst($g->title);
-          foreach ($g->getChildrens as $g2) {
+        // foreach ($groups as $g) {
+        //     $g->title= ucfirst($g->title);
+        //   foreach ($g->getChildrens as $g2) {
              
-              foreach ($g2->getChildrens as $g3) {
-                 echo $g3;
-          }
+        //       foreach ($g2->getChildrens as $g3) {
+        //          echo $g3;
+        //   }
 
         
-        }
-        }   
-        echo'<pre>';     
+        // }
+        // }   
+        // echo'<pre>';     
 
-        echo'</pre>';     
+        // echo'</pre>';     
 return view ('user.groups.index', ['groups'=>$groups]);
     }
 
@@ -67,7 +67,13 @@ return view ('user.groups.index', ['groups'=>$groups]);
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
-        return redirect()->route('user-groups.index');
+       if ($request->save_close) {
+           return redirect()->route('user-groups.index');
+       }else{
+        return redirect()->route('user-groups.create');
+
+    }
+    
     }
 
     /**

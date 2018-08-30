@@ -49,9 +49,14 @@ class categoryController extends Controller
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
-       
-       return redirect()->route('billet-categories.index');
+       if ($request->save_close) {
+           return redirect()->route('billet-categories.index');
+       }else{
+        return redirect()->route('billet-categories.create');
+
     }
+    
+       }
 
     /**
      * Display the specified resource.

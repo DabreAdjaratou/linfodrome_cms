@@ -72,7 +72,13 @@ return view ('user.resources.index', ['resources'=>$resources]);
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
-        return redirect()->route('resources.index');
+    if ($request->save_close) {
+           return redirect()->route('resources.index');
+       }else{
+        return redirect()->route('resources.create');
+
+    }
+     return redirect()->route('resources.index');
     }
 
     /**

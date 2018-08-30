@@ -32,7 +32,7 @@ class CreateArticlesTable extends Migration
             $table->unsignedInteger('created_by')->nullable(false)->comment('# foreign key users');
             $table->datetime('created_at')->nullable(false);
             $table->datetime('start_publication_at')->nullable(true);
-            $table->datetime('stop_publication_at datetime')->nullable(true);
+            $table->datetime('stop_publication_at')->nullable(true);
             $table->unsignedInteger('checkout')->default(0)->comment('contains the id of user that is updating');
             $table->unsignedBigInteger('views')->default(0);
         });

@@ -16,9 +16,6 @@ class SourceController extends Controller
     public function index()
     {
         $sources=Source::all();
-        foreach ($sources as $s) {
-            $s->title=ucfirst($s->title);
-        }
         return view ('article.sources.index',['sources'=>$sources]);
     }
 
@@ -54,9 +51,14 @@ class SourceController extends Controller
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
-       
-       return redirect()->route('article-sources.index');
+       if ($request->save_close) {
+           return redirect()->route('article-sources.index');
+       }else{
+        return redirect()->route('article-sources.create');
+
     }
+    
+     }
 
     /**
      * Display the specified resource.

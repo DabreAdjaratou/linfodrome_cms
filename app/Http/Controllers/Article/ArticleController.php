@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Article;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Article\Article;
+use App\Models\Article\Source;
+use App\Models\User\User;
+use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
@@ -15,38 +18,8 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        // $articles = Article::all('id','title','category_id','published','featured','source_id','created_by','created_at','image','views');
-
-        $articles = Article::with('getRevision','getAutor:id,name')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        foreach ($articles as $a) {
-         if ($a->published==1) {
-          $a->published=' <span class="uk-border-circle uk-text-success uk-text-bold uk-margin-small-left icon-container">✔</span>';
-      } else {
-        $a->published='<span class="uk-border-circle uk-text-danger uk-text-bold uk-margin-small-left icon-container">✖</span>';
-
-    }
-
-    if ($a->featured==1) {
-          $a->featured=' <span class="uk-border-circle uk-text-success uk-text-bold uk-margin-small-left icon-container">✔</span>';
-      } else {
-        $a->featured='<span class="uk-border-circle uk-text-danger uk-text-bold uk-margin-small-left icon-container">✖</span>';
         
-    }
-}
-
-  //       foreach ($articles as $a) {
-
-  //      for ($i=0; $i <count($a->getRevision) ; $i++) { 
-  //       if($i==count($a->getRevision)-1){
-  //           $revised_at=$a->getRevision[$i]->revised_at;
-  //           echo $revised_at;
-  //       }
-  // $articles=('revised_at', $revised_at);           
-  //             } 
-  //         }
-
-// print_r($articles);
-return view('article.articles.index',['articles'=>$articles]);
+        
 }
 
     /**
@@ -55,8 +28,14 @@ return view('article.articles.index',['articles'=>$articles]);
      * @return \Illuminate\Http\Response
      */
     public function create()
+
     {
-        return ('article.articles.create');
+        
+        $sources=Source::all();
+        $users=user::all('id','name');
+        $auth_username = Auth::user()->name;
+        return view('article.articles.create',['sources'=>$sources,'auth_username'=>$auth_username, 'users'=>$users]);
+
     }
 
     /**
@@ -67,7 +46,62 @@ return view('article.articles.index',['articles'=>$articles]);
      */
     public function store(Request $request)
     {
-        //
+       $validatedData = $request->validate([
+        'ontitle'=>'nullable|string',
+        'title' => 'required|string',
+        'published'=>'nullable',
+        'featured'=>'nullable',
+        'image'=>'required|image',
+        'image_legend'=>'nullable|string',
+        'video'=>'nullable|string',
+        'gallery_photo'=>'nullable',
+        'intro_text'=>'nullable|string',
+        'full_text'=>'required|string',
+        'source'=>'required|int',
+        'created_by'=>'required|int',
+        'start_publication_at'=>'nullable|string',
+        'stop_publication_at'=>'nullable|int',
+
+    ]);
+
+       $article= new article;
+       $article->ontitle = $request->ontitle;
+       $article->title =$request->title;
+       if(isset($request->published)){
+        $article->published = 1;
+       }else{
+
+        $article->published = 0;
+       }
+
+       if (isset($request->featured)) {
+          $article->featured =1;
+       }else {
+           $article->featured =0;
+       }
+       $article->image = $request->image;
+       $article->image_legend =$request->image_legend;
+       $article->video = $request->video;
+       $article->gallery_photo =$request->gallery_photo;
+       $article->intro_text = $request->intro_text;
+       $article->full_text =$request->full_text;
+       $article->source = $request->source;
+       $article->created_by =$request->created_by;
+       $article->start_publication_at = $request->start_publication_at;
+       $article->stop_publication_at =$request->stop_publication_at;
+              if ($article->save()) {
+        $request->session()->flash('message.type', 'success');
+        $request->session()->flash('message.content', 'Article ajouté avec succès!');
+    } else {
+        $request->session()->flash('message.type', 'danger');
+        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+    }
+       if ($request->save_close) {
+           return redirect()->route('articles.index');
+       }else{
+        return redirect()->route('articles.create');
+
+    }
     }
 
     /**

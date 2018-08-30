@@ -20,7 +20,7 @@
 		@foreach($accessLevels as $access)
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> <a href="">{{ $access->title }}</a></td>
+			<td> <a href="">{{ ucfirst($access->title) }}</a></td>
 			<td>{{ $access->groups }}</td>
 			<td>{{ $access->id }}</td>
                 </tr>

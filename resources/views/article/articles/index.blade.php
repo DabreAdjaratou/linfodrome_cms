@@ -32,10 +32,10 @@
 			<td> {!!$article->published !!}</td>
 			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
 			<td class="uk-table-expand"> {{ $article->getAutor->name }}</td>
-			<td class="uk-table-expand"> </td>
+			<td class="uk-table-expand">{{$article->getRevision->last()['getModifier']['name']}} </td>
 			<td class="uk-table-expand"> {{ $article->created_at }}</td>
-			<td class="uk-table-expand"> </td>
-			<td> {{ $article->wiews }}</td>
+			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
+			<td> {{ $article->views }}</td>
 			<td> {{ $article->image }}</td>
 			<td>{{ $article->id }}</td>
                 </tr>

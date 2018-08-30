@@ -19,7 +19,7 @@
 		@foreach($categories as $category)
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> {{ $category->title }}</td>
+			<td> {{ ucfirst($category->title) }}</td>
 			<td>{{ $category->id }}</td>
                 </tr>
 		@endforeach
