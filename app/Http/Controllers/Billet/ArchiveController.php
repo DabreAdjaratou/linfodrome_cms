@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Billet;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Billet\Archive;
 
 class ArchiveController extends Controller
 {
@@ -14,7 +15,10 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-        //
+
+        $billets = Archive::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+   
+   return view('billet.archives.index',['billets'=>$billets]);
     }
 
     /**

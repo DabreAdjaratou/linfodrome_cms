@@ -19,4 +19,11 @@ class Revision extends Model
      * @var bool
      */
     public $timestamps = false;
+
+
+     public function getModifier()
+    {
+       return $this->belongsTo('App\Models\User\User','user_id');
+    }
+
 }

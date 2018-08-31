@@ -14,25 +14,24 @@ class CreateBilletArchivesTable extends Migration
     public function up()
     {
         Schema::create('billet_archives', function (Blueprint $table) {
-             $table->unsignedInteger('id')->nullable(false);
-            $table->string('ontitle',255);
+            $table->unsignedInteger('id')->nullable(false);
+            $table->string('ontitle',255)->nullable(true);
             $table->string('title',255)->nullable(false);
             $table->string('alias',255)->nullable(false);
             $table->unsignedInteger('category_id')->nullable(false);
             $table->unsignedTinyInteger('published')->nullable(false)->default(0)->comment('0 : not published, 1 : published, 2 : draft , 3: trash');
             $table->unsignedTinyInteger('featured')->nullable(false)->default(0)->comment('0: not featured, 1:featured');
-            $table->string('image',255);
-            $table->string('image_legend',255);
-            $table->mediumtext('video');
-            $table->json('gallery_photo');
+            $table->string('image',255)->nullable(true);
+            $table->string('image_legend',255)->nullable(true);
+            $table->mediumtext('video')->nullable(true);
             $table->mediumtext('introtext')->nullable(false);
             $table->mediumtext('fulltext')->nullable(false);
-            $table->unsignedTinyInteger('source_id')->nullable(false);
-            $table->Text('keywords')->comment('list of keywords');
+            $table->unsignedTinyInteger('source_id')->nullable(true);
+            $table->Text('keywords')->nullable(true)->comment('list of keywords');
             $table->unsignedInteger('created_by')->nullable(false)->comment('# foreign key users');
             $table->datetime('created_at')->nullable(false);
-            $table->datetime('start_publication_at');
-            $table->datetime('stop_publication_at datetime');
+            $table->datetime('start_publication_at')->nullable(true);
+            $table->datetime('stop_publication_at')->nullable(true);
             $table->unsignedInteger('checkout')->default(0)->comment('contains the id of user that is updating');
             $table->unsignedBigInteger('views')->default(0);
         });

@@ -27,7 +27,7 @@ class CreateArticlesTable extends Migration
             $table->json('gallery_photo')->nullable(true);
             $table->mediumtext('introtext')->nullable(false);
             $table->mediumtext('fulltext')->nullable(false);
-            $table->unsignedTinyInteger('source_id')->nullable(false);
+            $table->unsignedTinyInteger('source_id')->nullable(true);
             $table->Text('keywords')->nullable(true)->comment('list of keywords');
             $table->unsignedInteger('created_by')->nullable(false)->comment('# foreign key users');
             $table->datetime('created_at')->nullable(false);

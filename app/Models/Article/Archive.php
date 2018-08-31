@@ -48,7 +48,7 @@ class Archive extends Model
 
     public function getRevision()
     {
-       return $this->hasMany('App\Models\Article\Revision');
+       return $this->hasMany('App\Models\Article\Revision','article_id');
     }
 
 

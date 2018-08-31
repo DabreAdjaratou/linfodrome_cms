@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Video;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Video\Archive;
 
 class ArchiveController extends Controller
 {
@@ -14,7 +15,11 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-        //
+       $videos = Archive::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','created_at','start_publication_at','stop_publication_at','views']);
+      
+
+        $videos=Archive::all();
+        return view ('video.archives.index', ['videos'=>$videos]);
     }
 
     /**

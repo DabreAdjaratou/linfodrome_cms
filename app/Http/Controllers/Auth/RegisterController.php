@@ -67,12 +67,13 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'is_active' => $data['is_active'],
-            'image' => $data['image'],
+            'image' => $data['image'] ?? NULL,
             'require_reset' => $data['require_reset'],
             'data' =>'{"title":"'.$data['title'].'","google":"'.$data['google-address'].'","twitter":"'.$data['twitter-address'].'","facebook":"'.$data['facebook-address'].'"}' ,
         ]);
