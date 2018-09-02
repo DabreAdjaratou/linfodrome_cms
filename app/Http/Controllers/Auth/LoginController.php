@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User\User;
 
 class LoginController extends Controller
 {
@@ -25,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/administrator';
 
     /**
      * Create a new controller instance.
@@ -36,4 +38,11 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+    
+    protected function redirectTo()
+{
+        if (Auth::user()->require_reset==0) {
+    return '/article-revisions';
+  } 
+}
 }

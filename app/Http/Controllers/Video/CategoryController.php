@@ -8,6 +8,13 @@ use App\Models\Video\Category;
 
 class CategoryController extends Controller
 {
+     /**
+     * Protecting routes
+     */
+    public function __construct()
+{
+    $this->middleware('auth');
+}
     /**
      * Display a listing of the resource.
      *

@@ -7,6 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Article\Archive;
 class ArchiveController extends Controller
 {
+    
+    /**
+     * Protecting routes
+     */
+    public function __construct()
+{
+    $this->middleware('auth');
+}
     /**
      * Display a listing of the resource.
      *

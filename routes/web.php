@@ -15,10 +15,18 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/home', 'HomeController@index')->name('home');
 
+//authentication's route
+Route::get('/password/require-reset', function () {
+    return view('auth/passwords/require-reset');
+})->name('password.require-reset')->middleware('auth');
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Route to administrator
+Route::get('/administrator', function () {
+    return view('layouts/administrator/admin-panel');
+})->name('administrator')->middleware('auth');
 
 //redirections
 // Route::redirect('/home', 'register', 301);

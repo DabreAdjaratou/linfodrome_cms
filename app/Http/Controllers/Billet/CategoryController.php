@@ -7,6 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Billet\Category;
 class CategoryController extends Controller
 {
+    
+     /**
+     * Protecting routes
+     */
+    public function __construct()
+{
+    $this->middleware('auth');
+}
     /**
      * Display a listing of the resource.
      *
