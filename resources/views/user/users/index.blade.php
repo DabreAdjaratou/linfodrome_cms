@@ -5,7 +5,7 @@
 @section('content')
 @parent
 @section ('pageTitle')<h3>{{ ('Liste des utilisateurs') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-striped uk-table-small responsive">	
+<table id="dataTable" class="uk-table uk-table-striped uk-table-small uk-text-small responsive">	
     <thead>
        <tr>
         <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>

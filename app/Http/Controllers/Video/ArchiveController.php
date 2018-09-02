@@ -15,11 +15,8 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-       $videos = Archive::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','created_at','start_publication_at','stop_publication_at','views']);
-      
-
-        $videos=Archive::all();
-        return view ('video.archives.index', ['videos'=>$videos]);
+       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','created_at','start_publication_at','stop_publication_at','views']);
+       return view ('video.archives.index', ['videos'=>$videos]);
     }
 
     /**

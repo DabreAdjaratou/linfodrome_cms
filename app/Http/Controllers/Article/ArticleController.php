@@ -20,9 +20,10 @@ class ArticleController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        
-        
+    {   
+        $articles = Article::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        return view('article.archives.index',['articles'=>$articles]);
+             
 }
 
     /**
@@ -37,8 +38,7 @@ class ArticleController extends Controller
         $sources=Source::all();
         $categories=Category::all();
         $users=user::all('id','name');
-        $auth_username = Auth::user()->name;
-        return view('article.articles.create',['sources'=>$sources, 'categories'=>$categories,'auth_username'=>$auth_username, 'users'=>$users]);
+        return view('article.articles.create',['sources'=>$sources, 'categories'=>$categories,'users'=>$users]);
 
     }
 
@@ -64,8 +64,8 @@ class ArticleController extends Controller
         'fulltext'=>'required|string',
         'source_id'=>'int',
         'created_by'=>'required|int',
-        'start_publication_at'=>'nullable|string',
-        'stop_publication_at'=>'nullable|int',
+        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
     ]);
 
@@ -83,16 +83,16 @@ class ArticleController extends Controller
        $article->introtext = $request->introtext;
        $article->fulltext =$request->fulltext;
        $article->source_id = $request->source;
-       $article->created_by =$request->created_by;
+       $article->created_by =$request->created_by ?? $request;
        $article->created_at =now();
        $article->start_publication_at = $request->start_publication_at;
        $article->stop_publication_at =$request->stop_publication_at;
 
-
-
-         if ($article->save()) {
-           $lastRecord= Article::latest()->first();
-           $archive= new Archive;
+       try {
+           DB::transaction(function () use ($article) {
+       $article->save();
+       $lastRecord= Article::latest()->first();
+       $archive= new Archive;
        $archive->id = $lastRecord->id;
        $archive->ontitle = $lastRecord->ontitle;
        $archive->title =$lastRecord->title;
@@ -112,16 +112,22 @@ class ArticleController extends Controller
        $archive->start_publication_at = $lastRecord->start_publication_at;
        $archive->stop_publication_at =$lastRecord->stop_publication_at;
        $archive->save();
-
-        $request->session()->flash('message.type', 'success');
-        $request->session()->flash('message.content', 'Article ajouté avec succès!');
-    } else {
+     
+       $oldest = Article::oldest()->first();
+       $oldest->delete();
+});
+           
+       } catch (Exception $exc) {
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
-    }
+//           echo $exc->getTraceAsString();
+       }
 
+       $request->session()->flash('message.type', 'success');
+       $request->session()->flash('message.content', 'Article ajouté avec succès!');
+    
        if ($request->save_close) {
-           return redirect()->action('ArchiveController@index');
+           return redirect()->route('article-archives.index');
        }else{
         return redirect()->route('articles.create');
     }

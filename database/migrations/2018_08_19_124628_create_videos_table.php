@@ -28,7 +28,7 @@ class CreateVideosTable extends Migration
             $table->datetime('start_publication_at')->nullable(true);
             $table->datetime('stop_publication_at')->nullable(true);
             $table->unsignedInteger('checkout')->default(0)->comment('contains the id of user that is updating');
-            $table->Text('keywords')->comment('list of keywords');
+            $table->Text('keywords')->nullable(true)->comment('list of keywords');
             $table->unsignedBigInteger('views')->default(0);
         });
     }

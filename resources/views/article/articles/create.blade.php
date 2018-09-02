@@ -8,8 +8,8 @@
 
 <form method="POST" action="{{ route('articles.store') }}"  enctype="multipart/form-data" class="">
 	@csrf
-	<button type="submit" name="save_close">{{('Enregistrer & fermer')}}</button>
-	<button type="submit" name="save_next">{{('Enreg & insérer prochain ')}}</button>
+	<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
+	<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
 	<button type="reset">{{('Annuler')}}</button>
 	<div>	
 		<label for="ontitle">{{('Sur Titre:')}}</label>
@@ -74,8 +74,8 @@
 
 	<div>
 	<label for="created_by">{{('Auteur:')}}</label>
-	<span>{{ $auth_username }}</span>
-	{{-- <input type="text" name="auth_userid" value="{{  }}"> --}}
+	<span>{{ Auth::User()->name}}</span>
+        <input type="hidden" name="auth_userid" value="{{ Auth::id() }}">
 		<select name="created_by">
 			<option></option>
 			@foreach ($users as $user)

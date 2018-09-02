@@ -5,7 +5,7 @@
 @section('content')
 @parent
 @section ('pageTitle')<h3>  {{ ('Liste des actions') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-striped uk-table-hover uk-table-small">	
+<table id="dataTable" class="uk-table uk-table-striped uk-table-hover uk-table-small uk-text-small responsive">	
 <thead>
 	<tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>

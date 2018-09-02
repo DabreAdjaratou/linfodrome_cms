@@ -21,7 +21,10 @@ class BilletController extends Controller
      */
     public function index()
     {
-        //
+       $billets = Billet::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+   
+   return view('billet.archives.index',['billets'=>$billets]);
+    
     }
 
     /**
@@ -61,8 +64,8 @@ class BilletController extends Controller
         'fulltext'=>'required|string',
         'source_id'=>'int',
         'created_by'=>'required|int',
-        'start_publication_at'=>'nullable|string',
-        'stop_publication_at'=>'nullable|int',
+        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
     ]);
 
@@ -86,7 +89,9 @@ class BilletController extends Controller
 
 
 
-       if ($billet->save()) {
+       try {
+           DB::transaction(function () use ($billet) {
+       $billet->save();
        $lastRecord= Billet::latest()->first();
        $archive= new Archive;
        $archive->id = $lastRecord->id;
@@ -107,16 +112,22 @@ class BilletController extends Controller
        $archive->start_publication_at = $lastRecord->start_publication_at;
        $archive->stop_publication_at =$lastRecord->stop_publication_at;
        $archive->save();
-
-        $request->session()->flash('message.type', 'success');
-        $request->session()->flash('message.content', 'Billet ajouté avec succès!');
-    } else {
+       $oldest = Billet::oldest()->first();
+       $oldest->delete();
+});
+           
+       } catch (Exception $exc) {
         $request->session()->flash('message.type', 'danger');
         $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
-    }
+//           echo $exc->getTraceAsString();
+       }
+
+       $request->session()->flash('message.type', 'success');
+       $request->session()->flash('message.content', 'Billet ajouté avec succès!');
+    
 
        if ($request->save_close) {
-           return redirect()->route('users.index');
+           return redirect()->route('billet-archives.index');
        }else{
         return redirect()->route('billets.create');
     }

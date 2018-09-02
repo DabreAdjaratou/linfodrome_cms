@@ -33,7 +33,7 @@ class Archive extends Model
      * @var array
      */
     protected $fillable = [
-        'ontitle','title','category_id','published','featured','image','image_legend','video','gallery_photo','introtext','fulltext','source_id','keywords','created_by','created_at','start_publication_at','stop_publication_at',
+        'title','category_id','published','featured','image','code','description','created_by','created_at','start_publication_at','stop_publication_at','keywords',
     ];
 
     public function getCategory()
@@ -41,7 +41,7 @@ class Archive extends Model
         return $this->belongsTo('App\Models\Video\Category','category_id');
     }
 
-   public function getAutor()
+   public function getAuthor()
     {
         return $this->belongsTo('App\Models\User\User','created_by');
     }

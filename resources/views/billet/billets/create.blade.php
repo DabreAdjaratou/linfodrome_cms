@@ -8,8 +8,8 @@
 
 <form method="POST" action="{{ route('billets.store') }}"  enctype="multipart/form-data" class="">
 	@csrf
-<button type="submit" name="save_close">{{('Enregistrer & fermer')}}</button>
-<button type="submit" name="save_next">{{('Enreg & insérer prochain ')}}</button>
+        <button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
+        <button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
 <button type="reset">{{('Annuler')}}</button>
 	<div>	
 <label for="ontitle">{{('Sur Titre:')}}</label>
