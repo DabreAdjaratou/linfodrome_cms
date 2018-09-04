@@ -14,14 +14,7 @@ class AccessLevel extends Model
      */
    protected $table = 'access_levels';
     
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
+   /**
      * The attributes that are mass assignable.
      *
      * @var array

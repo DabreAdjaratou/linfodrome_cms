@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User\User;
 
+
 class LoginController extends Controller
 {
     /*
@@ -41,8 +42,22 @@ class LoginController extends Controller
     
     protected function redirectTo()
 {
-        if (Auth::user()->require_reset==0) {
-    return '/article-revisions';
+      
+   if (Auth::user()->is_active==0) {
+    session()->flash('message.type', 'danger');
+    session()->flash('message.content', 'Votre compte est inactif!');
+    Auth::logout();
+    return false;
   } 
+
+    if (Auth::user()->require_reset==0) {
+    return '/password/require-reset';
+  } 
+
 }
+
+
+
+
+
 }

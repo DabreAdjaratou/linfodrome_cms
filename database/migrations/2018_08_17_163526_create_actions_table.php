@@ -17,6 +17,7 @@ class CreateActionsTable extends Migration
             $table->tinyIncrements('id');
             $table->string('title',50)->nullable(false)->unique();      
             $table->string('display_name',100)->nullable(false);
+            $table->timestamps();
         });
     }
 

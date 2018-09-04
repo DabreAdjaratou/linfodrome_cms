@@ -70,7 +70,7 @@ class BilletController extends Controller
         'introtext'=>'nullable|string',
         'fulltext'=>'required|string',
         'source_id'=>'int',
-        'created_by'=>'required|int',
+        // 'created_by'=>'int',
         'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
         'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
@@ -89,7 +89,7 @@ class BilletController extends Controller
        $billet->introtext = $request->introtext;
        $billet->fulltext =$request->fulltext;
        $billet->source_id = $request->source;
-       $billet->created_by =$request->created_by;
+       $billet->created_by =$request->created_by ?? $request->auth_userid;
        $billet->created_at =now();
        $billet->start_publication_at = $request->start_publication_at;
        $billet->stop_publication_at =$request->stop_publication_at;

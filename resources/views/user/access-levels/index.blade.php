@@ -6,7 +6,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{{ ('Liste des niveaux d\'accès') }}}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-text-small responsive">	
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small" {{--uk-text-small responsive --}}/>	
 	<thead>
             <tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>

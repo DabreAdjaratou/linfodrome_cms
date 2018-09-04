@@ -30,6 +30,11 @@ class CreateVideosTable extends Migration
             $table->unsignedInteger('checkout')->default(0)->comment('contains the id of user that is updating');
             $table->Text('keywords')->nullable(true)->comment('list of keywords');
             $table->unsignedBigInteger('views')->default(0);
+            $table->index('category_id');
+            $table->index(['published','start_publication_at','stop_publication_at'],'video_publication_time');
+            $table->index('featured');
+            $table->index('created_by');
+            $table->index('views');
         });
     }
 

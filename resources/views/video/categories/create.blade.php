@@ -17,7 +17,14 @@
 	<div>	
 <label for="title">{{('Titre:')}}</label>
 <input type="text" name="title" placeholder="Titre de la Categorie" required autofocus>
-
+</div>
+<div>	
+		<label for="published">{{('Titre:')}}</label>
+		<select name="published">
+			<option value="{{ 0 }}">Non publié</option>
+			<option value="{{ 1 }}">Publié</option>
+		</select>
+		
 	</div>
 
 </form>

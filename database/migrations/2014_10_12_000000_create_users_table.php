@@ -23,7 +23,9 @@ class CreateUsersTable extends Migration
             $table->string('image',255)->nullable(true);
             $table->unsignedTinyInteger('require_reset')->nullable(false)->default(1)->comment('0: require to reset password at the next login');
             $table->json('data')->nullable(true)->comment('contains user title,facebook,twitter,google in a json format');
-            
+            $table->timestamps();
+            $table->index(['password','email','is_active']);
+            $table->index('require_reset');
              
         });
     }

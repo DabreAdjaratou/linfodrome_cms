@@ -146,13 +146,13 @@ return [
     |
     */
 
-    'attributes' => [
-'name'=>'Le Nom',
-'email'=>'L\'adresse email',
-'image'=>'La photo',
-'password'=>'Le Mot de passe',
-'title'=>'Le titre',
-'display_name'=>'Le nom à afficher',
-    ],
+'attributes' => [
+'name'=>'Nom',
+'email'=>'Adresse email',
+'image'=>'Photo',
+'password'=>'Mot de passe',
+'title'=>'Titre',
+'display_name'=>'Nom à afficher',
+'created_by'=>'Auteur',    ],
 
 ];

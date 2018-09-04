@@ -27,7 +27,7 @@ Auth::routes();
 Route::get('/administrator', function () {
     return view('layouts/administrator/admin-panel');
 })->name('administrator')->middleware('auth');
-
+// 
 //redirections
 // Route::redirect('/home', 'register', 301);
 
@@ -58,3 +58,7 @@ Route::resource('actions','User\ActionController');
 Route::resource('user-groups','User\GroupController');
 Route::resource('resources','User\ResourceController');
 Route::resource('users','User\UserController');
+
+// Route to Banner
+Route::resource('banners','Banner\BannerController');
+Route::resource('banner_categories','Banner\BannerController');

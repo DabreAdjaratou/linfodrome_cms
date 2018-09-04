@@ -23,13 +23,18 @@ class CreateVideoArchivesTable extends Migration
             $table->string('image',255)->nullable(true);
             $table->mediumtext('code')->nullable(false);
             $table->string('description',255)->nullable(true);
-            $table->unsignedInteger('created_by')->comment('#foreign key usres : id of the journalist author of the video');
+            $table->unsignedInteger('created_by')->comment('#foreign key users : id of the journalist author of the video');
             $table->datetime('created_at')->nullable(false);
             $table->datetime('start_publication_at')->nullable(true);
             $table->datetime('stop_publication_at')->nullable(true);
             $table->unsignedInteger('checkout')->default(0)->comment('contains the id of user that is updating');
             $table->Text('keywords')->nullable(true)->comment('list of keywords');
             $table->unsignedBigInteger('views')->default(0);
+            $table->index('category_id');
+            $table->index(['published','start_publication_at','stop_publication_at'],'video_archives_publication_time');
+            $table->index('featured');
+            $table->index('created_by');
+            $table->index('views');
         });
     }
 

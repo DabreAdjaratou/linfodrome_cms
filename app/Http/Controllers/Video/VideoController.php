@@ -59,7 +59,7 @@ class VideoController extends Controller
         'featured'=>'nullable',
         'image'=>'required|image',
         'video'=>'required|string',
-        'created_by'=>'required|int',
+        // 'created_by'=>'int',
         'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
         'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
@@ -73,7 +73,7 @@ class VideoController extends Controller
        $video->featured=$request->featured ? $request->featured : 0 ; 
        $video->image = $request->image;
        $video->code = $request->video;
-       $video->created_by =$request->created_by;
+       $video->created_by =$request->created_by ?? (int)$request->auth_userid;
        $video->created_at =now();
        $video->start_publication_at = $request->start_publication_at;
        $video->stop_publication_at =$request->stop_publication_at;

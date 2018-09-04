@@ -35,6 +35,12 @@ class CreateArticleArchivesTable extends Migration
             $table->datetime('stop_publication_at')->nullable(true);
             $table->unsignedInteger('checkout')->default(0)->comment('contains the id of user that is updating');
             $table->unsignedBigInteger('views')->default(0);
+            $table->index('category_id');
+            $table->index(['published','start_publication_at','stop_publication_at'],'article_archives_publication_time');
+            $table->index('featured');
+            $table->index('source_id');
+            $table->index('created_by');
+            $table->index('views');
         });
     }
 

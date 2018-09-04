@@ -17,6 +17,7 @@ class CreateResourcesTable extends Migration
             $table->tinyIncrements('id');
             $table->string('title',100)->nullable(false)->unique();
             $table->json('actions');
+            $table->timestamps();
              });
     }
 

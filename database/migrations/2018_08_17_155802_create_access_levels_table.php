@@ -17,7 +17,7 @@ class CreateAccessLevelsTable extends Migration
             $table->tinyIncrements('id');
             $table->string('title',100);
             $table->json('groups')->comment('list of groups that belong to the acces level in json format ');
-           
+            $table->timestamps();
         });
     }
 

@@ -14,10 +14,17 @@
 		<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
 		<button type="reset">{{('Annuler')}}</button>
 	</div>
-	<div>	
+<div>	
 <label for="title">{{('Titre:')}}</label>
 <input type="text" name="title" placeholder="Titre de la Categorie" required autofocus>
-
+</div>
+<div>	
+		<label for="published">{{('Titre:')}}</label>
+		<select name="published">
+			<option value="{{ 0 }}">Non publié</option>
+			<option value="{{ 1 }}">Publié</option>
+		</select>
+		
 	</div>
 
 </form>

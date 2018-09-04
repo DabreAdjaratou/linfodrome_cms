@@ -20,7 +20,7 @@
 	<select  name="category" >
 		<option> </option>
 		@foreach($categories as $category)
-		<option value="{{ $category->id }}">{{ucfirst($category->title) }}</option>
+		<option value="{{ $category->id }}" {{ (old("category") == $category->id ? "selected":"") }}>{{ucfirst($category->title) }}</option>
 		@endforeach
 	</select>
 	<div>
@@ -38,15 +38,17 @@
 	
 	<div>
 		<label for="video">{{('Video:')}}</label>
-		<input type="text" name="video" value="{{ old('video') }}" >
+		<textarea name="video" value="{{ old('video') }}">{{{ old('video') }}}</textarea> 
 	</div>
 
 	<div>
 	<label for="created_by">{{('Auteur:')}}</label>
+	<span>{{ Auth::User()->name}}</span>
+        <input type="hidden" name="auth_userid" value="{{ Auth::id() }}">
 	    <select name="created_by">
 			<option></option>
 			@foreach ($users as $user)
-			<option value="{{ $user->id }}">{{ $user->name }} </option>
+			<option value="{{ $user->id }}" {{ (old("created_by") == $user->id ? "selected":"") }}>{{ $user->name }} </option>
 			@endforeach 
 		</select>
 	</div>
