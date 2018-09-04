@@ -23,7 +23,7 @@ class ArchiveController extends Controller
     public function index()
     {
 
-        $billets = Archive::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
    return view('billet.archives.index',['billets'=>$billets]);
     }
@@ -93,4 +93,10 @@ class ArchiveController extends Controller
     {
         //
     }
+
+    public function revision()
+  {
+    $billets= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
+    return view('billet.archives.revision',['billets'=>$billets]);
+  }
 }

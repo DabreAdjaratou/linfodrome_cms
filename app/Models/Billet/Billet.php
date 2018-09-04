@@ -27,7 +27,7 @@ class Billet extends Model
         return $this->belongsTo('App\Models\Billet\Category','category_id');
     }
 
-   public function getAutor()
+   public function getAuthor()
     {
         return $this->belongsTo('App\Models\User\User','created_by');
     }

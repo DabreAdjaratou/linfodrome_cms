@@ -31,7 +31,7 @@
 			<td> {!! ($article->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
 			<td> {!! ($article->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
 			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $article->getAutor->name }}</td>
+			<td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
 			<td class="uk-table-expand"> {{ $article->created_at }}</td>
 			<td class="uk-table-expand">{{$article->getRevision->last()['getModifier']['name']}} </td>
 			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>

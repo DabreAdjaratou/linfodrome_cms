@@ -31,7 +31,7 @@
 			<td> {!! ($billet->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
 			<td> {!! ($billet->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
 			<td class="uk-table-expand"> {{ $billet->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $billet->getAutor->name }}</td>
+			<td class="uk-table-expand"> {{ $billet->getAuthor->name }}</td>
 			<td class="uk-table-expand"> {{ $billet->created_at }}</td>
 			<td class="uk-table-expand">{{$billet->getRevision->last()['getModifier']['name']}} </td>
 			<td class="uk-table-expand">{{$billet->getRevision->last()['revised_at']}}  </td>

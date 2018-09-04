@@ -22,11 +22,8 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-        $articles = Archive::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      
-
-
-return view('article.archives.index',['articles'=>$articles]);
+        $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      return view('article.archives.index',['articles'=>$articles]);
     }
 
     /**
@@ -94,4 +91,16 @@ return view('article.archives.index',['articles'=>$articles]);
     {
         //
     }
+
+/**
+     * Display a listing of the revision.
+     *
+     * @return \Illuminate\Http\Response
+     */
+  public function revision()
+
+  {
+    $articles= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
+    return view('article.archives.revision',['articles'=>$articles]);
+  }
 }

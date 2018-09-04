@@ -91,4 +91,10 @@ class ArchiveController extends Controller
     {
         //
     }
+
+     public function revision()
+  {
+    $videos= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
+    return view('video.archives.revision',['videos'=>$videos]);
+  }
 }
