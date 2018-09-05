@@ -14,7 +14,9 @@
 			<th>{{ ('Categorie') }}</th>
 			<th>{{ ('A la Une') }}</th>
 			<th>{{ ('Publiée') }}</th>
-			<th>{{ ('journaliste') }}</th>
+			<th>{{ ('Journaliste') }}</th>
+			<th>{{ ('Cameraman') }}</th>
+			<th>{{ ('Monteur') }}</th>
 			<th>{{ ('crée lé') }}</th>
 			<th>{{ ('Debut publication') }}</th>
 			<th>{{ ('fin publication') }}</th>
@@ -32,6 +34,8 @@
 			<td> {!! ($video->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
 			<td> {!! ($video->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
 			<td class="uk-table-expand"> {{$video->getAuthor->name}}</td>
+			<td class="uk-table-expand"> {{$video->data->cameraman}}</td>
+			<td class="uk-table-expand"> {{$video->data->editor}}  </td>
 			<td class="uk-table-expand">{{$video->created_at}}</td>
 			<td class="uk-table-expand">{{ $video->start_publication_at}} </td>
 			<td class="uk-table-expand"> {{$video->stop_publication_at}}</td>

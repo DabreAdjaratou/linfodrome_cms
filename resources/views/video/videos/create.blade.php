@@ -42,9 +42,9 @@
 	</div>
 
 	<div>
-	<label for="created_by">{{('Auteur:')}}</label>
-	<span>{{ Auth::User()->name}}</span>
-        <input type="hidden" name="auth_userid" value="{{ Auth::id() }}">
+	<label for="created_by">{{('Journaliste:')}}</label>
+{{-- 	<span>{{ Auth::User()->name}}</span>
+        <input type="hidden" name="auth_userid" value="{{ Auth::id() }}"> --}}
 	    <select name="created_by">
 			<option></option>
 			@foreach ($users as $user)
@@ -52,7 +52,14 @@
 			@endforeach 
 		</select>
 	</div>
-
+<div>
+		<label for="cameraman">{{('Cameraman:')}}</label>
+		<input type="text" name="cameraman" value="{{ old('cameraman') }}" >
+	</div>
+	<div>
+		<label for="editor">{{('Monteur:')}}</label>
+		<input type="text" name="editor" value="{{ old('editor') }}" >
+	</div>
 	<div>
 		<label for="start_publication_at">{{('Star publication at:')}}</label>
 		<input type="text" name="start_publication_at" value="{{ old('start_publication_at') }}" >
