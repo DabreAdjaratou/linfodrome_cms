@@ -25,7 +25,8 @@
 	</thead>
 	<tbody>
 		@foreach($articles as $article)
-		<tr class="uk-text-small">
+		@can('view', Auth::User())
+  	<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $article->title }}</td>
 			<td> {!! ($article->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
@@ -40,6 +41,7 @@
 			<td>{{ $article->id }}</td>
                 </tr>
 		@endforeach
+		@endcan
 	</tbody>
 	<tfoot>
 	</tfoot>
