@@ -5,6 +5,8 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Group;
+use App\Models\User\Accesslevel;
+use Illuminate\Support\Collection;
 
 
 class GroupController extends Controller
@@ -24,20 +26,43 @@ class GroupController extends Controller
     public function index()
     {
         $groups = Group::with('getChildrens')->where('parent_id',0)->get();
-        // foreach ($groups as $g) {
-        //     $g->title= ucfirst($g->title);
-        //   foreach ($g->getChildrens as $g2) {
+
+               $accessLevels=Accesslevel::all();
+              $groups2 = Group::all();
+        foreach ($groups2 as $g) {
+//         //     $g->title= ucfirst($g->title);
+//         //   foreach ($g->getChildrens as $g2) {
              
-        //       foreach ($g2->getChildrens as $g3) {
-        //          echo $g3;
-        //   }
+//         //       foreach ($g2->getChildrens as $g3) {
+//         //          echo $g3;
+//         //   }
 
         
-        // }
-        // }   
-        // echo'<pre>';     
+//         // }
 
-        // echo'</pre>';     
+foreach ($accessLevels as $key=> $a) {
+    $collection = new Collection();
+// echo $a->groups;
+
+    $accessGroups=json_decode($a->groups);
+for ($i=0; $i <count($accessGroups) ; $i++) { 
+    
+ if ($accessGroups[$i]==$g->id){
+    $access[]=$a->title;
+  // echo 'group :'.$g->title.' ';
+  // echo 'access :'.$a->title.'<br> ';
+    }
+// $array2=array_merge($array);
+  // echo   $collection->access;
+     
+}
+        }
+    }   
+
+        echo'<pre>';     
+print_r($access);
+        echo'</pre>';         
+
 return view ('user.groups.index', ['groups'=>$groups]);
     }
 

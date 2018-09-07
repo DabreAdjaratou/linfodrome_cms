@@ -19,10 +19,7 @@ class ArticlePolicy
      */
     public function view(User $user, Article $article)
     {
-        if ($user->require_reset === 0) {
-            return true;
-        }
-        return false ;
+        
     }
 
     /**

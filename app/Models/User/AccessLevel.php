@@ -27,4 +27,9 @@ class AccessLevel extends Model
     public static function getGoup($id) {
         return Group::find($id);
     }
+
+public function getPermission() {
+        return $this->hasMany('App\Models\User\Permission', 'permissions', 'access_level_id');
+    }
+
 }

@@ -28,8 +28,10 @@ class User extends Authenticatable
     ];
 
 
-    //  public function getAccessLevels()
-    // {
-    //     return $this->hasManyThrough('App\Models\User\AccessLevel', 'App\User');
-    // }
+public function getGroups()
+    {
+        return $this->belongsToMany('App\Models\User\Group', 'user_usergroup_map', 'user_id', 'user_group_id');
+    }
+
+    
 }
