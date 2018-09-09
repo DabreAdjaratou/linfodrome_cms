@@ -18,9 +18,9 @@ Route::get('/', function () {
 Route::get('/home', 'HomeController@index')->name('home');
 
 //authentication's route
-Route::get('/password/require-reset', function () {
-    return view('auth/passwords/require-reset');
-})->name('password.require-reset')->middleware('auth');
+//Route::get('/password/require-reset', function () {
+//    return view('auth/passwords/require-reset');
+//})->name('password.require-reset')->middleware('auth');
 Auth::routes();
 
 //Route to administrator
