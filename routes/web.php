@@ -27,30 +27,30 @@ Auth::routes();
 Route::get('/administrator', function () {
     return view('layouts/administrator/admin-panel');
 })->name('administrator')->middleware('auth');
-
+// 
 //redirections
 // Route::redirect('/home', 'register', 301);
 
 // Route to Article
+Route::get('article-revisions','Article\ArchiveController@revision')->name('article-revisions');
 Route::resource('article-archives','Article\ArchiveController');
 Route::resource('articles','Article\ArticleController');
 Route::resource('article-categories','Article\CategoryController');
-Route::resource('article-revisions','Article\RevisionController');
 Route::resource('article-sources','Article\SourceController');
 
 
 // Route to Billet
+Route::get('billet-revisions','Billet\ArchiveController@revision')->name('billet-revisions');
 Route::resource('billet-archives','Billet\ArchiveController');
 Route::resource('billets','Billet\BilletController');
 Route::resource('billet-categories','Billet\CategoryController');
-Route::resource('billet-revisions','Billet\RevisionController');
 
 
 // Route to Video
+Route::get('video-revisions','Video\ArchiveController@revision')->name('video-revisions');
 Route::resource('video-archives','Video\ArchiveController');
 Route::resource('videos','Video\VideoController');
 Route::resource('video-categories','Video\CategoryController');
-Route::resource('video-revisions','Video\RevisionController');
 
 // Route to User
 Route::resource('access-levels','User\AccessLevelController');
@@ -58,3 +58,7 @@ Route::resource('actions','User\ActionController');
 Route::resource('user-groups','User\GroupController');
 Route::resource('resources','User\ResourceController');
 Route::resource('users','User\UserController');
+
+// Route to Banner
+Route::resource('banners','Banner\BannerController');
+Route::resource('banner_categories','Banner\BannerController');

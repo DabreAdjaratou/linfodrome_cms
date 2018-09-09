@@ -33,5 +33,5 @@ class Revision extends Model
        return $this->belongsTo('App\Models\User\User','user_id');
     }
 
-
+ 
 }

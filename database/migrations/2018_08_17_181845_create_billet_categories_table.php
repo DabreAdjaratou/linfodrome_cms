@@ -16,6 +16,10 @@ class CreateBilletCategoriesTable extends Migration
         Schema::create('billet_categories', function (Blueprint $table) {
             $table->tinyIncrements('id');
            $table->string('title',100)->nullable(false)->unique();
+           $table->string('alias',100)->nullable(false);
+            $table->tinyInteger('published')->nullable(false)->default(0)->comment('0 : not published, 1 : published');
+           $table->timestamps();
+           $table->index('published');
        });
     }
 

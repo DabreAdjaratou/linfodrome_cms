@@ -13,9 +13,12 @@ class CreateSourcesTable extends Migration
      */
     public function up()
     {
-        Schema::create('sources', function (Blueprint $table) {
+        Schema::create('article_sources', function (Blueprint $table) {
             $table->tinyIncrements('id');
             $table->string('title',100)->nullable(false)->unique();
+            $table->tinyInteger('published')->nullable(false)->default(0)->comment('0 : not published, 1 : published');
+            $table->timestamps();
+            $table->index('published');
         });
     }
 
@@ -26,6 +29,6 @@ class CreateSourcesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sources');
+        Schema::dropIfExists('article_sources');
     }
 }

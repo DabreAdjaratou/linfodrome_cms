@@ -16,8 +16,9 @@ class CreatePermissionsTable extends Migration
         Schema::create('permissions', function (Blueprint $table) {
             $table->tinyIncrements('id');
             $table->unsignedInteger('access_level_id')->nullable(false);
-            $table->unsignedInteger('ressource_id')->nullable(false);
-            $table->unsignedInteger('id_action')->nullable(false);
+            $table->unsignedInteger('resource_id')->nullable(false);
+            $table->unsignedInteger('action_id')->nullable(false);
+            $table->timestamps();
         });
     }
 

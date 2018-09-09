@@ -8,7 +8,9 @@
 
 <form method="POST" action="{{ route('articles.store') }}"  enctype="multipart/form-data" class="">
 	@csrf
+	@can('create', Auth::User()) 
 	<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
+	@endcan
 	<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
 	<button type="reset">{{('Annuler')}}</button>
 	<div>	
@@ -23,7 +25,7 @@
 	<select  name="category" >
 		<option> </option>
 		@foreach($categories as $category)
-		<option value="{{ $category->id }}">{{ucfirst($category->title) }}</option>
+		<option value="{{ $category->id }}" {{ (old("category") == $category->id ? "selected":"") }}>{{ucfirst($category->title) }}</option>
 		@endforeach
 	</select>
 	<div>
@@ -60,14 +62,14 @@
 
 	<div>
 		<label for="fulltext">{{('Content:')}}</label>
-		<textarea name="fulltext" id="fulltext"  value="{{ old('fulltext') }}"></textarea>
+		<textarea name="fulltext" id="fulltext" >{{ old('fulltext') }}</textarea>
 	</div>
 	<div>
 		<label for="source">{{('Source:')}}</label>
 		<select  name="source" >
 			<option> </option>
 			@foreach($sources as $source)
-			<option value="{{ $source->id }}">{{ucfirst($source->title) }}</option>
+		    <option value="{{ $source->id }}" {{ (old("source") == $source->id ? "selected":"") }}>{{ucfirst($source->title) }}</option>
 			@endforeach
 		</select>
 	</div>
@@ -79,7 +81,7 @@
 		<select name="created_by">
 			<option></option>
 			@foreach ($users as $user)
-			<option value="{{ $user->id }}">{{ $user->name }} </option>
+			<option value="{{ $user->id }}" {{ (old("created_by") == $user->id ? "selected":"") }}>{{ $user->name }} </option>
 			@endforeach 
 		</select>
 	</div>

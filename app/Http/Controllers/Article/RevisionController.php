@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Article;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use APP\Models\Article\Revision;
 
 class RevisionController extends Controller
 {

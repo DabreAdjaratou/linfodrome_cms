@@ -10,12 +10,6 @@ class User extends Authenticatable
     use Notifiable;
     
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -32,4 +26,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+
+public function getGroups()
+    {
+        return $this->belongsToMany('App\Models\User\Group', 'user_usergroup_map', 'user_id', 'user_group_id');
+    }
+
+    
 }

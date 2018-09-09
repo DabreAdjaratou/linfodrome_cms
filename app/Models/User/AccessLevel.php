@@ -14,14 +14,7 @@ class AccessLevel extends Model
      */
    protected $table = 'access_levels';
     
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
+   /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -34,4 +27,9 @@ class AccessLevel extends Model
     public static function getGoup($id) {
         return Group::find($id);
     }
+
+public function getPermission() {
+        return $this->hasMany('App\Models\User\Permission', 'permissions', 'access_level_id');
+    }
+
 }

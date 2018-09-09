@@ -33,7 +33,7 @@ class Archive extends Model
      * @var array
      */
     protected $fillable = [
-        'title','category_id','published','featured','image','code','description','created_by','created_at','start_publication_at','stop_publication_at','keywords',
+        'title','category_id','published','featured','image','code','description','created_by','data','created_at','start_publication_at','stop_publication_at','keywords',
     ];
 
     public function getCategory()

@@ -32,7 +32,12 @@ public function index()
          
       }
       $u->name= ucwords($u->name);
-   }
+      foreach ($u->getGroups as $g) {
+         $h=json_decode($g);
+         echo $h->title;
+       } ;
+
+          }
        return view ('user.users.index', ['users'=>$users]);
 }
 

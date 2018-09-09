@@ -46,10 +46,13 @@ class CategoryController extends Controller
     {
         $validatedData = $request->validate([
         'title' => 'required|unique:video_categories|max:100',
+        'published' => 'required|int',
         ]);
 
        $categorie= new Category;
        $categorie->title = $request->title;
+       $categorie->alias=str_slug($request->title);
+       $categorie->published = $request->published;
        if ($categorie->save()) {
         $request->session()->flash('message.type', 'success');
         $request->session()->flash('message.content', 'Categorie ajouté avec succès!');

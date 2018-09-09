@@ -28,7 +28,7 @@ class ArticleController extends Controller
      */
     public function index()
     {   
-        $articles = Article::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
         return view('article.archives.index',['articles'=>$articles]);
              
 }
@@ -70,7 +70,7 @@ class ArticleController extends Controller
         'introtext'=>'nullable|string',
         'fulltext'=>'required|string',
         'source_id'=>'int',
-        'created_by'=>'required|int',
+        // 'created_by'=>'int',
         'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
         'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
@@ -90,7 +90,7 @@ class ArticleController extends Controller
        $article->introtext = $request->introtext;
        $article->fulltext =$request->fulltext;
        $article->source_id = $request->source;
-       $article->created_by =$request->created_by ?? $request;
+       $article->created_by =$request->created_by ?? $request->auth_userid;
        $article->created_at =now();
        $article->start_publication_at = $request->start_publication_at;
        $article->stop_publication_at =$request->stop_publication_at;
@@ -186,4 +186,5 @@ class ArticleController extends Controller
     {
         //
     }
+
 }

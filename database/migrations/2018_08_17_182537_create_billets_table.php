@@ -23,7 +23,6 @@ class CreateBilletsTable extends Migration
             $table->unsignedTinyInteger('featured')->nullable(false)->default(0)->comment('0: not featured, 1:featured');
             $table->string('image',255)->nullable(true);
             $table->string('image_legend',255)->nullable(true);
-            $table->mediumtext('video')->nullable(true);
             $table->mediumtext('introtext')->nullable(false);
             $table->mediumtext('fulltext')->nullable(false);
             $table->unsignedTinyInteger('source_id')->nullable(true);
@@ -34,6 +33,12 @@ class CreateBilletsTable extends Migration
             $table->datetime('stop_publication_at')->nullable(true);
             $table->unsignedInteger('checkout')->default(0)->comment('contains the id of user that is updating');
             $table->unsignedBigInteger('views')->default(0);
+            $table->index('category_id');
+            $table->index(['published','start_publication_at','stop_publication_at'],'billets_publication_time');
+            $table->index('featured');
+            $table->index('source_id');
+            $table->index('created_by');
+            $table->index('views');
         });
     }
 

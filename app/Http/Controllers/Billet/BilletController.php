@@ -28,7 +28,7 @@ class BilletController extends Controller
      */
     public function index()
     {
-       $billets = Billet::with(['getRevision.getModifier:id,name','getAutor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+       $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
    return view('billet.archives.index',['billets'=>$billets]);
     
@@ -66,11 +66,10 @@ class BilletController extends Controller
         'featured'=>'nullable',
         'image'=>'nullable|image',
         'image_legend'=>'nullable|string',
-        'video'=>'nullable|string',
         'introtext'=>'nullable|string',
         'fulltext'=>'required|string',
         'source_id'=>'int',
-        'created_by'=>'required|int',
+        // 'created_by'=>'int',
         'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
         'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
@@ -85,11 +84,10 @@ class BilletController extends Controller
        $billet->featured=$request->featured ? $request->featured : 0 ;
        $billet->image = $request->image;
        $billet->image_legend =$request->image_legend;
-       $billet->video = $request->video;
        $billet->introtext = $request->introtext;
        $billet->fulltext =$request->fulltext;
        $billet->source_id = $request->source;
-       $billet->created_by =$request->created_by;
+       $billet->created_by =$request->created_by ?? $request->auth_userid;
        $billet->created_at =now();
        $billet->start_publication_at = $request->start_publication_at;
        $billet->stop_publication_at =$request->stop_publication_at;
@@ -110,7 +108,6 @@ class BilletController extends Controller
        $archive->featured =$lastRecord->featured;
        $archive->image = $lastRecord->image;
        $archive->image_legend =$lastRecord->image_legend;
-       $archive->video = $lastRecord->video;
        $archive->introtext = $lastRecord->introtext;
        $archive->fulltext =$lastRecord->fulltext;
        $archive->source_id = $lastRecord->source_id;
@@ -186,4 +183,6 @@ class BilletController extends Controller
     {
         //
     }
+
+     
 }

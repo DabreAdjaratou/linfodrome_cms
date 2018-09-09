@@ -8,12 +8,6 @@ class Action extends Model
 {
        
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -22,4 +16,6 @@ class Action extends Model
         'title','display_name',
     ];
 
+
+	
 }
