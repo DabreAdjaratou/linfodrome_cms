@@ -22,7 +22,8 @@
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td> <a href="">{{ ucfirst($access->title) }}</a></td>
 			<td>{{ $access->groups }}</td>
-			<td>{{ $access->id }}</td>
+			<td>{{ $access->id }}
+				<td>{{ $access->getPermission }}</td>
                 </tr>
 		@endforeach
 	</tbody>

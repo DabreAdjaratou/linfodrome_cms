@@ -28,8 +28,8 @@ class AccessLevel extends Model
         return Group::find($id);
     }
 
-public function getPermission() {
-        return $this->hasMany('App\Models\User\Permission', 'permissions', 'access_level_id');
+public function getPermissions() {
+        return $this->hasMany('App\Models\User\Permission', 'access_level_id');
     }
 
 }

@@ -6,6 +6,9 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des categories d\'articles') }}</h3> @endsection 
+<div class="uk-margin ">	
+	<a href="{{ route('article-categories.create') }}" class="uk-button uk-button-primary uk-button-small">Nouveau</a>
+</div>
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>

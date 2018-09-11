@@ -26,6 +26,7 @@ class ResourceController extends Controller
     {
         $resources = Resource::all();
         foreach ($resources as $r) {
+            // echo $r->getActions;
           $actions= json_decode($r->actions);
           $r->actions='';
           

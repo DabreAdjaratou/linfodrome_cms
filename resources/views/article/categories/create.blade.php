@@ -10,7 +10,11 @@
 	@csrf
 
 	<div>
-		
+		@can('create', App\Models\Article\Category::class)
+    <div>a le droit</div>
+   <div>'na le droit</div>
+@endcan
+
 		<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
 		<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
 		<button type="reset">{{('Annuler')}}</button>

@@ -24,44 +24,20 @@ class Group extends Model
         'title','parent_id',
     ]; 
     
+
     public function getChildrens()
     {
         return $this->hasMany('App\Models\User\Group', 'parent_id');
     }
 
-   public function getAccessLevels()
+    public function getParents()
     {
+        return $this->belongsTo('App\Models\User\Group', 'parent_id');
+    }
 
-//      $groups2 = Group::all();
-//      $accessLevels=AccessLevel::all();
-//         foreach ($groups2 as $g) {
-//         //     $g->title= ucfirst($g->title);
-//         //   foreach ($g->getChildrens as $g2) {
-             
-//         //       foreach ($g2->getChildrens as $g3) {
-//         //          echo $g3;
-//         //   }
-
-        
-//         // }
-
-// foreach ($accessLevels as $key=> $a) {
-//     $accessGroups=json_decode($a->groups);
-//     $array=[];
-// for ($i=0; $i <count($accessGroups) ; $i++) { 
-//  if ($accessGroups[$i]==$g->id){
-// $array['id']=$a->title;
-//  }
-// // $array2=array_merge($array);
-     
-// }
-//         }
-// print_r($array);
-//     }   
-//         echo'<pre>';     
-
-//         echo'</pre>';     
-    } 
     
-//     Return $accessLevels;
+    Public function getAccessLevels(){
+    return $this->belongsToMany('App\Models\User\Accesslevel', 'usergroup_accesslevel_map','user_group_id');
+    }
+   
 }
