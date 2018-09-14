@@ -18,18 +18,7 @@ class Resource extends Model
         'title',
     ];
 
-    public static function getAction($id) {
-        return Action::find($id);
-    }
-
     public function getActions() {
-    // return $this->hasManyThrough(
-    //         'App\Models\User\Action',
-    //         'App\Models\User\Permission',
-    //         'action_id', // Foreign key on users table...
-    //         'permission_id', // Foreign key on posts table...
-    //         'id', // Local key on countries table...
-    //         'id' // Local key on users table..
-    //     );
+        return $this->belongsToMany('App\Models\User\Action', 'resource_action_map',  'resource_id','action_id');
     }
 }

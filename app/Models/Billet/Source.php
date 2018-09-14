@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Models\Video;
+namespace App\Models\Billet;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Source extends Model
 {
-	 /**
+     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'video_categories';
-    
+    protected $table = 'billet_sources';
     /**
      * The attributes that are mass assignable.
      *
@@ -22,13 +21,15 @@ class Category extends Model
         'title','published',
     ];
 
-      public function getVideos()
+
+ public function getBillets()
     {
-         return $this->hasMany('App\Models\Video\Video','category_id');
+         return $this->hasMany('App\Models\Billet\Billet','source_id');
     }
 
     public function getArchives()
     {
-         return $this->hasMany('App\Models\Video\Archive','category_id');
+         return $this->hasMany('App\Models\Billet\Archive','source_id');
     }
+    
 }

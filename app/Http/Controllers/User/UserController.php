@@ -34,6 +34,28 @@ public function index()
       }
       $u->name= ucwords($u->name);
       }
+
+      $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', 1)->get(['id']);
+      
+//         foreach ($userData as $data) {
+//          foreach ($data->getGroups as $group) {
+//           echo '<pre>';
+//           ($group->getParents);
+//           echo '</pre>';
+//           foreach ($group->getAccessLevels as $acces) {
+//            foreach ($acces->getPermissions  as $key=>$permission) {
+//               $access_level= $acces->title;
+//               $permission_resource= $permission->getResource->title;
+//               $permission_action= $permission->getAction->title;
+//               // if ($permission_resource==$resource && $permission_action==$action) {
+//               //     return true;
+//               // }
+
+//           }
+
+//       }
+//   } 
+// }
      return view ('user.users.index', ['users'=>$users]);
 }
 

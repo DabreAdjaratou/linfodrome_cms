@@ -16,13 +16,13 @@
 	</div>
 	<div>	
 		<label for="title">{{('Titre:')}}</label>
-		<input type="text" name="title" placeholder="Titre de l'action" required autofocus>
+		<input type="text" name="title" placeholder="Titre de l'action" value="{{ old('title') }}" required autofocus>
 
 	</div>
 	<div>	
 
 		<label for="display_name">{{('Nom à afficher:')}}</label>
-		<input type="text" name="display_name" placeholder="">
+		<input type="text" name="display_name" placeholder="" value="{{ old('display_name') }}">
 
 	</div>
 

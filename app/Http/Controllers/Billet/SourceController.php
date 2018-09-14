@@ -1,12 +1,19 @@
 <?php
 
 namespace App\Http\Controllers\Billet;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Billet\Source;
 
 class SourceController extends Controller
 {
+     /**
+     * Protecting routes
+     */
+    public function __construct()
+{
+    $this->middleware('auth');
+}
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +21,8 @@ class SourceController extends Controller
      */
     public function index()
     {
-        //
+        $sources=Source::all();
+        return view ('billet.sources.index',['sources'=>$sources]);
     }
 
     /**
@@ -24,7 +32,7 @@ class SourceController extends Controller
      */
     public function create()
     {
-        //
+        return view('billet.sources.create');
     }
 
     /**
@@ -35,8 +43,33 @@ class SourceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        $validatedData = $request->validate([
+        'title' => 'required|unique:billet_sources|max:100',
+        ]);
+
+       $source= new Source;
+       $source->title = $request->title;
+       $source->published=$request->published ? $request->published : 0 ;
+       if ($source->save()) {
+        
+        session()->flash('message.type', 'success');
+        
+        session()->flash('message.content', 'Source ajouté avec succès!');
+    } else {
+        
+        session()->flash('message.type', 'danger');
+        
+        session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
+       if ($request->save_close) {
+           return redirect()->route('billet-sources.index');
+       }else{
+        return redirect()->route('billets-sources.create');
+
+    }
+    
+     }
 
     /**
      * Display the specified resource.
@@ -57,7 +90,8 @@ class SourceController extends Controller
      */
     public function edit($id)
     {
-        //
+       $source=Source::find($id);
+       return view('billet.sources.edit',compact('source'));
     }
 
     /**
@@ -69,7 +103,25 @@ class SourceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+         $source=Source::find($id);
+        $source->title = $request->title;
+        $source->published=$request->published ? $request->published : 0 ;
+        $source->save();
+
+if ($request->update) {
+        if ($source->save()) {
+           
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie modifiée avec succès!');
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la modification!');
+        }
+    }else{
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+    }
+           return redirect()->route('billet-sources.index');
     }
 
     /**
@@ -80,6 +132,21 @@ class SourceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $source= Source::with(['getBillets','getArchives'])->where('id',$id)->first();
+   if ($source->getBillets->isEmpty() && $source->getArchives->isEmpty()) {
+        if($source->delete()){
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Source supprimée avec succès!');
+           } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la suppression!');
+        }
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette Source ne peut être supprimée car elle est referencée par un ou plusieurs Billets!');
+        }
+
+        return redirect()->route('billet-sources.index');
+
     }
 }

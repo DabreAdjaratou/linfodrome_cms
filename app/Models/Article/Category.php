@@ -20,7 +20,17 @@ class Category extends Model
      * @var array
      */
     protected $fillable = [
-        'title',
+        'title','published',
     ];
+
+     public function getArticles()
+    {
+         return $this->hasMany('App\Models\Article\Article','category_id');
+    }
+
+    public function getArchives()
+    {
+         return $this->hasMany('App\Models\Article\Archive','category_id');
+    }
 
 }

@@ -37,4 +37,9 @@ class Billet extends Model
        return $this->hasMany('App\Models\Billet\Revision','billet_id');
     }
 
+    public function getSource()
+    {
+        return $this->belongsTo('App\Models\Billet\Source','source_id');
+    }
+
 }

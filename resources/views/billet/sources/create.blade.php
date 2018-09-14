@@ -6,7 +6,7 @@
 @section('pageTitle') <h3> {{ ('Ajouter une source ') }}</h3>@endsection 
 
 
-<form method="POST" action="{{ route('article-sources.store') }}">
+<form method="POST" action="{{ route('billet-sources.store') }}">
 	@csrf
 
 	<div>

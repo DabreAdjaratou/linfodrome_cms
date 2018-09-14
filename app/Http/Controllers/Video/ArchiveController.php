@@ -22,7 +22,7 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','data','created_at','start_publication_at','stop_publication_at','views']);
+       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','created_at','start_publication_at','stop_publication_at','views']);
        foreach ($videos as $v) {
         $v->data=json_decode($v->data);
         }

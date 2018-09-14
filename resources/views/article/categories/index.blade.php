@@ -14,7 +14,11 @@
             <tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre') }}</th>
+			<th>{{ ('Pulieé') }}</th>
+			<th> {{ ('Modifier') }}</th>
+			<th> {{ ('Supprimer') }}</th>
 			<th>{{ ('id') }}</th>
+
                        
 		</tr>
 	</thead>
@@ -23,6 +27,16 @@
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td> {{ ucfirst($category->title) }}</td>
+			<td>{{ $category->published }}</td>
+			<td> <a href="{{ route('article-categories.edit',['category'=>$category]) }}" ><span class="uk-text-success">Modifier</span></a>
+
+			</td>
+			<td> <form action="{{ route('article-categories.destroy',['category'=>$category]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette categorie?')">
+				@csrf
+				@method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+			</form> 
+			</td>
 			<td>{{ $category->id }}</td>
                 </tr>
 		@endforeach

@@ -6,40 +6,43 @@
 @parent
 @section ('pageTitle')<h3>{{ ('Liste des ressources') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-striped uk-table-hover uk-table-small" {{--uk-text-small responsive --}}>	
-<thead>
-	<tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-            <th>{{ ('Titre') }}</th>
-	    <th>{{ ('Actions') }}</th>
-	    <th>{{ ('id') }}</th>
-	</tr>
-	
-</thead>
-<tbody>
+	<thead>
+		<tr>
+			<th>{{ ('Titre') }}</th>
+			<th>{{ ('Actions') }}</th>
+			<th>{{ ('Modifier') }}</th>
+			<th>{{ ('Supprimer') }}</th>
+			<th>{{ ('id') }}</th>
+		</tr>
 
-@foreach($resources as $resource)
-	<tr>
-            <td><input type="checkbox" name="" class="uk-checkbox"></td>
-		<td>{{ $resource->title}}</td>
-		<td>
-			{{ $resource->actions }}
-{{-- @foreach($resource->actions as $action)
-{{ $action }}
-@endforeach --}}
+	</thead>
+	<tbody>
 
-{{-- 
-	{{ $resource->actions}} --}}
-		</td>
-		<td>{{ $resource->id }}</td>
+		@foreach($resources as $resource)
+		<tr>
+			<td>{{ $resource->title}}</td>
+			<td>@foreach ($resource->getActions as $action)
+				{{ ucfirst($action->title) }}
+			@endforeach </td>
+			<td> <a href="{{ route('resources.edit',['resource'=>$resource]) }}" ><span class="uk-text-success">Modifier</span></a>
 
-	</tr>
-@endforeach
-</tbody>
-<tfoot>
-</tfoot>
+			</td>
+			<td> <form action="{{ route('resources.destroy',['resource'=>$resource]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette resource?')">
+				@csrf
+				@method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+			</form> 
+			</td>
+			<td>{{ $resource->id }}</td>
+
+		</tr>
+		@endforeach
+	</tbody>
+	<tfoot>
+	</tfoot>
 </table>
 @section('sidebar')
- @component('layouts.administrator.user-sidebar') @endcomponent 
+@component('layouts.administrator.user-sidebar') @endcomponent 
 @endsection
 @section('js')
 

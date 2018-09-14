@@ -16,6 +16,11 @@ class Action extends Model
         'title','display_name',
     ];
 
+    public function getResources()
+    {
+        return $this->belongsToMany('App\Models\User\Resource', 'resource_action_map', 'action_id', 'resource_id');
+    }
+
 
 	
 }

@@ -25,12 +25,12 @@ class Group extends Model
     ]; 
     
 
-    public function getChildrens()
+    public function getChildren()
     {
         return $this->hasMany('App\Models\User\Group', 'parent_id');
     }
 
-    public function getParents()
+    public function getParent()
     {
         return $this->belongsTo('App\Models\User\Group', 'parent_id');
     }

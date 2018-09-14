@@ -26,7 +26,6 @@ class CreateVideosTable extends Migration
             $table->unsignedInteger('created_by')->comment('#foreign key usres : id of the journalist author of the video');
             $table->unsignedInteger('editor');
             $table->unsignedInteger('cameraman');
-            $table->int('editor')->comment('cameraman, editor');
             $table->datetime('created_at')->nullable(false);
             $table->datetime('start_publication_at')->nullable(true);
             $table->datetime('stop_publication_at')->nullable(true);

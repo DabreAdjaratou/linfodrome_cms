@@ -15,18 +15,19 @@
 	</div>
 	<div>	
 		<label for="title">{{('Titre:')}}</label>
-		<input type="text" name="title" placeholder="Titre du niveau d'acces" required autofocus>
+		<input type="text" name="title" placeholder="Titre du niveau d'acces"  value="{{ old('title') }}" required autofocus>
 	</div>
-	<div>	
-		<label for="groups">{{('Groupes:')}}</label>
-		<select name="groups[]" multiple required > 
-			@foreach($groups as $group)
-			<option value="{{ $group->id }}">{{ $group->title }}</option>
+
+	<div>
+		@foreach($groups as $group)
+		<ul>
+			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif>
+			{{ ucfirst($group->title) }}
+			@if(count($group->getChildren))
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>$accessLevelView])
+			@endif
+		</ul>                                     
 			@endforeach
-		</select>
-		</div>
-		
-
-	</form>
-
-	@endsection
+	</div>	
+</form>
+@endsection

@@ -13,11 +13,10 @@ class CreateResourceActionMap extends Migration
      */
     public function up()
     {
-        Schema::table('resource_action_map', function (Blueprint $table) {
-          $table->increments('id');
-            $table->unsignedInteger('resource_id')->nullable(false);
-            $table->unsignedInteger('action_id')->nullable(false);
-        });
+        Schema::create('resource_action_map', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('resource_id');
+            $table->unsignedInteger('action_id');
         });
     }
 
@@ -28,8 +27,6 @@ class CreateResourceActionMap extends Migration
      */
     public function down()
     {
-        Schema::table('resource_action_map', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('resource_action_map');
     }
 }

@@ -13,11 +13,10 @@ class CreateUsergroupAccesslevelMap extends Migration
      */
     public function up()
     {
-        Schema::table('usergroup_accesslevel_map', function (Blueprint $table) {
+        Schema::create('usergroup_accesslevel_map', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_group_id')->nullable(false);
-            $table->unsignedInteger('access_level_id')->nullable(false);
-      
+            $table->unsignedInteger('user_group_id');
+            $table->unsignedInteger('access_level_id');
         });
     }
 
@@ -28,8 +27,6 @@ class CreateUsergroupAccesslevelMap extends Migration
      */
     public function down()
     {
-        Schema::table('usergroup_accesslevel_map', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('usergroup_accesslevel_map');
     }
 }

@@ -26,7 +26,7 @@ class VideoController extends Controller
      */
     public function index()
     {
-     $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','data','created_at','start_publication_at','stop_publication_at','views']);
+     $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','created_at','start_publication_at','stop_publication_at','views']);
        foreach ($videos as $v) {
         $v->data=json_decode($v->data);
         }
@@ -110,13 +110,17 @@ class VideoController extends Controller
        });
 
      } catch (Exception $exc) {
-      $request->session()->flash('message.type', 'danger');
-      $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+      
+      session()->flash('message.type', 'danger');
+      
+      session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
     }
 
-    $request->session()->flash('message.type', 'success');
-    $request->session()->flash('message.content', 'Billet ajouté avec succès!');
+    
+    session()->flash('message.type', 'success');
+    
+    session()->flash('message.content', 'Billet ajouté avec succès!');
     
     
 

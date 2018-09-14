@@ -19,6 +19,16 @@ class Category extends Model
      * @var array
      */
     protected $fillable = [
-        'title',
+        'title','published',
     ];
+
+      public function getBillets()
+    {
+         return $this->hasMany('App\Models\Billet\Billet','category_id');
+    }
+
+    public function getArchives()
+    {
+         return $this->hasMany('App\Models\Billet\Archive','category_id');
+    }
 }

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Billet\Billet;
 use App\Models\Billet\Archive;
-use App\Models\Article\Source;
+use App\Models\Billet\Source;
 use App\Models\Billet\Category;
 use App\Models\User\User;
 use Illuminate\Support\Facades\DB;
@@ -121,13 +121,13 @@ class BilletController extends Controller
 });
            
        } catch (Exception $exc) {
-        $request->session()->flash('message.type', 'danger');
-        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
        }
 
-       $request->session()->flash('message.type', 'success');
-       $request->session()->flash('message.content', 'Billet ajouté avec succès!');
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Billet ajouté avec succès!');
     
 
        if ($request->save_close) {

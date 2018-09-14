@@ -46,20 +46,21 @@ class CategoryController extends Controller
     {
         $validatedData = $request->validate([
             'title' => 'required|unique:article_categories|max:100',
-            'published' => 'required|int',
+            'published' => 'nullable|int',
         ]);
 
-        $categorie= new Category;
+        $category= new Category;
 
-        $categorie->title = $request->title;
-        $categorie->alias=str_slug($request->title);
-        $categorie->published = $request->published;
-        if ($categorie->save()) {
-            $request->session()->flash('message.type', 'success');
-            $request->session()->flash('message.content', 'Categorie ajouté avec succès!');
+        $category->title = $request->title;
+        $category->alias=str_slug($request->title);
+        $category->published=$request->published ? $request->published : 0 ;
+       
+        if ($category->save()) {
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie ajouté avec succès!');
         } else {
-            $request->session()->flash('message.type', 'danger');
-            $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de l\'ajout!');
         }
 
         if ($request->save_close) {
@@ -91,7 +92,8 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category=Category::find($id);
+        return view('article.categories.edit',compact('category'));
     }
 
     /**
@@ -103,7 +105,26 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $category=Category::find($id);
+        $category->title = $request->title;
+        $category->alias=str_slug($request->title);
+        $category->published=$request->published ? $request->published : 0 ;
+        $category->save();
+
+if ($request->update) {
+        if ($category->save()) {
+           
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie modifiée avec succès!');
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la modification!');
+        }
+    }else{
+        session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Modification annulée!');
+    }
+           return redirect()->route('article-categories.index');
     }
 
     /**
@@ -114,6 +135,21 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category= Category::with(['getArticles','getArchives'])->where('id',$id)->first();
+   if ($category->getArticles->isEmpty() && $category->getArchives->isEmpty()) {
+        if($category->delete()){
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie supprimée avec succès!');
+           } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la suppression!');
+        }
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette categorie ne peut être supprimée car elle est referencée par un ou plusieurs articles!');
+        }
+
+        return redirect()->route('article-categories.index');
+
     }
 }

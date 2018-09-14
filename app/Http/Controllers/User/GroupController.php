@@ -25,31 +25,12 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::with('getChildrens')->where('parent_id',0)->get();
-        // foreach ($groups as $g) {
-    //         $g['title']='-'.$g['title'];
-    //         foreach ($g->getChildrens as $c) {
-    //          $c['title']='--'.$c['title'];
-    //          $g['get_childrens']=$g->getChildrens->toArray();
-    //          $c['get_childrens']=$c->getChildrens;
-    //          foreach ($c['get_childrens'] as $c2) {
-    //             $c2['title']='---'.$c2['title'];
-    //             $c2['get_childrens']=$c2->getChildrens;
-    //             foreach ($c2['get_childrens'] as $c3) {
-    //             $c3['title']='----'.$c3['title'];
-    //             $c3['get_childrens']=$c3->getChildrens;
-    //         }
-    //         }
+        $groups = Group::where('parent_id',0)->get();
+        $view='groupView';
+               
+    return view ('user.groups.index', compact('groups','view'));
 
-    //     }
-
-    // }
-  
-    // return view ('user.groups.index', ['groups'=>$groups->toArray()]);
-    return view ('user.groups.index', ['groups'=>$groups]);
-
-}
-
+         }    
     /**
      * Show the form for creating a new resource.
      *
@@ -77,11 +58,15 @@ class GroupController extends Controller
         $group->title = $request->title;
         $group->parent_id = $request->parent;
         if ($group->save()) {
-            $request->session()->flash('message.type', 'success');
-            $request->session()->flash('message.content', 'Groupe ajouté avec succès!');
+            
+            session()->flash('message.type', 'success');
+            
+            session()->flash('message.content', 'Groupe ajouté avec succès!');
         } else {
-            $request->session()->flash('message.type', 'danger');
-            $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+            
+            session()->flash('message.type', 'danger');
+            
+            session()->flash('message.content', 'Erreur lors de l\'ajout!');
         }
         if ($request->save_close) {
          return redirect()->route('user-groups.index');
@@ -137,17 +122,5 @@ class GroupController extends Controller
         //
     }
 
-    public function fore(Array $group){
-
-        for ($i=0; $i <count($group) ; $i++) { 
-         $group[$i]='<tr>
-         <td><input type="checkbox" name="" class="uk-checkbox"></td>
-         <td>'. $group[$i].'</td>
-         <td> {{$group[$i][id]</td>
-            </tr>';
-
-        }
-        return $group;
-
-    }
+    
 }

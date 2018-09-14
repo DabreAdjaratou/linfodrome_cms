@@ -10,7 +10,9 @@
 	<tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 		<th>{{ ('Titre') }}</th>
-		<th>{{ (' Display name') }}</th>
+		<th>{{ (' Nom affiché') }}</th>
+		<th>{{ ('Modifier') }}</th>
+		<th>{{ ('Supprimer') }}</th>
 	<th>id</th>
 
 	</tr>
@@ -26,6 +28,15 @@
             <td><input type="checkbox" name="" class="uk-checkbox"></td>
 		<td>{{ ucfirst($action->title) }}</td>
 		<td>{{ ucfirst($action->display_name )}}</td>
+		<td> <a href="{{ route('actions.edit',['action'=>$action]) }}" ><span class="uk-text-success">Modifier</span></a>
+
+			</td>
+			<td> <form action="{{ route('actions.destroy',['action'=>$action]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette action?')">
+				@csrf
+				@method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+			</form> 
+			</td>
 		<td>{{ $action->id }}</td>
 
 	</tr>
