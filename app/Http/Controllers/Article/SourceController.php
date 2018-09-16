@@ -46,17 +46,18 @@ class SourceController extends Controller
     {
         
         $validatedData = $request->validate([
-        'title' => 'required|unique:sources|max:100',
+        'title' => 'required|unique:article_sources|max:100',
         ]);
 
        $source= new Source;
        $source->title = $request->title;
+       $source->published=$request->published ? $request->published : 0 ;
        if ($source->save()) {
-        $request->session()->flash('message.type', 'success');
-        $request->session()->flash('message.content', 'Source ajouté avec succès!');
+        session()->flash('message.type', 'success');
+        session()->flash('message.content', 'Source ajouté avec succès!');
     } else {
-        $request->session()->flash('message.type', 'danger');
-        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
        if ($request->save_close) {
            return redirect()->route('article-sources.index');
@@ -86,7 +87,8 @@ class SourceController extends Controller
      */
     public function edit($id)
     {
-        //
+       $source=Source::find($id);
+       return view('article.sources.edit',compact('source'));
     }
 
     /**
@@ -98,7 +100,25 @@ class SourceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+         $source=Source::find($id);
+        $source->title = $request->title;
+        $source->published=$request->published ? $request->published : 0 ;
+        $source->save();
+
+if ($request->update) {
+        if ($source->save()) {
+           
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie modifiée avec succès!');
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la modification!');
+        }
+    }else{
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+    }
+           return redirect()->route('article-sources.index');
     }
 
     /**
@@ -109,6 +129,21 @@ class SourceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $source= Source::with(['getArticles','getArchives'])->where('id',$id)->first();
+   if ($source->getArticles->isEmpty() && $source->getArchives->isEmpty()) {
+        if($source->delete()){
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Source supprimée avec succès!');
+           } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la suppression!');
+        }
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette Source ne peut être supprimée car elle est referencée par un ou plusieurs Articles!');
+        }
+
+        return redirect()->route('article-sources.index');
+
     }
 }

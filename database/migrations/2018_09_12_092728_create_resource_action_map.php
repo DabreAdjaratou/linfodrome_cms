@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAccessLevelsTable extends Migration
+class CreateResourceActionMap extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateAccessLevelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('access_levels', function (Blueprint $table) {
-            $table->tinyIncrements('id');
-            $table->string('title',100);
-            $table->timestamps();
+        Schema::create('resource_action_map', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('resource_id');
+            $table->unsignedInteger('action_id');
         });
     }
 
@@ -27,6 +27,6 @@ class CreateAccessLevelsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('access_levels');
+        Schema::dropIfExists('resource_action_map');
     }
 }

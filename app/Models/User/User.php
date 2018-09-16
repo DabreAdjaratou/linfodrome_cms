@@ -27,11 +27,30 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-
-public function getGroups()
+    public function getGroups()
     {
         return $this->belongsToMany('App\Models\User\Group', 'user_usergroup_map', 'user_id', 'user_group_id');
     }
 
-    
+    public static function getPermissions($id,$resource,$action)
+    {
+        $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', $id)->get(['id']);
+        foreach ($userData as $data) {
+         foreach ($data->getGroups as $group) {
+          foreach ($group->getAccessLevels as $acces) {
+           foreach ($acces->getPermissions  as $key=>$permission) {
+              $access_level= $acces->title;
+              $permission_resource= $permission->getResource->title;
+              $permission_action= $permission->getAction->title;
+              if ($permission_resource==$resource && $permission_action==$action) {
+                  return true;
+              }
+
+          }
+
+      }
+  } 
+}
+return false;
+}   
 }

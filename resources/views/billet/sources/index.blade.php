@@ -1,11 +1,11 @@
 @extends('layouts.administrator.master')
-@section('title', 'Articles sources')
+@section('title', 'Bilets sources')
 @section('css')
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  {{ ('Liste des sources d\'articles') }}</h3> @endsection 
+<h3>  {{ ('Liste des sources de billets') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
@@ -24,10 +24,10 @@
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td> {{ucfirst($source->title) }}</td>
 			<td> {{ $source->published }}</td>
-			<td> <a href="{{ route('article-sources.edit',['source'=>$source]) }}" ><span class="uk-text-success">Modifier</span></a>
+			<td> <a href="{{ route('billet-sources.edit',['source'=>$source]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
-			<td> <form action="{{ route('article-sources.destroy',['source'=>$source]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette source?')">
+			<td> <form action="{{ route('billet-sources.destroy',['source'=>$source]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette source?')">
 				@csrf
 				@method('delete')
 <button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
@@ -41,7 +41,7 @@
 	</tfoot>
 </table>
 @section('sidebar')
- @component('layouts.administrator.article-sidebar') @endcomponent 
+ @component('layouts.administrator.billet-sidebar') @endcomponent 
 @endsection
 
 @section('js')

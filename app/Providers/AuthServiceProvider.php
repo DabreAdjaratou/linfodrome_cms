@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\User\AccessLevel;
+use App\Models\User\Permission;
 use App\Models\User\User;
 use lluminate\Support\Collection;
 
@@ -34,31 +35,8 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-//         $user= User::with('getGroups:title')->where('id',1)->get(['id','name']);
-//         $user= $user->toArray();
-//         $userGroups=$user[0]['get_groups'];
-       
-//         for ($i=0; $i <count($userGroups) ; $i++) { 
-
-//           $r[]=$userGroups[$i]['pivot']['user_group_id'];
-//         }
-// $r=collect($r);
-//         echo '<pre>';
-//         // print_r($r);
-//         echo '</pre>';
-// $accessLevels= AccessLevel::all();
-// for ($i=0; $i <count($r) ; $i++) { 
-//    foreach ($accessLevels as $key => $a) {
-//     $accessGroups=json_decode($a->groups);
-//     $e=$r->intersect($accessGroups);
-//     $all=collect($e->all());
-//         echo '<pre>';
-//         print_r();
-//         echo '</pre>';
-
-// }
-// }
+}
 
 
-    }
+    
 }

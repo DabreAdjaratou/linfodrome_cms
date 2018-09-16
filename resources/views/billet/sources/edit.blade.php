@@ -6,7 +6,7 @@
 @section('pageTitle') <h3> {{ ('Modifier une source ') }}</h3>@endsection 
 
 
-<form method="POST" action="{{ route('article-sources.update',['source'=>$source]) }}">
+<form method="POST" action="{{ route('billet-sources.update',['source'=>$source]) }}">
 	@csrf
 @method('put')
 	<div>

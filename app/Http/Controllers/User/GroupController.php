@@ -14,10 +14,10 @@ class GroupController extends Controller
      /**
      * Protecting routes
      */
-    public function __construct()
-{
-    $this->middleware('auth');
-}
+     public function __construct()
+     {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -25,47 +25,12 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::with('getChildrens')->where('parent_id',0)->get();
+        $groups = Group::where('parent_id',0)->get();
+        $view='groupView';
+               
+    return view ('user.groups.index', compact('groups','view'));
 
-               $accessLevels=Accesslevel::all();
-              $groups2 = Group::all();
-        foreach ($groups2 as $g) {
-//         //     $g->title= ucfirst($g->title);
-//         //   foreach ($g->getChildrens as $g2) {
-             
-//         //       foreach ($g2->getChildrens as $g3) {
-//         //          echo $g3;
-//         //   }
-
-        
-//         // }
-
-foreach ($accessLevels as $key=> $a) {
-    $collection = new Collection();
-// echo $a->groups;
-
-    $accessGroups=json_decode($a->groups);
-for ($i=0; $i <count($accessGroups) ; $i++) { 
-    
- if ($accessGroups[$i]==$g->id){
-    $access[]=$a->title;
-  // echo 'group :'.$g->title.' ';
-  // echo 'access :'.$a->title.'<br> ';
-    }
-// $array2=array_merge($array);
-  // echo   $collection->access;
-     
-}
-        }
-    }   
-
-        echo'<pre>';     
-print_r($access);
-        echo'</pre>';         
-
-return view ('user.groups.index', ['groups'=>$groups]);
-    }
-
+         }    
     /**
      * Show the form for creating a new resource.
      *
@@ -74,7 +39,7 @@ return view ('user.groups.index', ['groups'=>$groups]);
     public function create()
     {
         $parents = Group::all();
-     return view ('user.groups.create',['parents'=>$parents]);
+        return view ('user.groups.create',['parents'=>$parents]);
     }
 
     /**
@@ -86,27 +51,31 @@ return view ('user.groups.index', ['groups'=>$groups]);
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-        'title' => 'required|unique:user_groups|max:100',
-               ]);
+            'title' => 'required|unique:user_groups|max:100',
+        ]);
 
         $group = new Group;
         $group->title = $request->title;
         $group->parent_id = $request->parent;
         if ($group->save()) {
-        $request->session()->flash('message.type', 'success');
-        $request->session()->flash('message.content', 'Groupe ajouté avec succès!');
-    } else {
-        $request->session()->flash('message.type', 'danger');
-        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
-    }
-       if ($request->save_close) {
-           return redirect()->route('user-groups.index');
-       }else{
+            
+            session()->flash('message.type', 'success');
+            
+            session()->flash('message.content', 'Groupe ajouté avec succès!');
+        } else {
+            
+            session()->flash('message.type', 'danger');
+            
+            session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        }
+        if ($request->save_close) {
+         return redirect()->route('user-groups.index');
+     }else{
         return redirect()->route('user-groups.create');
 
     }
     
-    }
+}
 
     /**
      * Display the specified resource.
@@ -152,4 +121,6 @@ return view ('user.groups.index', ['groups'=>$groups]);
     {
         //
     }
+
+    
 }

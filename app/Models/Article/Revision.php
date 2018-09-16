@@ -30,7 +30,7 @@ class Revision extends Model
 
     public function getModifier()
     {
-       return $this->belongsTo('App\Models\User\User','user_id');
+       return $this->belongsTo('App\Models\User\User','id');
     }
 
  

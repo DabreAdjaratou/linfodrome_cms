@@ -125,13 +125,13 @@ class ArticleController extends Controller
 });
            
        } catch (Exception $exc) {
-        $request->session()->flash('message.type', 'danger');
-        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
        }
 
-       $request->session()->flash('message.type', 'success');
-       $request->session()->flash('message.content', 'Article ajouté avec succès!');
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Article ajouté avec succès!');
     
        if ($request->save_close) {
            return redirect()->route('article-archives.index');

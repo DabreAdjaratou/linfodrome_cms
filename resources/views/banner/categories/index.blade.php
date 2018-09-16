@@ -1,43 +1,37 @@
 @extends('layouts.administrator.master')
-@section('title', 'Articles list')
+@section('title', 'Banners categories')
 @section('css')
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  {{ ('Liste des articles') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
+<h3>  {{ ('Liste des categories de bannières') }}</h3> @endsection 
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small" {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre') }}</th>
-			<th>{{ ('A la une') }}</th>
 			<th>{{ ('Publiée') }}</th>
-			<th>{{ ('Category') }}</th>
-			<th>{{ ('Auteur') }}</th>
-			<th>{{ ('créé le') }}</th>
-			<th>{{ ('Dernière modification') }}</th>
-			<th>{{ ('Modifié le') }}</th>
-			<th>{{ ('Nbre de vue') }}</th>
-			<th>{{ ('Image') }}</th>
-			<th>{{ ('id') }}</th>                       
+			<th> {{ ('Modifier') }}</th>
+			<th> {{ ('Supprimer') }}</th>
+			<th>{{ ('id') }}</th>
+                       
 		</tr>
 	</thead>
 	<tbody>
-		@foreach($articles as $article)
-		<tr class="uk-text-small">
-			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $article->title }}</td>
-			<td> {!! ($article->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($article->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
-			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
-			<td class="uk-table-expand"> {{ $article->created_at }}</td>
-			<td class="uk-table-expand">{{$article->getRevision->last()['getModifier']['name']}} </td>
-			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
-			<td> {{ $article->views }}</td>
-			<td> {{ $article->image }}</td>
-			<td>{{ $article->id }}</td>
+		@foreach($categories as $category)
+		<tr>
+			<td><input type="checkbox" name="" class="uk-checkbox"></td>
+			<td> {{ ucfirst($category->title) }}</td>
+			<td> {{ $category->published }}</td>
+			<td> <a href="{{ route('banner-categories.edit',['category'=>$category]) }}" ><span class="uk-text-success">Modifier</span></a>
+			</td>
+			<td> <form action="{{ route('banner-categories.destroy',['category'=>$category]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette categorie?')">
+				@csrf
+				@method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+			</form> </td>
+			<td>{{ $category->id }}</td>
                 </tr>
 		@endforeach
 	</tbody>
@@ -45,7 +39,7 @@
 	</tfoot>
 </table>
 @section('sidebar')
- @component('layouts.administrator.article-sidebar') @endcomponent 
+ {{-- @component('layouts.administrator.banner-sidebar') @endcomponent  --}}
 @endsection
 
 @section('js')

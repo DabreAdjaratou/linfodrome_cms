@@ -24,12 +24,12 @@ class AccessLevel extends Model
     ];
 
 
-    public static function getGoup($id) {
-        return Group::find($id);
+public function getGroups() {
+        return $this->belongsToMany('App\Models\User\Group', 'usergroup_accesslevel_map',  'access_level_id','user_group_id');
     }
 
-public function getPermission() {
-        return $this->hasMany('App\Models\User\Permission', 'permissions', 'access_level_id');
+public function getPermissions() {
+        return $this->hasMany('App\Models\User\Permission', 'access_level_id');
     }
 
 }

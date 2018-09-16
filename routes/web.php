@@ -44,6 +44,7 @@ Route::get('billet-revisions','Billet\ArchiveController@revision')->name('billet
 Route::resource('billet-archives','Billet\ArchiveController');
 Route::resource('billets','Billet\BilletController');
 Route::resource('billet-categories','Billet\CategoryController');
+Route::resource('billet-sources','Billet\SourceController');
 
 
 // Route to Video
@@ -61,4 +62,4 @@ Route::resource('users','User\UserController');
 
 // Route to Banner
 Route::resource('banners','Banner\BannerController');
-Route::resource('banner_categories','Banner\BannerController');
+Route::resource('banner-categories','Banner\BannerController');

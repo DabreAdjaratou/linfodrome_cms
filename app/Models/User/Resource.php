@@ -18,7 +18,7 @@ class Resource extends Model
         'title',
     ];
 
-    public static function getAction($id) {
-        return Action::find($id);
+    public function getActions() {
+        return $this->belongsToMany('App\Models\User\Action', 'resource_action_map',  'resource_id','action_id');
     }
 }

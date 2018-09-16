@@ -24,7 +24,8 @@ class CreateVideoArchivesTable extends Migration
             $table->mediumtext('code')->nullable(false);
             $table->string('description',255)->nullable(true);
             $table->unsignedInteger('created_by')->comment('#foreign key users : id of the journalist author of the video');
-            $table->json('data')->comment('cameraman, editor');
+            $table->unsignedInteger('editor');
+            $table->unsignedInteger('cameraman');
             $table->datetime('created_at')->nullable(false);
             $table->datetime('start_publication_at')->nullable(true);
             $table->datetime('stop_publication_at')->nullable(true);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Action;
+use Illuminate\Support\Facades\DB;
 
 
 class ActionController extends Controller
@@ -23,7 +24,8 @@ class ActionController extends Controller
      */
     public function index()
     {
-       $actions = Action::all();
+
+       $actions = Action::all('id','title','display_name');
        return view ('user.actions.index', ['actions'=>$actions]);
    }
 
@@ -54,11 +56,11 @@ class ActionController extends Controller
        $action->title = $request->title;
        $action->display_name =$request->display_name;
        if ($action->save()) {
-        $request->session()->flash('message.type', 'success');
-        $request->session()->flash('message.content', 'Action ajouté avec succès!');
+        session()->flash('message.type', 'success');
+        session()->flash('message.content', 'Action ajouté avec succès!');
     } else {
-        $request->session()->flash('message.type', 'danger');
-        $request->session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
        if ($request->save_close) {
            return redirect()->route('actions.index');
@@ -88,7 +90,8 @@ class ActionController extends Controller
      */
     public function edit($id)
     {
-        //
+        $action=Action::find($id);
+        return view('user.actions.edit',compact('action'));
     }
 
     /**
@@ -100,7 +103,21 @@ class ActionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $action=Action::find($id);
+        $action->title = $request->title;
+        $action->display_name = $request->display_name;
+
+
+        if ($request->update) {
+           $action->save();
+        session()->flash('message.type', 'success');
+        session()->flash('message.content', 'Action modifier avec succès!');
+        }else{
+ session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+        }
+        return redirect()->route('actions.index');
+        
     }
 
     /**
@@ -111,6 +128,30 @@ class ActionController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $action=Action::find($id);
+        $existingInPivot=Action::with('getResources')->where('id',$action->id)->get();
+         foreach ($existingInPivot as $e) {
+            $existingResources=[];
+            foreach ($e->getResources as $existingResource) {
+               $existingResources[]=$existingResource->id;
+           }
+       }
+
+        try {
+         DB::transaction(function () use ($action,$existingResources) {
+        $action->delete();
+         
+       for ($i=0; $i <count($existingResources) ; $i++) { 
+             $action->getResources()->detach($existingResources[$i]);
+         }
+     });
+     } catch (Exception $exc) {
+         session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Erreur lors de la suppression');
+//           echo $exc->getTraceAsString();
+    }
+        session()->flash('message.type', 'success');
+        session()->flash('message.content', 'Action supprimer avec succès!');
+        return redirect()->route('actions.index');
     }
 }

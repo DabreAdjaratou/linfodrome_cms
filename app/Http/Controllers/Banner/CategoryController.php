@@ -2,11 +2,21 @@
 
 namespace App\Http\Controllers\Banner;
 
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Banner\Category;
 
 class CategoryController extends Controller
 {
+    
+     /**
+     * Protecting routes
+     */
+    public function __construct()
+{
+    $this->middleware('auth');
+}
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +24,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories=Category::all();
+        return view('banner.categories.index',['categories'=>$categories]);
     }
 
     /**
@@ -24,7 +35,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+    return view('banner.categories.create');
     }
 
     /**
@@ -35,8 +46,31 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+        'title' => 'required|unique:banner_categories|max:100',
+        'published' => 'nullable|int',
+        ]);
+
+       $category= new Category;
+       $category->title = $request->title;
+       $category->alias=str_slug($request->title);
+        $category->published=$request->published ? $request->published : 0 ;
+
+       if ($category->save()) {
+        session()->flash('message.type', 'success');
+        session()->flash('message.content', 'Categorie ajouté avec succès!');
+    } else {
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Erreur lors de l\'ajout!');
     }
+       if ($request->save_close) {
+           return redirect()->route('banner-categories.index');
+       }else{
+        return redirect()->route('banner-categories.create');
+
+    }
+    
+       }
 
     /**
      * Display the specified resource.
@@ -57,7 +91,8 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category=Category::find($id);
+        return view('banner.categories.edit',compact('category'));
     }
 
     /**
@@ -69,7 +104,27 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $category=Category::find($id);
+        $category->title = $request->title;
+        $category->alias=str_slug($request->title);
+        $category->published=$request->published ? $request->published : 0 ;
+        $category->save();
+
+if ($request->update) {
+        if ($category->save()) {
+           
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie modifiée avec succès!');
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la modification!');
+        }
+    }else{
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+    }
+           return redirect()->route('banner-categories.index');
+  
     }
 
     /**
@@ -80,6 +135,22 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+
+    $category= Category::with(['getBanners'])->where('id',$id)->first();
+   if ($category->getBanner->isEmpty()) {
+        if($category->delete()){
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie supprimée avec succès!');
+           } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la suppression!');
+        }
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette categorie ne peut être supprimée car elle est referencée par un ou plusieurs billets!');
+        }
+
+        return redirect()->route('banner-categories.index');
+
     }
 }

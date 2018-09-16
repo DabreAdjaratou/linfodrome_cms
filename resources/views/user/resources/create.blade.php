@@ -15,21 +15,29 @@
 	</div>
 	<div>	
 		<label for="title">{{('Titre:')}}</label>
-		<input type="text" name="title" placeholder="Titre de la ressource" required autofocus>
+		<input type="text" name="title" placeholder="Titre de la ressource" value="{{ old('title') }}" required autofocus>
 
 	</div>
+	<div>
+		<label>{{('Tout selectionner') }}</label>
+	 <input type="checkbox" name="checkAll" id="checkAll" class="uk-checkbox">
+	</div>
 	<div>	
-
-		<label for="actions">{{('Actions:')}}</label>
-		<select name="actions[]" multiple required > 
+	
 			@foreach($actions as $action)
-			<option value="{{ $action->id }}">{{ $action->title }}</option>
-			@endforeach 
-
-		</select>
-
+			<label>{{ ucfirst($action->title) }}</label>
+			<input type="checkbox" name="actions[]" value="{{ $action->id }}" class="uk-checkbox" @if(is_array(old('actions')) && in_array($action->id, old('actions'))) checked @endif> 
+				@endforeach 
 	</div>
 
 </form>
 
+@endsection
+
+@section('js')
+<script type="text/javascript">
+	$("#checkAll").change(function () {
+    $("input:checkbox").prop('checked', $(this).prop("checked"));
+});
+</script>
 @endsection
