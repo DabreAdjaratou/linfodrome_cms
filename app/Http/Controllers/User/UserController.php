@@ -26,13 +26,7 @@ public function index()
    $users = User::all('id','name','email','is_active','require_reset','data');
      foreach ($users as $u) {
           $u->data=json_decode($u->data);
-               if ($u->is_active==1) {
-          $u->is_active=' <span class="uk-border-circle uk-text-success uk-text-bold uk-margin-small-left icon-container">✔</span>';
-      } else {
-        $u->is_active='<span class="uk-border-circle uk-text-danger uk-text-bold uk-margin-small-left icon-container">✖</span>';
-         
-      }
-      $u->name= ucwords($u->name);
+          $u->name= ucwords($u->name);
       }
 
       $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', 1)->get(['id']);

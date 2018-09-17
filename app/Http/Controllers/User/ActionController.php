@@ -107,7 +107,6 @@ class ActionController extends Controller
         $action->title = $request->title;
         $action->display_name = $request->display_name;
 
-
         if ($request->update) {
            $action->save();
         session()->flash('message.type', 'success');

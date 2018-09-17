@@ -108,9 +108,8 @@ class CategoryController extends Controller
         $category->title = $request->title;
         $category->alias=str_slug($request->title);
         $category->published=$request->published ? $request->published : 0 ;
-        $category->save();
-
-if ($request->update) {
+    
+    if ($request->update) {
         if ($category->save()) {
            
            session()->flash('message.type', 'success');
@@ -137,7 +136,7 @@ if ($request->update) {
     {
 
     $category= Category::with(['getBanners'])->where('id',$id)->first();
-   if ($category->getBanner->isEmpty()) {
+   if ($category->getBanners->isEmpty()) {
         if($category->delete()){
            session()->flash('message.type', 'success');
            session()->flash('message.content', 'Categorie supprimée avec succès!');

@@ -61,5 +61,7 @@ Route::resource('resources','User\ResourceController');
 Route::resource('users','User\UserController');
 
 // Route to Banner
+
 Route::resource('banners','Banner\BannerController');
-Route::resource('banner-categories','Banner\BannerController');
+Route::resource('banner-categories','Banner\CategoryController')
+;
