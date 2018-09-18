@@ -41,12 +41,6 @@
 <label for="image_legend">{{('Image caption:')}}</label>
 <input type="text" name="image_legend" value="{{ old('image_legend') }}" >
 </div>
-
-<div>
-<label for="video">{{('Video:')}}</label>
-<input type="text" name="video" value="{{ old('video') }}" >
-</div>
-
 <div>
 <label for="introtext">{{('Intro text:')}}</label>
 <input type="text" name="introtext"  value="{{ old('introtext') }}">

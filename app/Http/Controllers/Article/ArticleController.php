@@ -11,6 +11,7 @@ use App\Models\Article\Category;
 use App\Models\User\User;
 use App\Models\Article\Revision;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 class ArticleController extends Controller
@@ -30,7 +31,7 @@ class ArticleController extends Controller
     public function index()
     {   
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      return view('article.archives.index',['articles'=>$articles]);
+      return view('article.articles.index',['articles'=>$articles]);
 
     }
 
@@ -196,6 +197,24 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
+      $validatedData = $request->validate([
+      'ontitle'=>'nullable|string',
+      'title' => 'required|string',
+      'category'=>'required|int',
+      'published'=>'nullable',
+      'featured'=>'nullable',
+      'image'=>'required|image',
+      'image_legend'=>'nullable|string',
+      'video'=>'nullable|string',
+      'gallery_photo'=>'nullable',
+      'introtext'=>'nullable|string',
+      'fulltext'=>'required|string',
+      'source_id'=>'int',
+        // 'created_by'=>'int',
+      'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+      'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+
+    ]);
      $article=Article::find($id);
      if (is_null($article)) {
      $article=Archive::find($id);
@@ -241,13 +260,14 @@ class ArticleController extends Controller
          if ($request->update) {
            $article->save();
            $archive->save();
-    $revision= new  Revision;
- $revision->type=explode('@', Route::CurrentRouteAction())[1];
- $revision->user_id=Auth::id();
- $revision->article_id=$article->id;
- $revision->revised_at=now();
- $revision->save();
-           
+           $revision= new  Revision;
+      $revision->type=explode('@', Route::CurrentRouteAction())[1];
+      $revision->user_id=Auth::id();
+      $revision->article_id=$article->id;
+      $revision->revised_at=now();
+      $revision->save();
+        session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Article modifié avec succès!');
          }else{
           session()->flash('message.type', 'danger');
           session()->flash('message.content', 'Modification annulée!');
@@ -271,7 +291,36 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        //
+    
+    $article=Article::find($id)->forceDelete();
+    return redirect()->route('articles.index');
+
     }
+
+     public function draft($id)
+    {
+      $article=Article::find($id);
+      $article->published=2;
+      $article->save();
+      return redirect()->route('articles.index');
+
+    }
+
+    public function trash($id)
+    {
+    $article=Article::find($id)->delete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Article mis en corbeille!');
+    return redirect()->route('articles.index');
+    }
+
+    public function restore($id)
+    {
+      $article=Article::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Article restaurer!');
+      return redirect()->route('articles.index');
+    }
+
 
   }

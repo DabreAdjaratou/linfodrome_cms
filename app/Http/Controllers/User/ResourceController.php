@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User\Resource;
 use App\Models\User\Action;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ResourceController extends Controller
 {
@@ -127,6 +128,9 @@ return redirect()->route('resources.index');
      */
     public function update(Request $request, $id)
     {
+        $validatedData = $request->validate([
+         'title' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
+         ]);
         $resource=Resource::find($id);
         $resource->title = $request->title;
         $actions =$request->actions;

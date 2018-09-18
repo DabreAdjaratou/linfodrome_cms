@@ -40,7 +40,7 @@
 	
 	<div>
 		<label for="video">{{('Video:')}}</label>
-		<textarea name="video" value="{{ $video->code }}">{{{ old('video') }}}</textarea> 
+		<textarea name="video" >{{ $video->code }}</textarea> 
 	</div>
 
 	<div>
@@ -73,11 +73,11 @@
 	</div>
 	<div>
 		<label for="start_publication_at">{{('Star publication at:')}}</label>
-		<input type="text" name="start_publication_at" value="{{ old('start_publication_at') }}" >
+		<input type="text" name="start_publication_at" value="{{ $video->start_publication_at }}" >
 	</div>
 	<div>
 		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
-		<input type="text" name="stop_publication_at"  value="{{ old('stop_publication_at') }}">
+		<input type="text" name="stop_publication_at"  value="{{ $video->stop_publication_at }}">
 	</div>
 
 </form>

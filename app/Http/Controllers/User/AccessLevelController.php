@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User\AccessLevel;
 use App\Models\User\Group;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AccessLevelController extends Controller
 {
@@ -108,19 +109,20 @@ return redirect()->route('access-levels.index');
      */
     public function edit($id)
     {
-       $accessLevel=AccessLevel::find($id);
+       $accessLevel=AccessLevel::with('getGroups')->find($id);
        $allGroups = Group::with('getChildren')->where('parent_id',0)->get();
-       // $allGroups=A::all();
-       foreach ($allGroups as $a) {
+       $t=Group::all();
+       foreach ($t as $a) {
         $groups[]=$a->title;
         $accessLevelGroups=[];
-        dd($accessLevel);
-        // foreach ($accessLevel->getGroups as $accessLevelGroup) {
-        //     $accessLevelGroups[]=$accessLevelGroup->title;
-        // }
+        // dd($accessLevel);
+        foreach ($accessLevel->getGroups as $accessLevelGroup) {
+            $accessLevelGroups[]=$accessLevelGroup->title;
+        }
     }
+       
     $arrayDiff=array_diff($groups, $accessLevelGroups);
-            return view('user.access-levels.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelView'=>'$accessLevelView']);
+ return view('user.access-levels.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups,'accessLevelView'=>'$accessLevelView']);
         
     }
 
@@ -133,7 +135,48 @@ return redirect()->route('access-levels.index');
      */
     public function update(Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'title' => 'required|'.Rule::unique('access_levels')->ignore($id, 'id').'|max:100',
+        ]);
+        $accessLevel =AccessLevel::find($id);
+        $accessLevel->title = $request->title;
+        $groups= $request->groups;
+       $existingInPivot=AccessLevel::with('getGroups')->where('id',$accessLevel->id)->get();
+        foreach ($existingInPivot as $e) {
+            $existingGroups=[];
+            foreach ($e->getGroups as $existingGroup) {
+               $existingGroups[]=$existingGroup->id;
+           }
+       }
+
+        if ($request->update) {
+            try {
+         DB::transaction(function () use ($accessLevel,$existingGroups,$groups) {
+          $accessLevel->save();
+          for ($i=0; $i <count($existingGroups) ; $i++) { 
+             $accessLevel->getGroups()->detach($existingGroups[$i]);
+         }
+         for ($i=0; $i <count($groups) ; $i++) { 
+             $accessLevel->getGroups()->attach($groups[$i]);
+         }
+     });
+     } catch (Exception $exc) {
         
+        session()->flash('message.type', 'danger');
+        
+        session()->flash('message.content', 'Erreur lors de la modification!');
+//           echo $exc->getTraceAsString();
+    }
+    
+    session()->flash('message.type', 'success');
+    
+    session()->flash('message.content', 'Niveau d\'accès Modifier avec succès!');
+
+        }else{
+ session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+        }       
+    return redirect()->route('access-levels.index');
     }
 
     /**

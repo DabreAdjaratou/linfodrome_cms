@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Billet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Billet\Category;
+use Illuminate\Validation\Rule;
+
 class CategoryController extends Controller
 {
     
@@ -102,6 +104,10 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
+       $validatedData = $request->validate([
+            'title' => 'required|'.Rule::unique('billet_categories')->ignore($id, 'id').'|max:100',
+            'published' => 'nullable|int',
+        ]);
         $category=Category::find($id);
         $category->title = $request->title;
         $category->alias=str_slug($request->title);

@@ -177,6 +177,22 @@ class BilletController extends Controller
      */
     public function update(Request $request, $id)
     {
+      $validatedData = $request->validate([
+        'ontitle'=>'nullable|string',
+        'title' => 'required|string',
+        'category'=>'required|int',
+        'published'=>'nullable',
+        'featured'=>'nullable',
+        'image'=>'nullable|image',
+        'image_legend'=>'nullable|string',
+        'introtext'=>'nullable|string',
+        'fulltext'=>'required|string',
+        'source_id'=>'int',
+        // 'created_by'=>'int',
+        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+
+    ]);
       $billet=Billet::find($id);
      if (is_null($billet)) {
      $billet=Archive::find($id);

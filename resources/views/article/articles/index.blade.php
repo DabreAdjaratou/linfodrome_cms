@@ -20,6 +20,8 @@
 			<th>{{ ('Modifié le') }}</th>
 			<th>{{ ('Nbre de vue') }}</th>
 			<th>{{ ('Image') }}</th>
+			<th>{{ ('Modifier') }}</th>
+			<th>{{ ('Supprimer') }}</th>
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
@@ -37,6 +39,15 @@
 			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
 			<td> {{ $article->views }}</td>
 			<td> {{ $article->image }}</td>
+			<td> <a href="{{ route('articles.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
+
+			</td>
+			<td> <form action="{{ route('articles.destroy',['article'=>$article]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cet article?')">
+				@csrf
+				@method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+			</form> 
+			</td>
 			<td>{{ $article->id }}</td>
                 </tr>
 		@endforeach

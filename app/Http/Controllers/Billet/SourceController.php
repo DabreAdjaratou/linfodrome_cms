@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Billet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Billet\Source;
+use Illuminate\Validation\Rule;
 
 class SourceController extends Controller
 {
@@ -103,7 +104,10 @@ class SourceController extends Controller
      */
     public function update(Request $request, $id)
     {
-         $source=Source::find($id);
+         $validatedData = $request->validate([
+         'title' => 'required|'.Rule::unique('billet_sources')->ignore($id, 'id').'|max:100',
+        ]);
+        $source=Source::find($id);
         $source->title = $request->title;
         $source->published=$request->published ? $request->published : 0 ;
         $source->save();

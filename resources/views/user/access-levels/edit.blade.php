@@ -19,31 +19,32 @@
 	</div>
 
 	<div>
+		
 @foreach($allGroups as $group)
-		@foreach ($group->getGroups as $accessLevelGroup)
-		@if($accessLevelGroup->id==$group->id)
-		<label>{{ ucfirst($group->title) }}</label>
-			<input type="checkbox" name="groups[]" value="{{ $group->id }}" class="uk-checkbox" checked> 	
-		@endif
-		@endforeach 
-		@if(in_array($group->title,$arrayDiff))
-		<label>{{ ucfirst($group->title) }}</label>
-			<input type="checkbox" name="groups[]" value="{{ $group->id }}" class="uk-checkbox">
-		@endif
-		@endforeach 
-
-
-
-
-		{{-- @foreach($groups as $group)
-		<ul>
-			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif>
+@foreach($accessLevel->getGroups as $accessLevelGroup)
+@if($accessLevelGroup->id==$group->id)
+         <ul>
+			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"  checked>
 			{{ ucfirst($group->title) }}
 			@if(count($group->getChildren))
-			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>$accessLevelView])
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'accessLevelView','accessLevel'=>$accessLevel,'arrayDiff'=>$arrayDiff])
 			@endif
-		</ul>                                     
-			@endforeach --}}
+		</ul>     
+@endif
+@endforeach
+@if(in_array($group->title,$arrayDiff))
+		 <ul>
+			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox">
+			{{ ucfirst($group->title) }}
+			@if(count($group->getChildren))
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'accessLevelView'])
+			@endif
+		</ul>  
+		@endif 
+
+		@endforeach 
+
+
 	</div>	
 </form>
 @endsection

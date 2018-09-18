@@ -46,12 +46,6 @@
 	</div>
 
 	<div>
-		<label for="video">{{('Video:')}}</label>
-		<input type="text" name="video" value="{{$billet->video}}" >
-	</div>
-
-	
-	<div>
 		<label for="introtext">{{('Intro text:')}}</label>
 		<input type="text" name="introtext" value="{{ $billet->introtext }}" >
 	</div>
