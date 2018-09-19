@@ -16,11 +16,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/password/require-reset','User\UserController@resetPassword')->name('password.required-reset');
 
 //authentication's route
-Route::get('/password/require-reset', function () {
-    return view('auth/passwords/require-reset');
-})->name('password.require-reset')->middleware('auth');
+// Route::get('/password/require-reset', function () {
+//     return view('auth/passwords/require-reset');
+// })->name('password.require-reset')->middleware('auth');
 Auth::routes();
 
 //Route to administrator

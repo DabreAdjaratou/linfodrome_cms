@@ -26,7 +26,7 @@ class BannerController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**

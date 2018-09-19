@@ -3,7 +3,7 @@
 @section('css')
 @endsection
 @section('content')
-@section('pageTitle') <h3> Ajouter un groupe</h3>@endsection 
+@section('pageTitle') <h3> Ajouter un permission</h3>@endsection 
 
 
 <form method="POST" action="{{ route('permissions.store') }}">

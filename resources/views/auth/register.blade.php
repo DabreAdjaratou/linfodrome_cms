@@ -4,8 +4,7 @@
 @endsection
 
 @section('content')
-
-               
+              
                 <div>
                     <form method="POST" action="{{ route('register') }}" aria-label="{{('Register') }}" enctype="multipart/form-data" class="">
                         @csrf
@@ -65,6 +64,17 @@
                             </select>
                         </div>
 
+<div>
+        @foreach($groups as $group)
+        <ul>
+            <input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif>
+            {{ ucfirst($group->title) }}
+            @if(count($group->getChildren))
+            @include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'accessLevelView'])
+            @endif
+        </ul>                                     
+            @endforeach
+    </div>  
                         <div>
                                 <button type="submit" class="btn btn-primary">
                                     {{('Enregistrer') }}

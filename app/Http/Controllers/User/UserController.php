@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -93,7 +95,8 @@ public function show($id)
  */
 public function edit($id)
 {
-    //
+  $user=User::find($id);
+   return view('user.users.edit',compact('user'));
 }
 
 /**
@@ -105,9 +108,38 @@ public function edit($id)
  */
 public function update(Request $request, $id)
 {
-    //
+  $validatedData=$request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|'.Rule::unique('users')->ignore($id, 'id'),
+            // 'password' => 'string|min:6|confirmed',
+            'is_active'=>'required|integer',
+            'image'=>'nullable|image',
+            'require_reset'=>'required|integer',
+            
+  ]);
+    $user=User::find($id);
+    $user->name=$request->name;
+    $user->email=$request->email;
+    $user->is_active=$request->is_active;
+    $user->image=$request->image?? NULL;
+    $user->require_reset=$request->require_reset;
+    $user->data= '{"title":"'.$request->title.'","google":"'.$request->google.'","twitter":"'.$request->twitter.'","facebook":"'.$request->facebook.'"}';
+   if ($request->update) {
+        if ($user->save()) {
+           
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Utilisateur modifiée avec succès!');
+        } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la modification!');
+        }
+    }else{
+        session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Modification annulée!');
+    }
+           return redirect()->route('users.index');
+        
 }
-
 /**
  * Remove the specified resource from storage.
  *
@@ -116,7 +148,11 @@ public function update(Request $request, $id)
  */
 public function destroy($id)
 {
-    //
 }
 
+public function resetPassword()
+{
+  
+  
+}
 }

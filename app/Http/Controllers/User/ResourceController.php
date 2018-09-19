@@ -80,11 +80,15 @@ try {
         session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
     }
-
 session()->flash('message.type', 'success');
 session()->flash('message.content', 'Resource ajouté avec succès!');
+if ($request->save_close) {
+           return redirect()->route('resources.index');
+       }else{
+        return redirect()->route('resources.create');
+
+    }
         
-return redirect()->route('resources.index');
 }
 
     /**
