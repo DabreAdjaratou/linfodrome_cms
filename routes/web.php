@@ -16,6 +16,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/password/require-reset','User\UserController@resetPassword')->name('password.required-reset');
 
 //authentication's route
 //Route::get('/password/require-reset', function () {
@@ -34,6 +35,9 @@ Route::get('/administrator', function () {
 // Route to Article
 Route::get('article-revisions','Article\ArchiveController@revision')->name('article-revisions');
 Route::resource('article-archives','Article\ArchiveController');
+Route::get('articles/{article}/trash','Article\ArticleController@trash')->name('article-trash');
+Route::get('articles/{article}/restore','Article\ArticleController@restore')->name('article-restore');
+Route::get('articles/{article}/draft','Article\ArticleController@draft')->name('article-draft');
 Route::resource('articles','Article\ArticleController');
 Route::resource('article-categories','Article\CategoryController');
 Route::resource('article-sources','Article\SourceController');
@@ -58,8 +62,11 @@ Route::resource('access-levels','User\AccessLevelController');
 Route::resource('actions','User\ActionController');
 Route::resource('user-groups','User\GroupController');
 Route::resource('resources','User\ResourceController');
+Route::resource('permissions','User\PermissionController');
 Route::resource('users','User\UserController');
 
 // Route to Banner
+
 Route::resource('banners','Banner\BannerController');
-Route::resource('banner-categories','Banner\BannerController');
+Route::resource('banner-categories','Banner\CategoryController')
+;

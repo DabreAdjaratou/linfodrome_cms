@@ -19,7 +19,7 @@ class Video extends Model
      * @var array
      */
     protected $fillable = [
-        'title','category_id','published','featured','image','code','description','created_by','data','created_at','start_publication_at','stop_publication_at','keywords',
+        'title','category_id','published','featured','image','code','description','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','keywords',
     ];
     
      public function getCategory()
@@ -30,6 +30,16 @@ class Video extends Model
    public function getAuthor()
     {
         return $this->belongsTo('App\Models\User\User','created_by');
+    }
+
+    public function getEditor()
+    {
+        return $this->belongsTo('App\Models\User\User','editor');
+    }
+
+    public function getCameraman()
+    {
+        return $this->belongsTo('App\Models\User\User','cameraman');
     }
 
     public function getRevision()

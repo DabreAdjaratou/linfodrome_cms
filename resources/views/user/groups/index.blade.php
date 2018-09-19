@@ -20,6 +20,14 @@
 
     <td><input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"></td>
     <td>{{ ucfirst($group->title) }}</td>
+    <td> <a href="{{ route('user-groups.edit',['group'=>$group]) }}" ><span class="uk-text-success">Modifier</span></a>
+            </td>
+            <td> <form action="{{ route('user-groups.destroy',['group'=>$group]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer ce groupe?')">
+                @csrf
+                @method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+            </form> 
+            </td>
     <td> {{$group->id }}</td> </tr>
 
     @if(count($group->getChildren))

@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Group;
 use App\Models\User\Accesslevel;
-use Illuminate\Support\Collection;
+// use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
 
 
 class GroupController extends Controller
@@ -96,7 +97,9 @@ class GroupController extends Controller
      */
     public function edit($id)
     {
-        //
+        $group=Group::find($id);
+        $parents = Group::all();
+        return view ('user.groups.edit',compact('parents','group'));
     }
 
     /**
@@ -108,7 +111,21 @@ class GroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+         $validatedData = $request->validate([
+            'title' => 'required|'.Rule::unique('user_groups')->ignore($id, 'id').'|max:100',
+        ]);
+        $group = Group::find($id);
+        $group->title = $request->title;
+        $group->parent_id = $request->parent;
+        if ($request->update) {
+           $group->save();
+        session()->flash('message.type', 'success');
+        session()->flash('message.content', 'Group modifier avec succès!');
+        }else{
+ session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+        }
+        return redirect()->route('user-groups.index');
     }
 
     /**

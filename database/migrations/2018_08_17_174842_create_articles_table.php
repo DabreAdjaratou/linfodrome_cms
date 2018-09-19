@@ -41,7 +41,7 @@ class CreateArticlesTable extends Migration
             $table->index('source_id');
             $table->index('created_by');
              $table->index('views');
-
+$table->softDeletes();
         });
     }
 

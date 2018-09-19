@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Action;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Validation\Rule;
 
 class ActionController extends Controller
 {
@@ -103,10 +103,13 @@ class ActionController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validatedData = $request->validate([
+         'title' => 'required|'.Rule::unique('actions')->ignore($id, 'id').'|max:100',
+         'display_name'=>'required|max:30',
+        ]);
         $action=Action::find($id);
         $action->title = $request->title;
         $action->display_name = $request->display_name;
-
 
         if ($request->update) {
            $action->save();

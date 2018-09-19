@@ -8,7 +8,11 @@ use App\Models\Video\Category;
 use App\Models\User\User;
 use App\Models\Video\Video;
 use App\Models\Video\Archive;
+use App\Models\Video\Revision;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
 
 class VideoController extends Controller
 {
@@ -26,11 +30,9 @@ class VideoController extends Controller
      */
     public function index()
     {
-     $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','created_at','start_publication_at','stop_publication_at','views']);
-       foreach ($videos as $v) {
-        $v->data=json_decode($v->data);
-        }
-       return view ('video.archives.index', ['videos'=>$videos]);
+     $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+
+           return view ('video.videos.index', compact('videos'));
 
    }
 
@@ -44,7 +46,7 @@ class VideoController extends Controller
 
       $categories=Category::all();
       $users=User::all();
-      return view ('video.videos.create',['categories'=>$categories,'users'=>$users]);
+      return view ('video.videos.create',compact('categories','users'));
     }
 
     /**
@@ -63,11 +65,10 @@ class VideoController extends Controller
         'image'=>'required|image',
         'video'=>'required|string',
         'created_by'=>'int',
-        'cameraman'=>'required|string',
-        'editor'=>'required|string',
+        'cameraman'=>'required|int',
+        'editor'=>'required|int',
         'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
         'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-
       ]);
 
       $video= new Video;
@@ -79,7 +80,8 @@ class VideoController extends Controller
       $video->image = $request->image;
       $video->code = $request->video;
       $video->created_by =$request->created_by;
-      $video->data ='{"cameraman":"'.$request->cameraman.'","editor":"'.$request->editor.'"}';
+      $video->cameraman =$request->cameraman;
+       $video->editor =$request->editor;
       $video->created_at =now();
       $video->start_publication_at = $request->start_publication_at;
       $video->stop_publication_at =$request->stop_publication_at;
@@ -100,7 +102,8 @@ class VideoController extends Controller
          $archive->image = $lastRecord->image;
          $archive->code = $lastRecord->code;
          $archive->created_by =$lastRecord->created_by;
-         $archive->data=$lastRecord->data;
+         $archive->cameraman =$lastRecord->cameraman;
+         $archive->editor =$lastRecord->editor;
          $archive->created_at =$lastRecord->created_at;
          $archive->start_publication_at = $lastRecord->start_publication_at;
          $archive->stop_publication_at =$lastRecord->stop_publication_at;
@@ -120,7 +123,7 @@ class VideoController extends Controller
     
     session()->flash('message.type', 'success');
     
-    session()->flash('message.content', 'Billet ajouté avec succès!');
+    session()->flash('message.content', 'Video ajouté avec succès!');
     
     
 
@@ -151,7 +154,10 @@ class VideoController extends Controller
      */
     public function edit($id)
     {
-        //
+      $video=Video::find($id);
+      $categories=Category::all();
+      $users=User::all();
+      return view ('video.videos.edit',compact('video','categories','users'));
     }
 
     /**
@@ -163,7 +169,81 @@ class VideoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+      $validatedData = $request->validate([
+        'title' => 'required|string',
+        'category'=>'required|int',
+        'published'=>'nullable',
+        'featured'=>'nullable',
+        'image'=>'required|image',
+        'video'=>'required|string',
+        'created_by'=>'int',
+        'cameraman'=>'required|int',
+        'editor'=>'required|int',
+        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+      ]);
+     $video=Video::find($id);
+     if (is_null($video)) {
+     $video=Archive::find($id);
+     }
+      $video->title =$request->title;
+      $video->alias =str_slug($request->title, '-');
+      $video->category_id = $request->category;
+      $video->published=$request->published ? $request->published : 0 ;
+      $video->featured=$request->featured ? $request->featured : 0 ; 
+      $video->image = $request->image;
+      $video->code = $request->video;
+      $video->created_by =$request->created_by;
+      $video->cameraman =$request->cameraman;
+      $video->editor =$request->editor;
+      $video->created_at =now();
+      $video->start_publication_at = $request->start_publication_at;
+      $video->stop_publication_at =$request->stop_publication_at;
+
+
+
+      try {
+       DB::transaction(function () use ($video,$request) {
+         $archive=Archive::find($video->id);
+         $archive->title =$video->title;
+         $archive->alias =$video->alias;
+         $archive->category_id = $video->category_id;
+         $archive->published = $video->published;
+         $archive->featured =$video->featured;
+         $archive->image = $video->image;
+         $archive->code = $video->code;
+         $archive->created_by =$video->created_by;
+         $archive->cameraman =$video->cameraman;
+         $archive->editor =$video->editor;
+         $archive->created_at =$video->created_at;
+         $archive->start_publication_at = $video->start_publication_at;
+         $archive->stop_publication_at =$video->stop_publication_at;
+        if ($request->update) {
+       $video->save();
+       $archive->save();
+       $revision= new  Revision;
+       $revision->type=explode('@', Route::CurrentRouteAction())[1];
+       $revision->user_id=Auth::id();
+       $revision->video_id=$video->id;
+       $revision->revised_at=now();
+       $revision->save();
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Video modifié avec succès!');
+           
+      }else{
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+    }
+     });
+           
+       } catch (Exception $exc) {
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Erreur lors de la modification!');
+//           echo $exc->getTraceAsString();
+       }
+
+           return redirect()->route('videos.index');
+    
     }
 
     /**

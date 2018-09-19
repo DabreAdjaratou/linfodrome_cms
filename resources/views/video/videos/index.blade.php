@@ -25,17 +25,17 @@
                        
 		</tr>
 	</thead>
-	<tbody>
-		@foreach($videos as $video)
+	<tbody>		
+		@foreach($videos as $video)		
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-                        <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
+            <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
 			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
 			<td> {!! ($video->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
 			<td> {!! ($video->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
-			<td class="uk-table-expand"> {{$video->getAuthor->name}}</td>
-			<td class="uk-table-expand"> {{$video->data->cameraman}}</td>
-			<td class="uk-table-expand"> {{$video->data->editor}}  </td>
+			<td class="uk-table-expand"> {{ucwords($video->getAuthor->name)}}</td>
+			<td class="uk-table-expand"> {{ucwords($video->getCameraman->name)}}</td>
+			<td class="uk-table-expand"> {{ucwords($video->getEditor->name)}}  </td>
 			<td class="uk-table-expand">{{$video->created_at}}</td>
 			<td class="uk-table-expand">{{ $video->start_publication_at}} </td>
 			<td class="uk-table-expand"> {{$video->stop_publication_at}}</td>

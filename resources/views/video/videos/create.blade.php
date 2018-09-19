@@ -43,8 +43,6 @@
 
 	<div>
 	<label for="created_by">{{('Journaliste:')}}</label>
-{{-- 	<span>{{ Auth::User()->name}}</span>
-        <input type="hidden" name="auth_userid" value="{{ Auth::id() }}"> --}}
 	    <select name="created_by">
 			<option></option>
 			@foreach ($users as $user)
@@ -53,12 +51,23 @@
 		</select>
 	</div>
 <div>
-		<label for="cameraman">{{('Cameraman:')}}</label>
-		<input type="text" name="cameraman" value="{{ old('cameraman') }}" >
+	<label for="cameraman">{{('cameraman:')}}</label>
+
+	    <select name="cameraman">
+			<option></option>
+			@foreach ($users as $user)
+			<option value="{{ $user->id }}" {{ (old("cameraman") == $user->id ? "selected":"") }}>{{ $user->name }} </option>
+			@endforeach 
+		</select>
 	</div>
 	<div>
-		<label for="editor">{{('Monteur:')}}</label>
-		<input type="text" name="editor" value="{{ old('editor') }}" >
+	<label for="editor">{{('editor:')}}</label>
+	    <select name="editor">
+			<option></option>
+			@foreach ($users as $user)
+			<option value="{{ $user->id }}" {{ (old("editor") == $user->id ? "selected":"") }}>{{ $user->name }} </option>
+			@endforeach 
+		</select>
 	</div>
 	<div>
 		<label for="start_publication_at">{{('Star publication at:')}}</label>

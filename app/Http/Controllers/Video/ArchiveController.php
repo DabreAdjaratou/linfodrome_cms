@@ -22,11 +22,9 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','created_by','created_at','start_publication_at','stop_publication_at','views']);
-       foreach ($videos as $v) {
-        $v->data=json_decode($v->data);
-        }
-       return view ('video.archives.index', ['videos'=>$videos]);
+       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+        
+       return view ('video.archives.index', compact('videos'));
     }
 
     /**
@@ -98,6 +96,6 @@ class ArchiveController extends Controller
      public function revision()
   {
     $videos= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
-    return view('video.archives.revision',['videos'=>$videos]);
+    return view('video.archives.revision',compact('videos'));
   }
 }

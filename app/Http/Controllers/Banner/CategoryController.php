@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Banner;
 
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Banner\Category;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -104,13 +104,16 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'title' => 'required|'.Rule::unique('banner_categories')->ignore($id, 'id').'|max:100',
+            'published' => 'nullable|int',
+        ]);
         $category=Category::find($id);
         $category->title = $request->title;
         $category->alias=str_slug($request->title);
         $category->published=$request->published ? $request->published : 0 ;
-        $category->save();
-
-if ($request->update) {
+    
+    if ($request->update) {
         if ($category->save()) {
            
            session()->flash('message.type', 'success');
@@ -137,7 +140,7 @@ if ($request->update) {
     {
 
     $category= Category::with(['getBanners'])->where('id',$id)->first();
-   if ($category->getBanner->isEmpty()) {
+   if ($category->getBanners->isEmpty()) {
         if($category->delete()){
            session()->flash('message.type', 'success');
            session()->flash('message.content', 'Categorie supprimée avec succès!');
