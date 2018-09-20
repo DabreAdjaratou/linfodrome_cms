@@ -47,7 +47,7 @@ class LoginController extends Controller
     session()->flash('message.type', 'danger');
     session()->flash('message.content', 'Votre compte est inactif!');
     Auth::logout();
-    return false;
+    return '/login';
   } 
 
     if (Auth::user()->require_reset==0) {

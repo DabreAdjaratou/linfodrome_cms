@@ -20,7 +20,7 @@ class CreateTableBannerCategories extends Migration
             $table->tinyInteger('published')->nullable(false)->default(0)->comment('0 : not published, 1 : published');
             $table->timestamps();
             $table->index('published');
-        
+        $table->softDeletes();
         });
     }
 

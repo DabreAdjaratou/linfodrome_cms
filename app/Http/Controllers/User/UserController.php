@@ -18,7 +18,9 @@ class UserController extends Controller
      */
      public function __construct()
      {
-      $this->middleware('auth');
+       $this->middleware('auth');
+       $this->middleware('activeUser')->except(['requireResetPassword','resetPassword']);
+
     }
 /**
  * Display a listing of the resource.
@@ -224,7 +226,7 @@ session()->flash('message.content', 'Mot de passe Modifié avec succès!');
   session()->flash('message.content', 'Modification annulée!');
 
   }
-  return redirect()->route('users.index');
+  return redirect()->route('administrator');
 
 }
 }

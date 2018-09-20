@@ -17,6 +17,7 @@ class CreateUsergroupAccesslevelMap extends Migration
             $table->increments('id');
             $table->unsignedInteger('user_group_id');
             $table->unsignedInteger('access_level_id');
+            $table->softDeletes();
         });
     }
 

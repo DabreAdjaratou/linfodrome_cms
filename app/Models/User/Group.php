@@ -4,9 +4,17 @@ namespace App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User\AccessLevel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Group extends Model
 {
+    use SoftDeletes;
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['deleted_at'];
 	 /**
      * The table associated with the model.
      *

@@ -16,20 +16,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/users/{user}/reset-password','User\UserController@requireResetPassword')->name('users.require-reset');
-// Route::post('/users/{user}/update-password','User\UserController@resetPassword')->name('users.update-password');
-Route::match(['put', 'patch'], '/users/{user}/update-password', 'User\UserController@resetPassword')->name('users.update-password');
 
-//authentication's route
-//Route::get('/password/require-reset', function () {
-//    return view('auth/passwords/require-reset');
-//})->name('password.require-reset')->middleware('auth');
 Auth::routes();
 
 //Route to administrator
 Route::get('/administrator', function () {
     return view('layouts/administrator/admin-panel');
-})->name('administrator')->middleware('auth');
+})->name('administrator')->middleware('auth','activeUser');
 // 
 //redirections
 // Route::redirect('/home', 'register', 301);
@@ -65,6 +58,8 @@ Route::resource('actions','User\ActionController');
 Route::resource('user-groups','User\GroupController');
 Route::resource('resources','User\ResourceController');
 Route::resource('permissions','User\PermissionController');
+Route::get('/users/{user}/reset-password','User\UserController@requireResetPassword')->name('users.require-reset');
+Route::match(['put', 'patch'], '/users/{user}/update-password', 'User\UserController@resetPassword')->name('users.update-password');
 Route::resource('users','User\UserController');
 
 // Route to Banner

@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->timestamps();
             $table->index(['password','email','is_active']);
             $table->index('require_reset');
+            $table->softDeletes();
              
         });
     }

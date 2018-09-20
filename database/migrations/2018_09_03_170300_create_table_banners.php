@@ -29,6 +29,7 @@ class CreateTableBanners extends Migration
             $table->integer('created_by');
             $table->timestamps();
             $table->index(['published','start_publication_at','stop_publication_at'],'banners_publication_time');
+            $table->softDeletes();
                    
         });
     }

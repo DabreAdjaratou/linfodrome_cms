@@ -1,10 +1,5 @@
 <!doctype html>
 
-@if(session()->has('message.content'))
-  <h1>  <div class="uk-alert uk-alert-{{ session('message.type') }}"> 
-    {!! session('message.content') !!}</h1>
-    </div>
-@endif
 
 <html lang="{{ app()->getLocale() }}">
     <head>

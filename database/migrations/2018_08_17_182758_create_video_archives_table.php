@@ -37,6 +37,7 @@ class CreateVideoArchivesTable extends Migration
             $table->index('featured');
             $table->index('created_by');
             $table->index('views');
+            $table->softDeletes();
         });
     }
 

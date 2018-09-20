@@ -19,7 +19,9 @@ class CreateUserGroupsTable extends Migration
             $table->unsignedInteger('parent_id')->default(0)->comment('reference the parent group using a reflexive relationship, the value is 0 when a group have not a group parent');
             $table->timestamps();
             $table->index('parent_id');
+            $table->softDeletes();
         });
+
     }
 
     /**

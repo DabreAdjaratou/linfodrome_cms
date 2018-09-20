@@ -30,11 +30,11 @@
 	</select>
 	<div>
 		<label for="published">{{('Published:')}}</label>
-		<input type="checkbox" name="published" value="{{ 1 }}">
+		<input type="checkbox" name="published" value="{{ 1 }}" @if(old('published')) checked @endif>
 	</div>
 	<div>
 		<label for="featured">{{('Featured:')}}</label>
-		<input type="checkbox" name="featured" value="{{ 1 }}">
+		<input type="checkbox" name="featured" value="{{ 1 }}" @if(old('featured')) checked @endif>
 	</div>
 	<div>
 		<label for="image">{{('Image:')}}</label>

@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class PermissionController extends Controller
 {
+    public function __construct()
+     {
+        $this->middleware(['auth','activeUser']);
+    }
     /**
      * Display a listing of the resource.
      *

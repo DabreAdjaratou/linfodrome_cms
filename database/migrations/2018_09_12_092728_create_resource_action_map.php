@@ -17,6 +17,7 @@ class CreateResourceActionMap extends Migration
             $table->increments('id');
             $table->unsignedInteger('resource_id');
             $table->unsignedInteger('action_id');
+            $table->softDeletes();
         });
     }
 

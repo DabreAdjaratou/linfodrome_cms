@@ -19,7 +19,7 @@ class CreateArticleArchivesTable extends Migration
             $table->string('title',255)->nullable(false);
             $table->string('alias',255)->nullable(false);
             $table->unsignedInteger('category_id')->nullable(false);
-            $table->unsignedTinyInteger('published')->nullable(false)->default(0)->comment('0 : not published, 1 : published, 2 : draft , 3: trash');
+            $table->unsignedTinyInteger('published')->nullable(false)->default(0)->comment('0 : not published, 1 : published, 2 : draft');
             $table->unsignedTinyInteger('featured')->nullable(false)->default(0)->comment('0: not featured, 1:featured');
             $table->string('image',255)->nullable(true);
             $table->string('image_legend',255)->nullable(true);
@@ -41,6 +41,7 @@ class CreateArticleArchivesTable extends Migration
             $table->index('source_id');
             $table->index('created_by');
             $table->index('views');
+            $table->softDeletes();
         });
     }
 

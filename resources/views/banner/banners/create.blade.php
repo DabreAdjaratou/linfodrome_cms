@@ -1,24 +1,30 @@
 @extends('layouts.administrator.master')
-@section('title', 'Create a new article')
+@section('title', 'Create a new banner')
 @section('css')
 @endsection
 @section('content')
-@section('pageTitle') <h3> {{ ('Ajouter une article ') }}</h3>@endsection 
+@section('pageTitle') <h3> {{ ('Ajouter une bannière ') }}</h3>@endsection 
 
 
-<form method="POST" action="{{ route('articles.store') }}"  enctype="multipart/form-data" class="">
+<form method="POST" action="{{ route('banners.store') }}"  enctype="multipart/form-data" class="">
 	@csrf
 	<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
 	<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
 	<button type="reset">{{('Annuler')}}</button>
-	<div>	
-		<label for="ontitle">{{('Sur Titre:')}}</label>
-		<input type="text" name="ontitle" placeholder="Sur titre" value="{{ old('ontitle') }}">
-	</div>
+	
 	<div>
 		<label for="title">{{('Titre:')}}</label>
 		<input type="text" name="title" placeholder="Titre"  value="{{ old('title') }}" required autofocus>
 	</div>
+	<div>
+		<label for="type">{{('Type:')}}</label>
+		<select name="type">
+			<option></option>
+			<option value="{{ 0 }}" {{ (old("type") == 0 ? "selected":"") }}>{{ ('Image') }}</option>
+			<option value="{{ 1 }}" {{ (old("type") == 1 ? "selected":"") }}>{{ ('Personnalisé') }}</option>
+		</select>
+	</div>
+	<div>
 	<label for="category">{{('category:')}}</label>
 	<select  name="category" >
 		<option> </option>
@@ -26,52 +32,16 @@
 		<option value="{{ $category->id }}" {{ (old("category") == $category->id ? "selected":"") }}>{{ucfirst($category->title) }}</option>
 		@endforeach
 	</select>
+	</div>
 	<div>
 		<label for="published">{{('Published:')}}</label>
-		<input type="checkbox" name="published" value="{{ 1 }}">
+		<input type="checkbox" name="published" value="{{ 1 }}" @if(old('published')) checked @endif>
 	</div>
 	<div>
-		<label for="featured">{{('Featured:')}}</label>
-		<input type="checkbox" name="featured" value="{{ 1 }}">
+		<label for="url">{{('URL:')}}</label>
+		<input type="text" name="url" placeholder="URL"  value="{{ old('url') }}" required autofocus>
 	</div>
-	<div>
-		<label for="image">{{('Image:')}}</label>
-		<input type="file" name="image" value="{{ old('image') }}" >
-	</div>
-	<div>
-		<label for="image_legend">{{('Image caption:')}}</label>
-		<input type="text" name="image_legend"  value="{{ old('image_legend') }}">
-	</div>
-
-	<div>
-		<label for="video">{{('Video:')}}</label>
-		<input type="text" name="video" value="{{ old('video') }}" >
-	</div>
-
-	<div>
-		<label for="gallery_photo">{{('Gallerie Photo:')}}</label>
-		<input type="text" name="gallery_photo" value="{{ old('gallery_photo') }}" >
-	</div>
-
-	<div>
-		<label for="introtext">{{('Intro text:')}}</label>
-		<input type="text" name="introtext" value="{{ old('introtext') }}" >
-	</div>
-
-	<div>
-		<label for="fulltext">{{('Content:')}}</label>
-		<textarea name="fulltext" id="fulltext" >{{ old('fulltext') }}</textarea>
-	</div>
-	<div>
-		<label for="source">{{('Source:')}}</label>
-		<select  name="source" >
-			<option> </option>
-			@foreach($sources as $source)
-		    <option value="{{ $source->id }}" {{ (old("source") == $source->id ? "selected":"") }}>{{ucfirst($source->title) }}</option>
-			@endforeach
-		</select>
-	</div>
-
+	
 	<div>
 	<label for="created_by">{{('Auteur:')}}</label>
 	<span>{{ Auth::User()->name}}</span>
@@ -92,6 +62,66 @@
 		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
 		<input type="text" name="stop_publication_at"  value="{{ old('stop_publication_at') }}">
 	</div>
+<div class="uk-grid">
+	<div class="uk-width-1-3">
+		<fieldset>
+	
+	<legend>Ordinateur</legend>
+	<div>
+		<label for="imageForComputer">{{('Image:')}}</label>
+		<input type="file" name="imageForComputer" value="{{ old('imageForComputer') }}" >
+	</div>
+	<div>
+		<label for="sizeForComputer">{{('Size:')}}</label>
+		<input type="text" name="sizeForComputer" placeholder="Size"  value="{{ old('sizeForComputer') }}" required autofocus>
+	</div>
+	<div>
+		<label for="codeForComputer">{{('Code:')}}</label>
+		<textarea name="codeForComputer" >{{{ old('codeForComputer') }}}</textarea> 
+	</div>
+</fieldset>
+	</div>
+	<div class="uk-width-1-3">
+		<fieldset>
+	
+	<legend>tablette</legend>
+	<div>
+		<label for="imageForTablet">{{('Image:')}}</label>
+		<input type="file" name="imageForTablet" value="{{ old('imageForTablet') }}" >
+	</div>
+	<div>
+		<label for="sizeForTablet">{{('Size:')}}</label>
+		<input type="text" name="sizeForTablet" placeholder="Size"  value="{{ old('sizeForTablet') }}" required autofocus>
+	</div>
+	<div>
+		<label for="codeForTablet">{{('Code:')}}</label>
+		<textarea name="codeForTablet" >{{{ old('codeForTablet') }}}</textarea> 
+	</div>
+</fieldset>
+	</div>
+
+	<div class="uk-width-1-3">
+		<fieldset>
+	
+	<legend>Modile</legend>
+	<div>
+		<label for="imageForMobile">{{('Image:')}}</label>
+		<input type="file" name="imageForMobile" value="{{ old('imageForMobile') }}" >
+	</div>
+	<div>
+		<label for="sizeForMobile">{{('Size:')}}</label>
+		<input type="text" name="sizeForMobile" placeholder="Size"  value="{{ old('sizeForMobile') }}" required autofocus>
+	</div>
+	<div>
+		<label for="codeForMobile">{{('Code:')}}</label>
+		<textarea name="codeForMobile" >{{ old('codeForMobile') }}</textarea> 
+	</div>
+</fieldset>
+	</div>
+</div>
+
+
+
 
 </form>
 @section('js')

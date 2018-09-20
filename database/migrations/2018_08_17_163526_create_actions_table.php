@@ -18,6 +18,7 @@ class CreateActionsTable extends Migration
             $table->string('title',50)->nullable(false)->unique();      
             $table->string('display_name',100)->nullable(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

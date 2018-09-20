@@ -5,7 +5,7 @@
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  {{ ('Liste des articles') }}</h3> @endsection 
+<h3>  {{ ('Liste des banières') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>
@@ -13,29 +13,30 @@
 			<th>{{ ('Titre') }}</th>
 			<th>{{ ('Publiée') }}</th>
 			<th>{{ ('Category') }}</th>
-			<th>{{ ('Image') }}</th>
-			<th>{{ ('créé le') }}</th>
-			<th>{{ ('Dernière modification') }}</th>
-			<th>{{ ('Modifié le') }}</th>
-			<th>{{ ('Nbre de vue') }}</th>
-			<th>{{ ('Image') }}</th>
-			<th>{{ ('id') }}</th>                       
+			<th>{{ ('Type') }}</th>
+			<th>{{ ('url') }}</th>
+			<th>{{ ('Debut de la publication') }}</th>
+			<th>{{ ('fin de la publication') }}</th>
+			<th>{{ ('Auteur') }}</th>                       
+			<th>{{ ('Crée le') }}</th>
+			<th>{{ ('Modifié le') }}</th>   
+			<th>id</th>
 		</tr>
 	</thead>
 	<tbody>
 		@foreach($banners as $banner)
-		<tr class="uk-text-small">
+			<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $banner->title }}</td>
-			<td> {!! ($banner->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($banner->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
-			<td class="uk-table-expand"> {{ $banner->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $banner->getAutor->name }}</td>
-			<td class="uk-table-expand"> {{ $banner->created_at }}</td>
-			<td class="uk-table-expand">{{$banner->getRevision->last()['getModifier']['name']}} </td>
-			<td class="uk-table-expand">{{$banner->getRevision->last()['revised_at']}}  </td>
-			<td> {{ $banner->views }}</td>
-			<td> {{ $banner->image }}</td>
+			<td> {{ $banner->title }}</td>
+			<td> {{ $banner->published }}</td>
+			<td> {{ $banner->getCategory->title }}</td>
+			<td> {{ $banner->type }}</td>
+			<td>{{$banner->url}}  </td>
+			<td>{{$banner->start_publication_at}}  </td>
+			<td>{{$banner->stop_publication_at}}  </td>
+			<td> {{$banner->getAuthor->name }}</td>
+			<td>{{$banner->created_at}}  </td>
+			<td>{{$banner->updated_at}}  </td>
 			<td>{{ $banner->id }}</td>
                 </tr>
 		@endforeach

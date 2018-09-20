@@ -17,6 +17,7 @@ class CreateAccessLevelsTable extends Migration
             $table->tinyIncrements('id');
             $table->string('title',100);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

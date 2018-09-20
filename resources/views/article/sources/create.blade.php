@@ -23,6 +23,6 @@
 		<input type="checkbox" name="published" value="{{ 1 }}" @if(old('published')) checked @endif class="uk-checkbox">
 	</div>
 </form>
-</form>
+
 
 @endsection

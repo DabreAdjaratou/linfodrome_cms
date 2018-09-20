@@ -19,6 +19,7 @@ class CreatePermissionsTable extends Migration
             $table->unsignedInteger('resource_id')->nullable(false);
             $table->unsignedInteger('action_id')->nullable(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
