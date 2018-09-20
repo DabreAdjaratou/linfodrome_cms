@@ -1,8 +1,8 @@
 @foreach($children as $child)
-@if($view=='accessLevelView')
-  @if(isset($accessLevel))
-    @foreach($accessLevel->getGroups as $accessLevelGroup)
-      @if($accessLevelGroup->title==$child->title)
+@if($view=='view')
+  @if(isset($data))
+    @foreach($data->getGroups as $Group)
+      @if($Group->title==$child->title)
         <ul>
             <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" checked>
             {{ ucfirst($child->title) }}

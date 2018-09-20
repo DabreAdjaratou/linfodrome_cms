@@ -111,8 +111,8 @@ return redirect()->route('access-levels.index');
     {
        $accessLevel=AccessLevel::with('getGroups')->find($id);
        $allGroups = Group::with('getChildren')->where('parent_id',0)->get();
-       $t=Group::all();
-       foreach ($t as $a) {
+       $allGroups2=Group::all();
+       foreach ($allGroups2 as $a) {
         $groups[]=$a->title;
         $accessLevelGroups=[];
         // dd($accessLevel);
@@ -122,7 +122,7 @@ return redirect()->route('access-levels.index');
     }
        
     $arrayDiff=array_diff($groups, $accessLevelGroups);
- return view('user.access-levels.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups,'accessLevelView'=>'$accessLevelView']);
+ return view('user.access-levels.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups,'view'=>'view']);
         
     }
 

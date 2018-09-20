@@ -9,7 +9,10 @@
                     <form method="POST" action="{{ route('users.update',['user'=>$user]) }}" enctype="multipart/form-data" class="">
                         @csrf
 @method ('put')
-                        <div>
+                      <div>
+		<button type="submit" name="update" value="update">{{ ('Modifier') }}</button>
+		<button type="submit" name="cancel" value="cancel"> {{ ('Annuler') }}</button>
+	</div>  <div>
                             <label for="name">{{ ('Nom') }}</label>
                             <input id="name" type="text" name="name" value="{{$user->name }}" required autofocus>            
                         </div>
@@ -65,24 +68,34 @@
                                 <option value="{{ 1 }}" @if($user->require_reset==1) selected @endif>{{ ('Non') }}</option>
                             </select>
                         </div>
-{{-- 
+
 <div>
-        @foreach($groups as $group)
-        <ul>
-            <input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif>
-            {{ ucfirst($group->title) }}
-            @if(count($group->getChildren))
-            @include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'accessLevelView'])
-            @endif
-        </ul>                                     
-            @endforeach
-    </div>   --}}
-                        <div>
-                                <button type="submit" class="btn btn-primary">
-                                    {{('Enregistrer') }}
-                                </button>
-                          
-                        </div>
+       
+            @foreach($allGroups as $group)
+@foreach($user->getGroups as $userGroup)
+@if($userGroup->id==$group->id)
+         <ul>
+			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"  checked>
+			{{ ucfirst($group->title) }}
+			@if(count($group->getChildren))
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$user,'arrayDiff'=>$arrayDiff])
+			@endif
+		</ul>     
+@endif
+@endforeach
+@if(in_array($group->title,$arrayDiff))
+		 <ul>
+			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox">
+			{{ ucfirst($group->title) }}
+			@if(count($group->getChildren))
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view'])
+			@endif
+		</ul>  
+		@endif 
+
+		@endforeach 
+    </div>   
+                        
                     </form>
                 </div>
             

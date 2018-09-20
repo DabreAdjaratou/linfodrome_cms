@@ -27,7 +27,7 @@
 			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"  checked>
 			{{ ucfirst($group->title) }}
 			@if(count($group->getChildren))
-			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'accessLevelView','accessLevel'=>$accessLevel,'arrayDiff'=>$arrayDiff])
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$accessLevel,'arrayDiff'=>$arrayDiff])
 			@endif
 		</ul>     
 @endif
@@ -37,7 +37,7 @@
 			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox">
 			{{ ucfirst($group->title) }}
 			@if(count($group->getChildren))
-			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'accessLevelView'])
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view'])
 			@endif
 		</ul>  
 		@endif 

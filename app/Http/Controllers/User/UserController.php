@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\User;
+use App\Models\User\Group;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
@@ -96,7 +97,20 @@ public function show($id)
 public function edit($id)
 {
   $user=User::find($id);
-   return view('user.users.edit',compact('user'));
+   $allGroups = Group::with('getChildren')->where('parent_id',0)->get();
+       $allGroups2=Group::all();
+       foreach ($allGroups2 as $a) {
+        $groups[]=$a->title;
+        $userGroups=[];
+        
+        foreach ($user->getGroups as $userGroup) {
+            $userGroups[]=$userGroup->title;
+        }
+    }
+       
+    $arrayDiff=array_diff($groups, $userGroups);
+ return view('user.users.edit',['arrayDiff'=>$arrayDiff,'user'=>$user,'allGroups'=>$allGroups, 'userGroups'=>$userGroups]);
+   
 }
 
 /**
