@@ -70,7 +70,7 @@
             <input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif>
             {{ ucfirst($group->title) }}
             @if(count($group->getChildren))
-            @include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'accessLevelView'])
+            @include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view'])
             @endif
         </ul>                                     
             @endforeach

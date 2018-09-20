@@ -16,7 +16,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/password/require-reset','User\UserController@resetPassword')->name('password.required-reset');
+Route::get('/users/{user}/reset-password','User\UserController@requireResetPassword')->name('users.require-reset');
+// Route::post('/users/{user}/update-password','User\UserController@resetPassword')->name('users.update-password');
+Route::match(['put', 'patch'], '/users/{user}/update-password', 'User\UserController@resetPassword')->name('users.update-password');
 
 //authentication's route
 //Route::get('/password/require-reset', function () {

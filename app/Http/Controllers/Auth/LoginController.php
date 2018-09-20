@@ -51,8 +51,10 @@ class LoginController extends Controller
   } 
 
     if (Auth::user()->require_reset==0) {
-    return '/password/require-reset';
-  } 
+    return 'users/'.Auth::id().'/reset-password';
+  }else{
+    return '/administrator';
+  }
 
 }
 
