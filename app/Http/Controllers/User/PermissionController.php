@@ -23,7 +23,8 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions=Permission::with('getAction','getAccessLevel','getResource')->get(['access_level_id','resource_id','action_id'])->groupBy('access_level_id','resource_id');
+        $permissions=Permission::with('getAction','getAccessLevel','getResource')->get(['access_level_id','resource_id','action_id'])->groupBy('access_level_id');
+        // $permissions=Accesslevel::with('getPermissions.getResource.getActions')->get();
 
         // die(print_r($permissions));
         return view('user.permissions.index',compact('permissions'));
@@ -106,10 +107,27 @@ class PermissionController extends Controller
      */
     public function edit($id)
     {
+        $accessLevel=Accesslevel::find($id);
 
-         $resources=Resource::with('getActions')->get(['id','title']);
-        $accessLevels=Accesslevel::all('id','title');
-        return view('user.permissions.edit',compact('resources','accessLevels'));
+        $permissions=Permission::with('getAction','getAccessLevel','getResource')->where('access_level_id',$id)->get(['access_level_id','resource_id','action_id']);
+        $resources=Resource::with('getActions','getPermissions')->get(['id','title']);
+       // dd($resources);
+       // $allActions=Action::all();
+        foreach ($resources as $resource) {
+            foreach ($resource->getActions as $resourceAction) {
+             $resourceActions[]=$resourceAction->id;
+            }
+       foreach ($permissions as $p) {
+        $actions[]=$p->action_id;
+           
+        $resourceActions=[];
+                # code...
+                    }
+    }
+    $arrayDiff=array_diff($actions, $resourceActions);
+    // dd($arrayDiff);
+               return view('user.permissions.edit',compact('resources','accessLevels','accessLevel','permissions','arrayDiff'));
+    // return view ('user.resources.edit',['arrayDiff'=>$arrayDiff,'resource'=>$resource,'allActions'=>$allActions]);
     }
 
     /**

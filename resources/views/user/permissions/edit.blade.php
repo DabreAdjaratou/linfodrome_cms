@@ -6,21 +6,16 @@
 @section('pageTitle') <h3> Modifier une permission</h3>@endsection 
 
 
-<form method="POST" action="{{ route('permissions.update',['permission'=$permission]) }}">
+<form method="POST" action="{{ route('permissions.update',['accessLevel'=>$accessLevel]) }}">
 	@csrf
+	@method('put')
 	<div>
-		<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
-		<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
-		<button type="reset">{{('Annuler')}}</button>
+		<button type="submit" name="update" value="update">{{ ('Modifier') }}</button>
+		<button type="submit" name="cancel" value="cancel"> {{ ('Annuler') }}</button>
 	</div>
 	<div>	
 		<label for="accessLevel">{{('Niveau d\'accès:') }}</label>
-		<select name="accessLevel">
-			<option value="0"> </option>
-			@foreach ($accessLevels as $accessLevel)
-			<option value="{{ $accessLevel->id }}"> {{ $accessLevel->title }}</option>
-			@endforeach 
-		</select>
+		<input type=" text" name="accessLevel" value="{{ $accessLevel->title }}" disabled>
 	</div>
 <table class="uk-table uk-table-small uk-table-striped">
 @foreach($resources as $resource)
@@ -28,11 +23,23 @@
 {{ $resource->title }}
 </td>
 @foreach($resource->getActions as $action)
+@php  $actions=[];@endphp
+
+@foreach ($permissions as $permission) 
+@if($action->id==$permission->action_id && $resource->id==$permission->resource_id) 
+@php $actions[]=$permission->action_id ;@endphp
+<td> <label for="action"> {{ $action->title }} </label>
+<input type="checkbox" name="{{ $resource->title}}[]" value="{{$action->id}}" class="uk-checkbox" checked></td>
+@elseif($resource->id==$permission->resource_id && $action->id==$permission->action_id &&  !(in_array($action->id, $actions)))
 <td>
 	<label for="action"> {{ $action->title }} </label>
 <input type="checkbox" name="{{ $resource->title}}[]" value="{{$action->id}}" class="uk-checkbox">
 </td>
+@endif
+@endforeach 
+
 @endforeach
+
 </tr>
 @endforeach
 </table>		

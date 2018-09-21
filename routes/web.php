@@ -29,10 +29,17 @@ Route::get('/administrator', function () {
 
 // Route to Article
 Route::get('article-revisions','Article\ArchiveController@revision')->name('article-revisions');
+Route::get('article-archives/{article}/trash','Article\ArchiveController@putInTrash')->name('article-archives.put-in-trash');
+Route::get('article-archives/{article}/restore','Article\ArchiveController@restore')->name('article-archives.restore');
+Route::get('article-archives/{article}/draft','Article\ArchiveController@putInDraft')->name('article-archives.put-in-draft');
+Route::get('article-archives/draft','Article\ArchiveController@articleInDraft')->name('article-archives.draft');
+Route::get('article-archives/trash','Article\ArchiveController@articleInTrash')->name('article-archives.trash');
 Route::resource('article-archives','Article\ArchiveController');
-Route::get('articles/{article}/trash','Article\ArticleController@trash')->name('article-trash');
-Route::get('articles/{article}/restore','Article\ArticleController@restore')->name('article-restore');
-Route::get('articles/{article}/draft','Article\ArticleController@draft')->name('article-draft');
+Route::get('articles/{article}/trash','Article\ArticleController@putInTrash')->name('articles.put-in-trash');
+Route::get('articles/{article}/restore','Article\ArticleController@restore')->name('articles.restore');
+Route::get('articles/{article}/draft','Article\ArticleController@putInDraft')->name('articles.put-in-draft');
+Route::get('articles/draft','Article\ArticleController@articleInDraft')->name('articles.draft');
+Route::get('articles/trash','Article\ArticleController@articleInTrash')->name('articles.trash');
 Route::resource('articles','Article\ArticleController');
 Route::resource('article-categories','Article\CategoryController');
 Route::resource('article-sources','Article\SourceController');
