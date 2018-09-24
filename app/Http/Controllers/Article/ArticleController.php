@@ -330,13 +330,13 @@ class ArticleController extends Controller
       return redirect()->route('articles.index');
     }
 
-    public function articleInTrash()
+    public function inTrash()
     {
        $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
        return view('article.articles.trash',compact('articles'));
     }
 
-public function articleInDraft()
+public function inDraft()
     {
       $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
         return view('article.articles.draft',compact('articles'));

@@ -30,7 +30,7 @@ class BilletController extends Controller
      */
     public function index()
     {
-       $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+       $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
    return view('billet.archives.index',['billets'=>$billets]);
     
@@ -266,8 +266,52 @@ class BilletController extends Controller
      */
     public function destroy($id)
     {
-        //
+    $billet=Billet::onlyTrashed()->find($id)->forceDelete();
+    $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Billet supprimé avec success!');
+    return redirect()->route('billets.trash');
+    }
+    
+ public function putInDraft($id)
+    {
+      $billet=Billet::find($id);
+      $archive=Archive::find($id);
+      $billet->published=2;
+      $archive->published=2;
+      $billet->save();
+      $archive->save();
+      return redirect()->route('billets.index');
     }
 
+    public function putInTrash($id)
+    {
+    $billet=Billet::find($id)->delete();
+    $archive=Archive::find($id)->delete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Billet mis en corbeille!');
+    return redirect()->route('billets.index');
+    }
+
+    public function restore($id)
+    {
+      $billet=Billet::onlyTrashed()->find($id)->restore();
+      $archive=Archive::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Billet restaurer!');
+      return redirect()->route('billets.index');
+    }
+
+    public function inTrash()
+    {
+       $billets=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+       return view('billet.billets.trash',compact('billets'));
+    }
+
+public function inDraft()
+    {
+      $billets=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        return view('billet.billets.draft',compact('billets'));
+  }
      
 }

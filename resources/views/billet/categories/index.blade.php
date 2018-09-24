@@ -6,6 +6,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des categories de billets') }}</h3> @endsection 
+<a href="{{ route('billet-categories.create') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small" {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
@@ -26,11 +27,8 @@
 			<td> {{ $category->published }}</td>
 			<td> <a href="{{ route('billet-categories.edit',['category'=>$category]) }}" ><span class="uk-text-success">Modifier</span></a>
 			</td>
-			<td> <form action="{{ route('billet-categories.destroy',['category'=>$category]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette categorie?')">
-				@csrf
-				@method('delete')
-<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
-			</form> </td>
+			<td> <a href="{{ route('billet-categories.put-in-trash',['category'=>$category]) }}"><span class="uk-text-danger">Mettre en corbeille</span></a>
+			</td>
 			<td>{{ $category->id }}</td>
                 </tr>
 		@endforeach

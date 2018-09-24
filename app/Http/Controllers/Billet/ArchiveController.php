@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Billet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Billet\Archive;
+use App\Models\Billet\Billet;
 
 class ArchiveController extends Controller
 {
@@ -91,8 +92,68 @@ class ArchiveController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $billet=Billet::onlyTrashed()->find($id);
+        if($billet){
+            return redirect()->route('billets.destroy',compact('billet'));
+        }else{
+    $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Billet supprimé avec success!');
+    return redirect()->route('billet-archives.index');
     }
+    }
+
+     public function putInDraft($id)
+    {
+      $billet=Billet::find($id);
+      if ($billet) {
+        return redirect()->route('billets.put-in-draft',compact('billet'));
+      }else{
+      $archive=Archive::find($id);
+      $archive->published=2;
+      $archive->save();
+      return redirect()->route('billet-archives.index');
+    }
+}
+
+    public function putInTrash($id)
+    {
+       $billet=Billet::find($id);
+      if ($billet) {
+        return redirect()->route('billets.put-in-trash',compact('billet'));
+      }else{
+    $archive=Archive::find($id)->delete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Billet mis en corbeille!');
+}
+    return redirect()->route('billet-archives.index');
+    }
+
+    public function restore($id)
+    {
+         $billet=Billet::find($id);
+      if ($billet) {
+        return redirect()->route('billets.restore',compact('billet'));
+      }else{
+      $archive=Archive::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'billet restaurer!');
+  }
+      return redirect()->route('billet-archives.index');
+    }
+
+    public function inTrash()
+    {
+       $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+       return view('billet.archives.trash',compact('archives'));
+    }
+
+public function inDraft()
+    {
+      $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        return view('billet.archives.draft',compact('archives'));
+  }
+
 
     public function revision()
   {

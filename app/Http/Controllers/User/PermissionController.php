@@ -5,7 +5,7 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Resource;
-use App\Models\User\Accesslevel;
+use App\Models\User\AccessLevel;
 use App\Models\User\Permission;
 use Illuminate\Support\Facades\DB;
 
@@ -38,7 +38,7 @@ class PermissionController extends Controller
     public function create()
     {
         $resources=Resource::with('getActions')->get(['id','title']);
-        $accessLevels=Accesslevel::all('id','title');
+        $accessLevels=AccessLevel::all('id','title');
         return view('user.permissions.create',compact('resources','accessLevels'));
     }
 

@@ -134,23 +134,55 @@ if ($request->update) {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+     public function destroy($id)
     {
-        $source= Source::with(['getBillets','getArchives'])->where('id',$id)->first();
-   if ($source->getBillets->isEmpty() && $source->getArchives->isEmpty()) {
-        if($source->delete()){
+        $source= Source::onlyTrashed()->find($id);
+                if($source->forceDelete()){
            session()->flash('message.type', 'success');
            session()->flash('message.content', 'Source supprimée avec succès!');
            } else {
            session()->flash('message.type', 'danger');
            session()->flash('message.content', 'Erreur lors de la suppression!');
         }
-        } else {
+        
+        return redirect()->route('billet-sources.trash');
+    }
+    
+    
+    public function putInTrash($id)
+    {
+        $source= Source::with(['getBillets','getArchives'])->where('id',$id)->first();
+        if ($source->getBillets->isEmpty() && $source->getArchives->isEmpty()) {
+        
+            if($source->delete()){
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Source mis en corbeille!!');
+           } else {
            session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Cette Source ne peut être supprimée car elle est referencée par un ou plusieurs Billets!');
+           session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
         }
+      } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette source ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
+        }
+  return redirect()->route('billet-sources.index');
+    }
 
-        return redirect()->route('billet-sources.index');
+    public function restore($id)
+    {
+      
+        Source::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'source restaurer!');
+      return redirect()->route('billet-sources.index');
+   
+    }
 
+    public function inTrash()
+    {
+     $sources= Source::onlyTrashed()->get(['id','title']);
+       return view('billet.sources.trash',compact('sources'));
+   
+        
     }
 }

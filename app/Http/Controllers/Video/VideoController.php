@@ -252,8 +252,53 @@ class VideoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+   public function destroy($id)
     {
-        //
+    $video=Video::onlyTrashed()->find($id)->forceDelete();
+    $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Video supprimé avec success!');
+    return redirect()->route('videos.trash');
     }
+    
+     public function putInDraft($id)
+    {
+      $video=Video::find($id);
+      $archive=Archive::find($id);
+      $video->published=2;
+      $archive->published=2;
+      $video->save();
+      $archive->save();
+      return redirect()->route('videos.index');
+    }
+
+    public function putInTrash($id)
+    {
+    $video=Video::find($id)->delete();
+    $archive=Archive::find($id)->delete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Article mis en corbeille!');
+    return redirect()->route('videos.index');
+    }
+
+    public function restore($id)
+    {
+      $video=Video::onlyTrashed()->find($id)->restore();
+      $archive=Archive::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Article restaurer!');
+      return redirect()->route('videos.index');
+    }
+
+    public function inTrash()
+    {
+       $videos=Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+       return view('video.videos.trash',compact('videos'));
+    }
+
+public function inDraft()
+    {
+      $videos=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+        return view('video.videos.draft',compact('videos'));
+  }
   }

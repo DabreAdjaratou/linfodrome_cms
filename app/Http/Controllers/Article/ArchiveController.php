@@ -236,13 +236,13 @@ class ArchiveController extends Controller
       return redirect()->route('article-archives.index');
     }
 
-    public function articleInTrash()
+    public function inTrash()
     {
        $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
        return view('article.archives.trash',compact('archives'));
     }
 
-public function articleInDraft()
+public function inDraft()
     {
       $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
         return view('article.archives.draft',compact('archives'));

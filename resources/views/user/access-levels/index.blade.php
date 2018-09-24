@@ -6,9 +6,9 @@
 @section ('pageTitle')
 @parent
 <h3>  {{{ ('Liste des niveaux d\'accès') }}}</h3> @endsection 
-<div class="uk-margin ">	
-	<a href="{{ route('access-levels.create') }}" class="uk-button uk-button-primary uk-button-small">Nouveau</a>
-</div>
+	
+	<a href="{{ route('access-levels.create') }}" ">Nouveau</a>
+
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small" {{--uk-text-small responsive --}}/>	
 	<thead>
             <tr>

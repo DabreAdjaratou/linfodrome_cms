@@ -1,5 +1,5 @@
 @extends('layouts.administrator.master')
-@section('title', 'Articles trash')
+@section('title', 'Articles draft')
 @section('css')
 @endsection
 @section('content')
@@ -18,11 +18,12 @@
 			<th>{{ ('Modifié le') }}</th>
 			<th>{{ ('Nbre de vue') }}</th>
 			<th>{{ ('Image') }}</th>
+                        <th>{{ ('Modifier') }}</th>
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
 	<tbody>
-		@foreach($archives as $article)
+		@foreach($articles as $article)
   	<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $article->title }}</td>
@@ -33,6 +34,9 @@
 			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
 			<td> {{ $article->views }}</td>
 			<td> {{ $article->image }}</td>
+                         <td> <a href="{{ route('articles.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
+
+			</td>
 			<td>{{ $article->id }}</td>
                 </tr>
 		@endforeach
@@ -46,3 +50,5 @@
 @endsection
 
 @section('js')
+@endsection
+@endsection

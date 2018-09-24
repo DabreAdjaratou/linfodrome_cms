@@ -6,6 +6,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des sources d\'articles') }}</h3> @endsection 
+<a href="{{ route('article-sources.create') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
@@ -13,7 +14,7 @@
 			<th>{{ ('Titre') }}</th>
 			<th> {{ ('Publiée') }}</th>
 			<th>{{ ('Modifier') }}</th>
-			<th>{{ ('Supprimer') }}</th>
+			<th>{{ ('Corbeille') }}</th>
 			<th>{{ ('id') }}</th>
                        
 		</tr>
@@ -27,12 +28,10 @@
 			<td> <a href="{{ route('article-sources.edit',['source'=>$source]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
-			<td> <form action="{{ route('article-sources.destroy',['source'=>$source]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette source?')">
-				@csrf
-				@method('delete')
-<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
-			</form> 
+                        <td> <a href="{{ route('article-sources.put-in-trash',['source'=>$source]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+
 			</td>
+			
 			<td>{{ $source->id }}</td>
                 </tr>
 		@endforeach

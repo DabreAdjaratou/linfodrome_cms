@@ -5,6 +5,7 @@
 @section('content')
 @parent
 @section ('pageTitle')<h3>{{ ('Liste des utilisateurs') }}</h3> @endsection 
+<a href="{{ route('register') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-striped uk-table-small uk-text-small responsive">	
     <thead>
        <tr>

@@ -6,6 +6,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des articles') }}</h3> @endsection 
+<a href="{{ route('articles.create') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>
@@ -21,7 +22,8 @@
 			<th>{{ ('Nbre de vue') }}</th>
 			<th>{{ ('Image') }}</th>
 			<th>{{ ('Modifié') }} </th>
-			<th> {{ ('supprimer') }}</th>
+                        <th>{{ ('Brouillon') }} </th>
+			<th> {{ ('Corbeille') }}</th>
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
@@ -42,11 +44,11 @@
 			<td> <a href="{{ route('article-archives.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
-			<td> <form action="{{ route('article-archives.destroy',['article'=>$article]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cet article?')">
-				@csrf
-				@method('delete')
-<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
-			</form> 
+                        <td> <a href="{{ route('articles.put-in-draft',['article'=>$article]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
+
+			</td>
+			 <td> <a href="{{ route('article-archives.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+
 			</td>
 			<td>{{ $article->id }}</td>
                 </tr>

@@ -1,23 +1,18 @@
 @extends('layouts.administrator.master')
-@section('title', 'Articles categories')
+@section('title', 'Articles categories trash')
 @section('css')
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  {{ ('Liste des categories d\'articles') }}</h3> @endsection 
-<a href="{{ route('article-categories.create') }}">Nouveau</a> 
-<div class="uk-margin ">	
-	<a href="{{ route('article-categories.create') }}" class="uk-button uk-button-primary uk-button-small">Nouveau</a>
-</div>
+<h3>  {{ ('Liste des categories d\'articles en corbeille') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre') }}</th>
-			<th>{{ ('Pulieé') }}</th>
-			<th> {{ ('Modifier') }}</th>
-			<th> {{ ('Corbeille') }}</th>
+			<th> {{ ('Restaurer') }}</th>
+			<th> {{ ('Supprimer') }}</th>
 			<th>{{ ('id') }}</th>
 
                        
@@ -29,12 +24,15 @@
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td> {{ ucfirst($category->title) }}</td>
 			<td>{{ $category->published }}</td>
-			<td> <a href="{{ route('article-categories.edit',['category'=>$category]) }}" ><span class="uk-text-success">Modifier</span></a>
+			<td> <a href="{{ route('article-categories.restore',['category'=>$category]) }}" ><span class="uk-text-success">Restaurer</span></a>
 
 			</td>
-                        <td> <a href="{{ route('article-categories.put-in-trash',['category'=>$category]) }}"><span class="uk-text-danger">Mettre en corbeille</span></a>
+			<td> <form action="{{ route('article-categories.destroy',['category'=>$category]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette categorie?')">
+				@csrf
+				@method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+			</form> 
 			</td>
-			
 			<td>{{ $category->id }}</td>
                 </tr>
 		@endforeach

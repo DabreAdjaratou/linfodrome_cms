@@ -198,4 +198,20 @@ class BannerController extends Controller
     {
         //
     }
+    
+     public function putInTrash($id)
+    {
+    
+    }
+
+    public function restore($id)
+    {
+      
+    }
+
+    public function inTrash()
+    {
+    
+        
+    }
 }

@@ -134,23 +134,55 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+     public function destroy($id)
     {
-        $category= Category::with(['getVideos','getArchives'])->where('id',$id)->first();
-   if ($category->getVideos->isEmpty() && $category->getArchives->isEmpty()) {
-        if($category->delete()){
+        $category= Category::onlyTrashed()->find($id);
+                if($category->forceDelete()){
            session()->flash('message.type', 'success');
            session()->flash('message.content', 'Categorie supprimée avec succès!');
            } else {
            session()->flash('message.type', 'danger');
            session()->flash('message.content', 'Erreur lors de la suppression!');
         }
-        } else {
+        
+        return redirect()->route('video-categories.trash');
+    }
+    
+    
+    public function putInTrash($id)
+    {
+        $category= Category::with(['getVideos','getArchives'])->where('id',$id)->first();
+        if ($category->getVideos->isEmpty() && $category->getArchives->isEmpty()) {
+        
+            if($category->delete()){
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie mis en corbeille!!');
+           } else {
            session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Cette categorie ne peut être supprimée car elle est referencée par une ou plusieurs videos!');
+           session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
         }
+      } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette categorie ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
+        }
+  return redirect()->route('video-categories.index');
+    }
 
-        return redirect()->route('video-categories.index');
+    public function restore($id)
+    {
+      
+        Category::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Categorie restaurer!');
+      return redirect()->route('video-categories.index');
+   
+    }
 
+    public function inTrash()
+    {
+     $categories= Category::onlyTrashed()->get(['id','title']);
+       return view('video.categories.trash',compact('categories'));
+   
+        
     }
 }

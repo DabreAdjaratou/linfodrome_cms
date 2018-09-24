@@ -5,6 +5,7 @@
 @section('content')
 @parent
 @section ('pageTitle')<h3>{{ ('Liste des groupes') }}</h3> @endsection 
+<a href="{{ route('user-groups.create') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-divider uk-table-small" {{--uk-text-small responsive --}} >	
     <thead>
        <tr>

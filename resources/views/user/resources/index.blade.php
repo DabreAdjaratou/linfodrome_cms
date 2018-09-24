@@ -5,6 +5,7 @@
 @section('content')
 @parent
 @section ('pageTitle')<h3>{{ ('Liste des ressources') }}</h3> @endsection 
+<a href="{{ route('resources.create') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-striped uk-table-hover uk-table-small" {{--uk-text-small responsive --}}>	
 	<thead>
 		<tr>

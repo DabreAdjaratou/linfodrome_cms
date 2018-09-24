@@ -6,6 +6,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des banières') }}</h3> @endsection 
+<a href="{{ route('banners.create') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>

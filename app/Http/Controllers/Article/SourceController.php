@@ -114,7 +114,7 @@ if ($request->update) {
         if ($source->save()) {
            
            session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Categorie modifiée avec succès!');
+           session()->flash('message.content', 'source modifiée avec succès!');
         } else {
            session()->flash('message.type', 'danger');
            session()->flash('message.content', 'Erreur lors de la modification!');
@@ -132,23 +132,58 @@ if ($request->update) {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+   
     public function destroy($id)
     {
-        $source= Source::with(['getArticles','getArchives'])->where('id',$id)->first();
-   if ($source->getArticles->isEmpty() && $source->getArchives->isEmpty()) {
-        if($source->delete()){
+        $source= Source::onlyTrashed()->find($id);
+                if($source->forceDelete()){
            session()->flash('message.type', 'success');
            session()->flash('message.content', 'Source supprimée avec succès!');
            } else {
            session()->flash('message.type', 'danger');
            session()->flash('message.content', 'Erreur lors de la suppression!');
         }
-        } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Cette Source ne peut être supprimée car elle est referencée par un ou plusieurs Articles!');
-        }
-
-        return redirect()->route('article-sources.index');
-
+        
+        return redirect()->route('article-sources.trash');
     }
+    
+    
+    public function putInTrash($id)
+    {
+        $source= Source::with(['getArticles','getArchives'])->where('id',$id)->first();
+        if ($source->getArticles->isEmpty() && $source->getArchives->isEmpty()) {
+        
+            if($source->delete()){
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Source mis en corbeille!!');
+           } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+        }
+      } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette source ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
+        }
+  return redirect()->route('article-sources.index');
+    }
+
+    public function restore($id)
+    {
+      
+        Source::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'source restaurer!');
+      return redirect()->route('article-sources.index');
+   
+    }
+
+    public function inTrash()
+    {
+     $sources= Source::onlyTrashed()->get(['id','title']);
+       return view('article.sources.trash',compact('sources'));
+   
+        
+    }
+
+    
 }

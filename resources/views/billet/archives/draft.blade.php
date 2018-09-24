@@ -1,12 +1,11 @@
 @extends('layouts.administrator.master')
-@section('title', 'Billets list')
+@section('title', 'Billets draft')
 @section('css')
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  {{ ('Liste des billets') }}</h3> @endsection
-<a href="{{ route('billets.create') }}">Nouveau</a> 
+<h3>  {{ ('Liste des billets au brouillon') }}</h3> @endsection 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-text-small responsive uk-table-justify responsive" >	
 	<thead>
             <tr>
@@ -22,13 +21,12 @@
 			<th>{{ ('Nbre de vue') }}</th>
 			<th>{{ ('Image') }}</th>
                         <th>{{ ('Modifier') }}</th>
-                         <th>{{ ('Brouillon') }}</th>
-                        <th>{{ ('Corbeille') }}</th>
+                        <th>{{ ('Brouillon') }}</th>
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
 	<tbody>
-		@foreach($billets as $billet)
+		@foreach($archives as $billet)
 		<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $billet->title }}</td>
@@ -44,10 +42,7 @@
                         <td> <a href="{{ route('billet-archives.edit',['billet'=>$billet]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
-                        <td> <a href="{{ route('billet-archives.put-in-draft',['billet'=>$billet]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
-
-			</td>
-			 <td> <a href="{{ route('billet-archives.put-in-trash',['billet'=>$billet]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+                        <td> <a href="{{ route('billet-archives.put-in-trash',['billet'=>$billet]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
 
 			</td>
 			<td>{{ $billet->id }}</td>

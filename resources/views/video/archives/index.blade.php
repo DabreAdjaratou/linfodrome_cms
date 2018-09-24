@@ -6,6 +6,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des videos') }}</h3> @endsection 
+<a href="{{ route('videos.create') }}">Nouveau</a> 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
 	<thead>
             <tr>
@@ -21,6 +22,9 @@
 			<th>{{ ('Debut publication') }}</th>
 			<th>{{ ('fin publication') }}</th>
 			<th>{{ ('Nbre de vue') }}</th>
+                        <th>{{ ('Modifier') }}</th>
+                        <th>{{ ('Brouillon') }}</th>
+                        <th>{{ ('Corbeille') }}</th>
 			<th>{{ ('id') }}</th>
                        
 		</tr>
@@ -40,6 +44,15 @@
 			<td class="uk-table-expand">{{ $video->start_publication_at}} </td>
 			<td class="uk-table-expand"> {{$video->stop_publication_at}}</td>
 			<td> {{$video->views}}</td>
+                         <td> <a href="{{ route('video-archives.edit',['video'=>$video]) }}" ><span class="uk-text-success">Modifier</span></a>
+
+			</td>
+                        <td> <a href="{{ route('video-archives.put-in-draft',['video'=>$video]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
+
+			</td>
+			 <td> <a href="{{ route('video-archives.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+
+			</td>
 			<td>{{ $video->id }}</td>
                 </tr>
 		@endforeach
