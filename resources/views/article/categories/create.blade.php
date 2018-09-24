@@ -10,7 +10,7 @@
 	@csrf
 
 	<div>
-		@can('create', App\Models\Article\Category::class)
+		@can('trash', App\Models\Article\Category::class)
     <div>a le droit</div>
    <div>'na le droit</div>
 @endcan

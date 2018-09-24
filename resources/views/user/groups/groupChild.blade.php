@@ -1,8 +1,7 @@
 @foreach($children as $child)
 @if($view=='view')
-  @if(isset($data))
-    @foreach($data->getGroups as $Group)
-      @if($Group->title==$child->title)
+  {{-- @if(isset($data)) --}}
+    @if(in_array($child->title,$data))
         <ul>
             <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" checked>
             {{ ucfirst($child->title) }}
@@ -11,7 +10,7 @@
               @endif
         </ul>
       @endif
-    @endforeach
+  
       @if(in_array($child->title,$arrayDiff))
         <ul>
           <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" >
@@ -21,15 +20,15 @@
             @endif
         </ul>
       @endif
-  @else
+  {{-- @else
     <ul>
       <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif>
       {{ ucfirst($child->title) }}
       @if(count($child->getChildren))
-        @include('user.groups.groupChild',['children' => $child->getChildren,])
+        @include('user.groups.groupChild',['children' => $child->getChildren])
       @endif
-    </ul>
-  @endif
+    </ul> --}}
+  {{-- @endif --}}
 @else  
   <tr> 
     <td><input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox"></td>

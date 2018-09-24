@@ -23,5 +23,7 @@
 		<input type="checkbox" name="published" value="{{ 1 }}" @if(old('published')) checked @endif>
 	</div>
 </form>
-
+@section('sidebar')
+ @component('layouts.administrator.banner-sidebar') @endcomponent 
+@endsection
 @endsection

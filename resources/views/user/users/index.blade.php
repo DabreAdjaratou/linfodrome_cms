@@ -17,6 +17,7 @@
         <th>{{ ('Google') }}</th>
         <th>{{ ('twitter') }}</th>
         <th>{{ ('Actif') }}</th>
+        <th>{{ ('Modifier') }}</th>
         <th>{{ ('id') }}</th>
 
     </tr>
@@ -40,6 +41,7 @@
         <td class="uk-table-expand uk-text-truncate">{{ $user->data->google}}</td>
         <td class="uk-table-expand uk-text-truncate">{{ $user->data->twitter}}</td>
         <td>{!!$user->is_active!!}</td>
+        <td> <a href="{{ route('users.edit',['user'=>$user]) }}">Modifier</a></td>
         <td>{{ $user->id}}</td>
     </tr>
     @endforeach

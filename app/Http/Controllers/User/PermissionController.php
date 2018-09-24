@@ -24,9 +24,7 @@ class PermissionController extends Controller
     public function index()
     {
         $permissions=Permission::with('getAction','getAccessLevel','getResource')->get(['access_level_id','resource_id','action_id'])->groupBy('access_level_id');
-        // $permissions=Accesslevel::with('getPermissions.getResource.getActions')->get();
-
-        // die(print_r($permissions));
+        
         return view('user.permissions.index',compact('permissions'));
     }
 
@@ -57,15 +55,16 @@ class PermissionController extends Controller
         foreach ($resources as $r) {
             $title=$r->title;
             $actions=$request->$title;
-
-            try {
+              try {
                 DB::transaction(function () use ($actions,$request,$r) {
+                  if($actions){
                    for ($i=0; $i <count($actions) ; $i++) { 
                      $permission= new Permission;
                      $permission->access_level_id = $request->accessLevel;
                      $permission->resource_id=$r->id;
                      $permission->action_id=$actions[$i];
                      $permission->save();
+                 }
                  }
              });
 
@@ -114,20 +113,35 @@ class PermissionController extends Controller
        // dd($resources);
        // $allActions=Action::all();
         foreach ($resources as $resource) {
+        $resourceActions=[];
+            $resourcePermissions=[];
             foreach ($resource->getActions as $resourceAction) {
              $resourceActions[]=$resourceAction->id;
             }
-       foreach ($permissions as $p) {
-        $actions[]=$p->action_id;
-           
-        $resourceActions=[];
-                # code...
-                    }
-    }
-    $arrayDiff=array_diff($actions, $resourceActions);
-    // dd($arrayDiff);
-               return view('user.permissions.edit',compact('resources','accessLevels','accessLevel','permissions','arrayDiff'));
-    // return view ('user.resources.edit',['arrayDiff'=>$arrayDiff,'resource'=>$resource,'allActions'=>$allActions]);
+            $permissions=$resource->getPermissions->toArray();
+            for ($i=0; $i <count($permissions) ; $i++) { 
+                // $permissions[$i]->getAccessLevel;
+                if($permissions[$i]['resource_id'])
+                $resourcePermissions[]= $permissions[$i]['action_id'];
+
+            }
+        // $actions=[];
+       // foreach ($permissions as $p) {
+       //  if($p->resource_id==$resource->id){
+       //       $actions[]=$p->action_id;
+       //  }
+            $resourceActions=array($resource->title=>$resourceActions);
+                                  }
+            print_r($resourcePermissions);
+            // print_r($resourceActions);
+            $resource->getActions=$resourceActions;
+
+   // }
+            // print_r($resources);
+    // $arrayDiff=array_diff($actions, $resourceActions);
+    // // dd($arrayDiff);
+               return view('user.permissions.edit',compact('resources','accessLevel','permissions'));
+    // return view ('user.permissions.edit',['resource'=>$resource,'permissions'=>$permissions]);
     }
 
     /**

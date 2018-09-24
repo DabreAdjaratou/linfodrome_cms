@@ -206,7 +206,9 @@ class ArchiveController extends Controller
       $archive=Archive::find($id);
       $archive->published=2;
       $archive->save();
-      return redirect()->route('article-archives.index');
+     session()->flash('message.type', 'success');
+     session()->flash('message.content', 'Article mis au brouillon!');
+    return back();
     }
 }
 
@@ -220,7 +222,8 @@ class ArchiveController extends Controller
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Article mis en corbeille!');
 }
-    return redirect()->route('article-archives.index');
+    return back();
+
     }
 
     public function restore($id)

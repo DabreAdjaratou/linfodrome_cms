@@ -23,5 +23,7 @@
 		<input type="checkbox" name="published" value="{{1}}" @if($category->published==1) checked @endif class="uk-checkbox">
 	</div>
 </form>
-
+@section('sidebar')
+ @component('layouts.administrator.banner-sidebar') @endcomponent 
+@endsection
 @endsection

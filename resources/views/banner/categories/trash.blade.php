@@ -43,7 +43,9 @@
 </table>
 @section('sidebar')
 @endsection
-
+@section('sidebar')
+ @component('layouts.administrator.banner-sidebar') @endcomponent 
+@endsection
 @section('js')
 
 @endsection

@@ -37,25 +37,7 @@ public function index()
 
 $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', 1)->get(['id']);
 
-//         foreach ($userData as $data) {
-//          foreach ($data->getGroups as $group) {
-//           echo '<pre>';
-//           ($group->getParents);
-//           echo '</pre>';
-//           foreach ($group->getAccessLevels as $acces) {
-//            foreach ($acces->getPermissions  as $key=>$permission) {
-//               $access_level= $acces->title;
-//               $permission_resource= $permission->getResource->title;
-//               $permission_action= $permission->getAction->title;
-//               // if ($permission_resource==$resource && $permission_action==$action) {
-//               //     return true;
-//               // }
 
-//           }
-
-//       }
-//   } 
-// }
 return view ('user.users.index', ['users'=>$users]);
 }
 
@@ -99,6 +81,7 @@ public function show($id)
  */
 public function edit($id)
 {
+  
   $user=User::find($id);
   $allGroups = Group::with('getChildren')->where('parent_id',0)->get();
   $allGroups2=Group::all();
@@ -169,8 +152,11 @@ if ($request->update) {
     for ($i=0; $i <count($existingGroups) ; $i++) { 
      $user->getGroups()->detach($existingGroups[$i]);
    }
+   if ($groups) {
+     # code...
    for ($i=0; $i <count($groups) ; $i++) { 
      $user->getGroups()->attach($groups[$i]);
+   }
    }
  });
  } catch (Exception $exc) {

@@ -7,6 +7,8 @@
 @parent
 <h3>  {{ ('Liste des categories de billets') }}</h3> @endsection 
 <a href="{{ route('billet-categories.create') }}">Nouveau</a> 
+<a href="{{ route('billet-categories.trash') }}">Corbeille</a> 
+
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small" {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>

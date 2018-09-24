@@ -23,9 +23,9 @@
 {{ $resource->title }}
 </td>
 @foreach($resource->getActions as $action)
-@php  $actions=[];@endphp
 
-@foreach ($permissions as $permission) 
+{{ print_r($action) }}
+{{-- @foreach ($permissions as $permission) 
 @if($action->id==$permission->action_id && $resource->id==$permission->resource_id) 
 @php $actions[]=$permission->action_id ;@endphp
 <td> <label for="action"> {{ $action->title }} </label>
@@ -36,7 +36,7 @@
 <input type="checkbox" name="{{ $resource->title}}[]" value="{{$action->id}}" class="uk-checkbox">
 </td>
 @endif
-@endforeach 
+@endforeach --}} 
 
 @endforeach
 

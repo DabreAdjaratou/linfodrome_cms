@@ -281,6 +281,7 @@ class BilletController extends Controller
       $archive->published=2;
       $billet->save();
       $archive->save();
+    return back();
       return redirect()->route('billets.index');
     }
 
@@ -290,7 +291,7 @@ class BilletController extends Controller
     $archive=Archive::find($id)->delete();
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Billet mis en corbeille!');
-    return redirect()->route('billets.index');
+    return back();
     }
 
     public function restore($id)

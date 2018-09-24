@@ -7,6 +7,7 @@
 @parent
 <h3>  {{ ('Liste des categories de video') }}</h3> @endsection 
 <a href="{{ route('video-categories.create') }}">Nouveau</a> 
+<a href="{{ route('video-categories.trash') }}">Corbeille</a> 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small" {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>

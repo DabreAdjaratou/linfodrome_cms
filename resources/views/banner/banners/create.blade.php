@@ -120,10 +120,11 @@
 	</div>
 </div>
 
-
-
-
 </form>
+
+@section('sidebar')
+ @component('layouts.administrator.banner-sidebar') @endcomponent 
+@endsection
 @section('js')
 
 @endsection

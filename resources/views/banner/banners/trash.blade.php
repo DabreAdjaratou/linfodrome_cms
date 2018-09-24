@@ -1,13 +1,11 @@
 @extends('layouts.administrator.master')
-@section('title', 'Banners list')
+@section('title', 'Banners trash')
 @section('css')
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des banières') }}</h3> @endsection 
-<a href="{{ route('banners.create') }}">Nouveau</a> 
-<a href="{{ route('banners.trash') }}">Corbeille</a> 
 
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
@@ -22,10 +20,9 @@
 			<th>{{ ('fin de la publication') }}</th>
 			<th>{{ ('Auteur') }}</th>                       
 			<th>{{ ('Crée le') }}</th>
-			<th>{{ ('Modifié le') }}</th> 
-			<th> {{ ('Modifier') }}</th>
-			<th> {{ ('Corbeille') }}</th>  
-			<th>id</th>
+			<th> {{ ('Restaurer') }}</th>
+			<th> {{ ('Supprimer') }}</th>  
+			<th>{{ ('id') }}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -45,11 +42,16 @@
 			<td>{{$banner->stop_publication_at}}  </td>
 			<td> {{$banner->getAuthor->name }}</td>
 			<td>{{$banner->created_at}}  </td>
-			<td>{{$banner->updated_at}}  </td><td> <a href="{{ route('banners.edit',['banner'=>$banner]) }}" ><span class="uk-text-success">Modifier</span></a>
+			<td> <a href="{{ route('banners.restore',['banner'=>$banner]) }}" ><span class="uk-text-danger">Restaurer</span></a>
 			</td>
-			<td> <a href="{{ route('banners.put-in-trash',['banner'=>$banner]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+			<td> <form action="{{ route('banners.destroy',['banner'=>$banner]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cette Bannières?')">
+				@csrf
+				@method('delete')
+<button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>
+			</form> 
 			</td>
 			<td>{{ $banner->id }}</td>
+
                 </tr>
 		@endforeach
 	</tbody>

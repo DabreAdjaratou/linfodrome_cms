@@ -30,7 +30,7 @@ class VideoController extends Controller
      */
     public function index()
     {
-     $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+     $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
 
            return view ('video.videos.index', compact('videos'));
 
@@ -269,7 +269,7 @@ class VideoController extends Controller
       $archive->published=2;
       $video->save();
       $archive->save();
-      return redirect()->route('videos.index');
+    return back();
     }
 
     public function putInTrash($id)
@@ -278,7 +278,7 @@ class VideoController extends Controller
     $archive=Archive::find($id)->delete();
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Article mis en corbeille!');
-    return redirect()->route('videos.index');
+    return back();
     }
 
     public function restore($id)

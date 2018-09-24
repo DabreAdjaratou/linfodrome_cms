@@ -59,5 +59,26 @@ class User extends Authenticatable
   } 
 }
 return false;
-}   
+}  
+
+public static function isAdmin($id) {
+  $userData = User::with(['getGroups.getAccessLevels'])->where('id', $id)->get(['id']);
+ foreach ($userData as $data) {
+         foreach ($data->getGroups as $group) {
+          foreach ($group->getAccessLevels as $acces) {
+           foreach ($acces as $a) {
+ if(strcasecmp($group->title, 'Manager')==0){
+      return true;
+    }elseif(strcasecmp($group->title, 'public')==0){
+      return false;
+  }
+
+          }
+
+      }
+     
+}
+}
+}
+
 }

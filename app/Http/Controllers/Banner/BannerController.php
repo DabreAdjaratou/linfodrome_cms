@@ -196,22 +196,33 @@ class BannerController extends Controller
      */
     public function destroy($id)
     {
-        //
+    $banner=Banner::onlyTrashed()->find($id)->forceDelete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', ' bannière supprimée avec success!');
+    return redirect()->route('banners.trash');  
+        
     }
     
      public function putInTrash($id)
     {
-    
+    $banner=Banner::find($id)->delete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Bannière mis en corbeille!');
+    return redirect()->route('banners.index');
     }
 
     public function restore($id)
     {
-      
+       $banner=Banner::onlyTrashed()->find($id)->restore();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Bannière restaurer!');
+      return redirect()->route('banners.index');
+    
     }
 
     public function inTrash()
     {
-    
-        
+    $banners=Banner::onlyTrashed()->with(['getCategory:id,title','getAuthor:id,name'])->get();
+       return view('banner.banners.trash',compact('banners'));      
     }
 }

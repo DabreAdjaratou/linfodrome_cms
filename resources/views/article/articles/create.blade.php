@@ -8,9 +8,9 @@
 
 <form method="POST" action="{{ route('articles.store') }}"  enctype="multipart/form-data" class="">
 	@csrf
-	{{-- @can('create', Auth::User())  --}}
+	@can('draft', Auth::User()) 
 	<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
-	{{-- @endcan --}}
+	@endcan
 	<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
 	<button type="reset">{{('Annuler')}}</button>
 	<div>	

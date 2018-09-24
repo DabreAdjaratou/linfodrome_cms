@@ -42,11 +42,11 @@
 			<td class="uk-table-expand">{{ $video->start_publication_at}} </td>
 			<td class="uk-table-expand"> {{$video->stop_publication_at}}</td>
 			<td> {{$video->views}}</td>
-                         <td> <a href="{{ route('video.edit',['video'=>$video]) }}" ><span class="uk-text-success">Modifier</span></a>
+                         <td> <a href="{{ route('videos.edit',['video'=>$video]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
                         <td> {{$video->views}}</td>
-                         <td> <a href="{{ route('video.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-success">Mettre en Corbeille</span></a>
+                         <td> <a href="{{ route('videos.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-success">Mettre en Corbeille</span></a>
 
 			</td>
 			

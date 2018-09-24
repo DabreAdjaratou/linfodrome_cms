@@ -120,9 +120,9 @@ return redirect()->route('access-levels.index');
             $accessLevelGroups[]=$accessLevelGroup->title;
         }
     }
-       
+     
     $arrayDiff=array_diff($groups, $accessLevelGroups);
- return view('user.access-levels.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups,'view'=>'view']);
+ return view('user.access-levels.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups]);
         
     }
 

@@ -7,6 +7,8 @@
 @parent
 <h3>  {{ ('Liste des categories de bannières') }}</h3> @endsection 
 <a href="{{ route('banner-categories.create') }}">Nouveau</a> 
+<a href="{{ route('banner-categories.trash') }}">Corbeille</a> 
+
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small" {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
@@ -37,9 +39,8 @@
 	</tfoot>
 </table>
 @section('sidebar')
- {{-- @component('layouts.administrator.banner-sidebar') @endcomponent  --}}
+@component('layouts.administrator.banner-sidebar') @endcomponent 
 @endsection
-
 @section('js')
 
 @endsection

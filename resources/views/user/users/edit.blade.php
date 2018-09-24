@@ -71,24 +71,21 @@
 
 <div>
        
-            @foreach($allGroups as $group)
-@foreach($user->getGroups as $userGroup)
-@if($userGroup->id==$group->id)
+    @foreach($allGroups as $group)
+    @if(in_array($group->title,$userGroups))
          <ul>
 			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"  checked>
 			{{ ucfirst($group->title) }}
 			@if(count($group->getChildren))
-			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$user,'arrayDiff'=>$arrayDiff])
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$userGroups,'arrayDiff'=>$arrayDiff])
 			@endif
 		</ul>     
-@endif
-@endforeach
-@if(in_array($group->title,$arrayDiff))
+@elseif(in_array($group->title,$arrayDiff))
 		 <ul>
 			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox">
 			{{ ucfirst($group->title) }}
 			@if(count($group->getChildren))
-			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view'])
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$userGroups,'arrayDiff'=>$arrayDiff])
 			@endif
 		</ul>  
 		@endif 

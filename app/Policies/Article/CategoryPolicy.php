@@ -12,6 +12,11 @@ class CategoryPolicy
     use HandlesAuthorization;
 
 private $policy='Article';
+
+public function before($user, $ability)
+{
+ return  User::isAdmin($user->id);
+}
     /**
      * Determine whether the user can view the category.
      *
@@ -32,11 +37,10 @@ private $policy='Article';
      */
     public function create(User $user)
     {
-if(User::getPermissions($user->id,'ArticleCategory','create')){
-
-    return true;
-}
-return false;
+    if(User::getPermissions($user->id,'App\Models\Article\Category','create')){
+       return true;
+    }
+    return false;
  //         
 }
 

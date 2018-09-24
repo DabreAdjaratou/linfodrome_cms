@@ -21,23 +21,22 @@
 	<div>
 		
 @foreach($allGroups as $group)
-@foreach($accessLevel->getGroups as $accessLevelGroup)
-@if($accessLevelGroup->id==$group->id)
+@if(in_array($group->title,$accessLevelGroups))
          <ul>
 			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"  checked>
 			{{ ucfirst($group->title) }}
 			@if(count($group->getChildren))
-			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$accessLevel,'arrayDiff'=>$arrayDiff])
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$accessLevelGroups,'arrayDiff'=>$arrayDiff])
 			@endif
 		</ul>     
 @endif
-@endforeach
+
 @if(in_array($group->title,$arrayDiff))
 		 <ul>
 			<input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox">
 			{{ ucfirst($group->title) }}
 			@if(count($group->getChildren))
-			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view'])
+			@include('user.groups.groupChild',['children' => $group->getChildren,'view'=>'view','data'=>$accessLevelGroups,'arrayDiff'=>$arrayDiff])
 			@endif
 		</ul>  
 		@endif 
