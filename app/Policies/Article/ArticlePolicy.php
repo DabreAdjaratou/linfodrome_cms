@@ -10,6 +10,10 @@ class ArticlePolicy
 {
     use HandlesAuthorization;
 
+    public function before($user)
+    {
+     return  User::isAdmin($user->id);
+    }
     /**
      * Determine whether the user can view the article.
      *

@@ -154,11 +154,30 @@ class VideoController extends Controller
      */
     public function edit($id)
     {
-      $video=Video::find($id);
-      $categories=Category::all();
-      $users=User::all();
-      return view ('video.videos.edit',compact('video','categories','users'));
+
+      session()->put('link',url()->previous());
+      $video= Video::find($id);
+      $archive=Archive::find($id);
+      if($video->checkout!=0){
+        if ($video->checkout!=Auth::id()) {
+         session()->flash('message.type', 'warning');
+         session()->flash('message.content', 'video dejà en cour de modification!');
+         return redirect()->route('videos.index');
+       }else{
+        $categories=Category::all('id','title');
+        $users=user::all('id','name');
+        return view('video.videos.edit',compact('video','categories','users'));
+      }
+    }else{
+      $video->checkout=Auth::id();
+      $archive->checkout=Auth::id();
+      $archive->save();
+      $video->save();
+      $categories=Category::all('id','title');
+      $users=user::all('id','name');
+      return view('video.videos.edit',compact('video','categories','users'));
     }
+          }
 
     /**
      * Update the specified resource in storage.
@@ -174,7 +193,7 @@ class VideoController extends Controller
         'category'=>'required|int',
         'published'=>'nullable',
         'featured'=>'nullable',
-        'image'=>'required|image',
+        'image'=>'image',
         'video'=>'required|string',
         'created_by'=>'int',
         'cameraman'=>'required|int',
@@ -182,16 +201,13 @@ class VideoController extends Controller
         'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
         'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
       ]);
-     $video=Video::find($id);
-     if (is_null($video)) {
-     $video=Archive::find($id);
-     }
+      $video=Video::find($id);
       $video->title =$request->title;
       $video->alias =str_slug($request->title, '-');
       $video->category_id = $request->category;
       $video->published=$request->published ? $request->published : 0 ;
       $video->featured=$request->featured ? $request->featured : 0 ; 
-      $video->image = $request->image;
+      $video->image = $request->image ? $request->image : $video->image;
       $video->code = $request->video;
       $video->created_by =$request->created_by;
       $video->cameraman =$request->cameraman;
@@ -199,6 +215,7 @@ class VideoController extends Controller
       $video->created_at =now();
       $video->start_publication_at = $request->start_publication_at;
       $video->stop_publication_at =$request->stop_publication_at;
+$video->checkout=0;
 
 
 
@@ -218,6 +235,8 @@ class VideoController extends Controller
          $archive->created_at =$video->created_at;
          $archive->start_publication_at = $video->start_publication_at;
          $archive->stop_publication_at =$video->stop_publication_at;
+$archive->checkout=0;
+
         if ($request->update) {
        $video->save();
        $archive->save();
@@ -242,7 +261,8 @@ class VideoController extends Controller
 //           echo $exc->getTraceAsString();
        }
 
-           return redirect()->route('videos.index');
+    return redirect(session()->get('link'));
+           
     
     }
 

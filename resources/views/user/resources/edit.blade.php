@@ -16,6 +16,10 @@
 	<div>	
 		<label for="title">{{('Titre:')}}</label>
 		<input type="text" name="title" placeholder="Titre de la ressource" value="{{ $resource->title }}" required autofocus>
+	</div>
+		<div>	
+		<label for="display_name">{{('Nom à affiché:')}}</label>
+		<input type="text" name="display_name"  value="{{ $resource->display_name }}" required>
 
 	</div>
 	<div>

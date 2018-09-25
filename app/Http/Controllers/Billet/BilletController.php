@@ -32,7 +32,7 @@ class BilletController extends Controller
     {
        $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
-   return view('billet.archives.index',['billets'=>$billets]);
+   return view('billet.billets.index',['billets'=>$billets]);
     
     }
 
@@ -133,7 +133,7 @@ class BilletController extends Controller
     
 
        if ($request->save_close) {
-           return redirect()->route('billets.index');
+           return redirect()->route('billet-archives.index');
        }else{
         return redirect()->route('billets.create');
     }
@@ -160,7 +160,30 @@ class BilletController extends Controller
      */
     public function edit($id)
     {
-
+      session()->put('link',url()->previous());
+      $billet= Billet::find($id);
+      $archive=Archive::find($id);
+      if($billet->checkout!=0){
+        if ($billet->checkout!=Auth::id()) {
+         session()->flash('message.type', 'warning');
+         session()->flash('message.content', 'Billet dejà en cour de modification!');
+         return redirect()->route('billets.index');
+       }else{
+        $sources=Source::all('id','title');
+        $categories=Category::all('id','title');
+        $users=user::all('id','name');
+        return view('billet.billets.edit',compact('billet','sources','categories','users'));
+      }
+    }else{
+      $billet->checkout=Auth::id();
+      $archive->checkout=Auth::id();
+      $archive->save();
+      $billet->save();
+      $sources=Source::all('id','title');
+      $categories=Category::all('id','title');
+      $users=user::all('id','name');
+      return view('billet.billets.edit',compact('billet','sources','categories','users'));
+    }
       $billet= Billet::find($id);
       $sources=Source::all('id','title');
       $categories=Category::all('id','title');
@@ -212,6 +235,7 @@ class BilletController extends Controller
        $billet->created_at =now();
        $billet->start_publication_at = $request->start_publication_at;
        $billet->stop_publication_at =$request->stop_publication_at;
+       $billet->checkout=0;
 
        try {
            DB::transaction(function () use ($billet,$request) {
@@ -231,6 +255,8 @@ class BilletController extends Controller
        $archive->created_at =$billet->created_at;
        $archive->start_publication_at = $billet->start_publication_at;
        $archive->stop_publication_at =$billet->stop_publication_at;
+       $archive->checkout=0;
+
        if ($request->update) {
        $billet->save();
        $archive->save();
@@ -255,7 +281,8 @@ class BilletController extends Controller
 //           echo $exc->getTraceAsString();
        }
 
-           return redirect()->route('billets.index');
+    return redirect(session()->get('link'));
+           
     }
 
     /**

@@ -10,6 +10,7 @@
 	<thead>
 		<tr>
 			<th>{{ ('Titre') }}</th>
+			<th>{{ ('Nom à Affiché') }}</th>
 			<th>{{ ('Actions') }}</th>
 			<th>{{ ('Modifier') }}</th>
 			<th>{{ ('Supprimer') }}</th>
@@ -22,6 +23,7 @@
 		@foreach($resources as $resource)
 		<tr>
 			<td>{{ $resource->title}}</td>
+			<td>{{ $resource->display_name}}</td>
 			<td>@foreach ($resource->getActions as $action)
 				{{ ucfirst($action->title) }}
 			@endforeach </td>

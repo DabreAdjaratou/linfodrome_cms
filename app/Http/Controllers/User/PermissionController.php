@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class PermissionController extends Controller
 {
     public function __construct()
-     {
+    {
         $this->middleware(['auth','activeUser']);
     }
     /**
@@ -55,18 +55,18 @@ class PermissionController extends Controller
         foreach ($resources as $r) {
             $title=$r->title;
             $actions=$request->$title;
-              try {
+            try {
                 DB::transaction(function () use ($actions,$request,$r) {
                   if($actions){
-                   for ($i=0; $i <count($actions) ; $i++) { 
-                     $permission= new Permission;
-                     $permission->access_level_id = $request->accessLevel;
-                     $permission->resource_id=$r->id;
-                     $permission->action_id=$actions[$i];
-                     $permission->save();
-                 }
-                 }
-             });
+                     for ($i=0; $i <count($actions) ; $i++) { 
+                       $permission= new Permission;
+                       $permission->access_level_id = $request->accessLevel;
+                       $permission->resource_id=$r->id;
+                       $permission->action_id=$actions[$i];
+                       $permission->save();
+                   }
+               }
+           });
 
             } catch (Exception $e) {
 
@@ -80,8 +80,8 @@ class PermissionController extends Controller
         }
 
         if ($request->save_close) {
-         return redirect()->route('permissions.index');
-     }else{
+           return redirect()->route('permissions.index');
+       }else{
         return redirect()->route('permissions.create');
     }
 }
@@ -107,41 +107,8 @@ class PermissionController extends Controller
     public function edit($id)
     {
         $accessLevel=Accesslevel::find($id);
-
-        $permissions=Permission::with('getAction','getAccessLevel','getResource')->where('access_level_id',$id)->get(['access_level_id','resource_id','action_id']);
         $resources=Resource::with('getActions','getPermissions')->get(['id','title']);
-       // dd($resources);
-       // $allActions=Action::all();
-        foreach ($resources as $resource) {
-        $resourceActions=[];
-            $resourcePermissions=[];
-            foreach ($resource->getActions as $resourceAction) {
-             $resourceActions[]=$resourceAction->id;
-            }
-            $permissions=$resource->getPermissions->toArray();
-            for ($i=0; $i <count($permissions) ; $i++) { 
-                // $permissions[$i]->getAccessLevel;
-                if($permissions[$i]['resource_id'])
-                $resourcePermissions[]= $permissions[$i]['action_id'];
-
-            }
-        // $actions=[];
-       // foreach ($permissions as $p) {
-       //  if($p->resource_id==$resource->id){
-       //       $actions[]=$p->action_id;
-       //  }
-            $resourceActions=array($resource->title=>$resourceActions);
-                                  }
-            print_r($resourcePermissions);
-            // print_r($resourceActions);
-            $resource->getActions=$resourceActions;
-
-   // }
-            // print_r($resources);
-    // $arrayDiff=array_diff($actions, $resourceActions);
-    // // dd($arrayDiff);
-               return view('user.permissions.edit',compact('resources','accessLevel','permissions'));
-    // return view ('user.permissions.edit',['resource'=>$resource,'permissions'=>$permissions]);
+        return view('user.permissions.edit',compact('resources','accessLevel'));
     }
 
     /**
@@ -153,7 +120,45 @@ class PermissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->update) {
+            $resources=Resource::all('id','title');
+            $existingPermissions=Permission::where('access_level_id',$id)->get();
+            try {
+                DB::transaction(function () use ($request,$id,$resources,$existingPermissions) {
+                    for ($i=0; $i <count($existingPermissions) ; $i++) { 
+                        $existingPermissions[$i]->forceDelete();
+                    }
+                    foreach ($resources as $r) {
+                        $title=$r->title;
+                        $actions=$request->$title;
+
+                        if($actions){
+                         for ($i=0; $i <count($actions) ; $i++) { 
+                           $permission= new Permission;
+                           $permission->access_level_id = $id;
+                           $permission->resource_id=$r->id;
+                           $permission->action_id=$actions[$i];
+                           $permission->save();
+                       }
+                   }
+
+               }
+           });
+
+            } catch (Exception $e) {
+
+                session()->flash('message.type', 'danger');
+                session()->flash('message.content', 'Erreur lors de l\'ajout!');
+            }
+            session()->flash('message.type', 'success');
+            session()->flash('message.content', 'Permissions modifiée avec succès!');
+
+        }else{
+            session()->flash('message.type', 'danger');
+            session()->flash('message.content', 'Modification annulée!');
+
+        }
+        return redirect()->route('permissions.index');
     }
 
     /**
@@ -164,6 +169,6 @@ class PermissionController extends Controller
      */
     public function destroy($id)
     {
-        //
+      
     }
 }

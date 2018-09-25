@@ -18,6 +18,11 @@
 		<input type="text" name="title" placeholder="Titre de la ressource" value="{{ old('title') }}" required autofocus>
 
 	</div>
+	<div>	
+		<label for="display_name">{{('Nom à affiché:')}}</label>
+		<input type="text" name="display_name"  value="{{ old('display_name') }}" required>
+
+	</div>
 	<div>
 		<label>{{('Tout selectionner') }}</label>
 	 <input type="checkbox" name="checkAll" id="checkAll" class="uk-checkbox">

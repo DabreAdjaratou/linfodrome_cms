@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Policies\Article;
+namespace App\Policies\Billet;
 
 use App\Models\User\User;
-use App\Models\Article\Revision;
+use App\Billet\Revision;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RevisionPolicy
@@ -18,7 +18,7 @@ class RevisionPolicy
      * Determine whether the user can view the revision.
      *
      * @param  \App\Models\User\User  $user
-     * @param  \App\Models\Article\Revision  $revision
+     * @param  \App\Billet\Revision  $revision
      * @return mixed
      */
     public function view(User $user, Revision $revision)
@@ -41,7 +41,7 @@ class RevisionPolicy
      * Determine whether the user can update the revision.
      *
      * @param  \App\Models\User\User  $user
-     * @param  \App\Models\Article\Revision  $revision
+     * @param  \App\Billet\Revision  $revision
      * @return mixed
      */
     public function update(User $user, Revision $revision)
@@ -53,7 +53,7 @@ class RevisionPolicy
      * Determine whether the user can delete the revision.
      *
      * @param  \App\Models\User\User  $user
-     * @param  \App\Models\Article\Revision  $revision
+     * @param  \App\Billet\Revision  $revision
      * @return mixed
      */
     public function delete(User $user, Revision $revision)
@@ -65,7 +65,7 @@ class RevisionPolicy
      * Determine whether the user can restore the revision.
      *
      * @param  \App\Models\User\User  $user
-     * @param  \App\Models\Article\Revision  $revision
+     * @param  \App\Billet\Revision  $revision
      * @return mixed
      */
     public function restore(User $user, Revision $revision)
@@ -77,7 +77,7 @@ class RevisionPolicy
      * Determine whether the user can permanently delete the revision.
      *
      * @param  \App\Models\User\User  $user
-     * @param  \App\Models\Article\Revision  $revision
+     * @param  \App\Billet\Revision  $revision
      * @return mixed
      */
     public function forceDelete(User $user, Revision $revision)

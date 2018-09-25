@@ -84,7 +84,7 @@ class ArchiveController extends Controller
         if ($archive->checkout!=Auth::id()) {
          session()->flash('message.type', 'warning');
          session()->flash('message.content', 'Article dejà en cour de modification!');
-         return redirect()->route('articles.index');
+         return redirect()->route('article-archives.index');
        }else{
         $sources=Source::all('id','title');
         $categories=Category::all('id','title');

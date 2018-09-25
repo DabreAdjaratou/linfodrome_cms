@@ -4,9 +4,15 @@ namespace App\Http\Controllers\Billet;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Billet\Archive;
 use App\Models\Billet\Billet;
-
+use App\Models\Billet\Archive;
+use App\Models\Billet\Source;
+use App\Models\Billet\Category;
+use App\Models\User\User;
+use App\Models\Billet\Revision;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 class ArchiveController extends Controller
 {
      /**
@@ -69,7 +75,33 @@ class ArchiveController extends Controller
      */
     public function edit($id)
     {
-        //
+      $billet= Billet::find($id);
+      if($billet){
+        return redirect()->route('billets.edit',['billet'=>$billet]);
+      }else{
+ $archive=Archive::find($id);
+      if($archive->checkout!=0){
+        if ($archive->checkout!=Auth::id()) {
+         session()->flash('message.type', 'warning');
+         session()->flash('message.content', 'Billet dejà en cour de modification!');
+         return redirect()->route('billet-archives.index');
+       }else{
+        $sources=Source::all('id','title');
+        $categories=Category::all('id','title');
+        $users=user::all('id','name');
+        return view('billet.archives.edit',compact('archive','sources','categories','users'));
+      }
+    }else{
+      $archive->checkout=Auth::id();
+      $archive->save();
+      $sources=Source::all('id','title');
+      $categories=Category::all('id','title');
+      $users=user::all('id','name');
+      return view('billet.archives.edit',compact('archive','sources','categories','users'));
+    }
+
+      }
+      
     }
 
     /**
@@ -81,7 +113,60 @@ class ArchiveController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+         $validatedData = $request->validate([
+        'ontitle'=>'nullable|string',
+        'title' => 'required|string',
+        'category'=>'required|int',
+        'published'=>'nullable',
+        'featured'=>'nullable',
+        'image'=>'nullable|image',
+        'image_legend'=>'nullable|string',
+        'introtext'=>'nullable|string',
+        'fulltext'=>'required|string',
+        'source_id'=>'int',
+        // 'created_by'=>'int',
+        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+
+    ]);
+           
+     $archive=Archive::find($id);
+       $archive->ontitle = $request->ontitle;
+       $archive->title =$request->title;
+       $archive->alias =str_slug($request->title, '-');
+       $archive->category_id = $request->category;
+       $archive->published=$request->published ? $request->published : 0 ;
+       $archive->featured=$request->featured ? $request->featured : 0 ; 
+       $archive->image = $request->image;
+       $archive->image_legend =$request->image_legend;
+       $archive->introtext = $request->introtext;
+       $archive->fulltext =$request->fulltext;
+       $archive->source_id = $request->source;
+       $archive->created_by =$request->created_by ?? $request->auth_userid;
+       $archive->created_at =now();
+       $archive->start_publication_at = $request->start_publication_at;
+       $archive->stop_publication_at =$request->stop_publication_at;
+       $archive->checkout=0;
+
+        if ($request->update) {
+       $archive->save();
+       $revision= new  Revision;
+ $revision->type=explode('@', Route::CurrentRouteAction())[1];
+ $revision->user_id=Auth::id();
+ $revision->$archive_id=$archive->id;
+ $revision->revised_at=now();
+ $revision->save();
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'modifié avec succès!');
+           
+      }else{
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Modification annulée!');
+    }
+    
+
+    return redirect()->route('billet-archives.index');
+           
     }
 
     /**

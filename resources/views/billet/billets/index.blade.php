@@ -41,13 +41,13 @@
 			<td class="uk-table-expand">{{$billet->getRevision->last()['revised_at']}}  </td>
 			<td> {{ $billet->views }}</td>
 			<td> {{ $billet->image }}</td>
-                         <td> <a href="{{ route('billet-archives.edit',['billet'=>$billet]) }}" ><span class="uk-text-success">Modifier</span></a>
+                         <td> <a href="{{ route('billets.edit',['billet'=>$billet]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
                          <td> <a href="{{ route('billets.put-in-draft',['billet'=>$billet]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
 
 			</td>
-			 <td> <a href="{{ route('billet-archives.put-in-trash',['billet'=>$billet]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+			 <td> <a href="{{ route('billets.put-in-trash',['billet'=>$billet]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
 
 			</td>
 			<td>{{ $billet->id }}</td>

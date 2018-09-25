@@ -14,6 +14,12 @@ use SoftDeletes;
      * @var array
      */
     protected $dates = ['deleted_at'];
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 
 public function getAction(){
 

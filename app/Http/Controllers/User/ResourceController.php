@@ -25,7 +25,7 @@ class ResourceController extends Controller
      */
     public function index()
     {
-        $resources = Resource::with('getActions:title')->get(['id','title']);  
+        $resources = Resource::with('getActions:title')->get(['id','title','display_name']);  
         foreach ($resources as $d) {
           foreach ($d->getActions as $action) {
              if ($d->getActions->last()->title==$action->title) {
@@ -62,9 +62,11 @@ return view ('user.resources.index', compact('resources'));
     {
         $validatedData = $request->validate([
             'title' => 'required|unique:resources|max:100',
+            'display_name' => 'required|unique:resources|max:100',
         ]);
         $resource= new Resource;
         $resource->title = $request->title;
+        $resource->display_name= $request->display_name;
         $actions =$request->actions;
 
 
@@ -134,9 +136,11 @@ if ($request->save_close) {
     {
         $validatedData = $request->validate([
          'title' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
+         'display_name' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
          ]);
         $resource=Resource::find($id);
         $resource->title = $request->title;
+        $resource->display_name = $request->display_name;
         $actions =$request->actions;
         // $existing=Resource::find($resource->id);
         $existingInPivot=Resource::with('getActions')->where('resources.id',$resource->id)->get();
