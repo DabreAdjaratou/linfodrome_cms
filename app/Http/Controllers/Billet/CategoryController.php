@@ -25,7 +25,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories=Category::all();
-        return view('billet.categories.index',['categories'=>$categories]);
+        return view('billet.categories.administrator.index',['categories'=>$categories]);
     }
 
     /**
@@ -35,7 +35,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-    return view('billet.categories.create');
+    return view('billet.categories.administrator.create');
     }
 
     /**
@@ -46,6 +46,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+      if ($request->cancel) {
+           return redirect()->route('billet-categories.index');
+      }
         $validatedData = $request->validate([
         'title' => 'required|unique:billet_categories|max:100',
         'published' => 'nullable|int',
@@ -92,7 +95,7 @@ class CategoryController extends Controller
     public function edit($id)
     {
         $category=Category::find($id);
-        return view('billet.categories.edit',compact('category'));
+        return view('billet.categories.administrator.edit',compact('category'));
     }
 
     /**
@@ -182,7 +185,7 @@ class CategoryController extends Controller
     public function inTrash()
     {
      $categories= Category::onlyTrashed()->get(['id','title']);
-       return view('billet.categories.trash',compact('categories'));
+       return view('billet.categories.administrator.trash',compact('categories'));
    
         
     }

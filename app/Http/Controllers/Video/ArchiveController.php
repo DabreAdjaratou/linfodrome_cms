@@ -31,7 +31,7 @@ class ArchiveController extends Controller
     {
        $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
         
-       return view ('video.archives.index', compact('videos'));
+       return view ('video.archives.administrator.index', compact('videos'));
     }
 
     /**
@@ -86,16 +86,16 @@ class ArchiveController extends Controller
          session()->flash('message.content', 'video dejà en cour de modification!');
          return redirect()->route('video-archives.index');
        }else{
-        $categories=Category::all('id','title');
+      $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
-        return view('video.archives.edit',compact('video','categories','users'));
+        return view('video.archives.administrator.edit',compact('video','categories','users'));
       }
     }else{
       $video->checkout=Auth::id();
       $video->save();
-      $categories=Category::all('id','title');
-      $users=user::all('id','name');
-       return view ('video.archives.edit',compact('video','categories','users'));
+      $categories=Category::where('published',1)->get(['id','title']);
+       $users=user::all('id','name');
+       return view ('video.archives.administrator.edit',compact('video','categories','users'));
     }
       
     }
@@ -219,19 +219,19 @@ $video->checkout=0;
     public function inTrash()
     {
        $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-       return view('video.archives.trash',compact('archives'));
+       return view('video.archives.administrator.trash',compact('archives'));
     }
 
 public function inDraft()
     {
       $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-        return view('video.archives.draft',compact('archives'));
+        return view('video.archives.administrator.draft',compact('archives'));
   }
 
 
      public function revision()
   {
     $videos= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
-    return view('video.archives.revision',compact('videos'));
+    return view('video.archives.administrator.revision',compact('videos'));
   }
 }

@@ -59,6 +59,7 @@ class RegisterController extends Controller
             'image'=>'nullable|image',
             'require_reset'=>'required|integer',
             'data'=>'nullable|json',
+            'groups'=>'required',
         ]);
     }
 

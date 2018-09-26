@@ -24,7 +24,7 @@ class BannerController extends Controller
     public function index()
     {
         $banners=Banner::with(['getCategory:id,title','getAuthor:id,name'])->get();
-        return view('banner.banners.index',compact('banners'));
+        return view('banner.banners.administrator.index',compact('banners'));
     }
 
     /**
@@ -34,9 +34,9 @@ class BannerController extends Controller
      */
     public function create()
     {
-        $categories=Category::all('id','title');
+             $categories=Category::where('published',1)->get(['id','title']);
         $users=User::all('id','name');
-     return view('banner.banners.create',compact('categories','users'));   
+     return view('banner.banners.administrator.create',compact('categories','users'));   
     }
 
     /**
@@ -117,9 +117,9 @@ class BannerController extends Controller
     public function edit($id)
     {
         $banner=Banner::find($id);
-        $categories=Category::all('id','title');
+      $categories=Category::where('published',1)->get(['id','title']);
         $users=User::all('id','name');
-        return view('banner.banners.edit',compact('banner','categories','users'));
+        return view('banner.banners.administrator.edit',compact('banner','categories','users'));
     }
 
     /**
@@ -223,6 +223,6 @@ class BannerController extends Controller
     public function inTrash()
     {
     $banners=Banner::onlyTrashed()->with(['getCategory:id,title','getAuthor:id,name'])->get();
-       return view('banner.banners.trash',compact('banners'));      
+       return view('banner.banners.administrator.trash',compact('banners'));      
     }
 }

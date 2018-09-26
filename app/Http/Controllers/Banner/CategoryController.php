@@ -25,7 +25,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories=Category::all();
-        return view('banner.categories.index',['categories'=>$categories]);
+        return view('banner.categories.administrator.index',['categories'=>$categories]);
     }
 
     /**
@@ -35,7 +35,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-    return view('banner.categories.create');
+    return view('banner.categories.administrator.create');
     }
 
     /**
@@ -92,7 +92,7 @@ class CategoryController extends Controller
     public function edit($id)
     {
         $category=Category::find($id);
-        return view('banner.categories.edit',compact('category'));
+        return view('banner.categories.administrator.edit',compact('category'));
     }
 
     /**
@@ -183,7 +183,7 @@ class CategoryController extends Controller
     public function inTrash()
     {
      $categories=Category::onlyTrashed()->get(['id','title']);
-       return view('banner.categories.trash',compact('categories'));
+       return view('banner.categories.administrator.trash',compact('categories'));
    
         
     }

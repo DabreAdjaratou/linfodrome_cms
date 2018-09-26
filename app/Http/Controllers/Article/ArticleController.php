@@ -33,7 +33,7 @@ class ArticleController extends Controller
     {   
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
             
-      return view('article.articles.index',['articles'=>$articles]);
+      return view('article.articles.administrator.index',['articles'=>$articles]);
 
     }
 
@@ -45,10 +45,12 @@ class ArticleController extends Controller
     public function create()
 
     {
-      $sources=Source::all('id','title');
-      $categories=Category::all('id','title');
+      session()->put('link',url()->previous());
+      // mkdir(storage_path("/path/to/my/dir"),0777,true);
+      $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
-      return view('article.articles.create',compact('sources','categories','users'));
+      return view('article.articles.administrator.create',compact('sources','categories','users'));
     }
 
     /**
@@ -84,8 +86,9 @@ class ArticleController extends Controller
      $article->alias =str_slug($request->title, '-');
      $article->category_id = $request->category;
      $article->published=$request->published ? $request->published : 0 ;
-     $article->featured=$request->featured ? $request->featured : 0 ; 
-     $article->image = $request->image->getClientOriginalName();
+     $article->featured=$request->featured ? $request->featured : 0 ;
+     $article->image = $request->image->storeAs('images', $request->image->getClientOriginalName()); 
+     // $article->image = $request->image->getClientOriginalName();
      $article->image_legend =$request->image_legend;
      $article->video = $request->video;
      $article->gallery_photo =$request->gallery_photo;
@@ -98,7 +101,7 @@ class ArticleController extends Controller
      $article->stop_publication_at =$request->stop_publication_at;
      $article->checkout=0;
 
-        Storage::disk('local')->put('Images',$request->image->getClientOriginalName());
+        // Storage::disk('local')->put('Images',$request->image->getClientOriginalName());
      try {
        DB::transaction(function () use ($article) {
          $article->save();
@@ -139,7 +142,7 @@ class ArticleController extends Controller
     session()->flash('message.content', 'Article ajouté avec succès!');
     
     if ($request->save_close) {
-     return redirect()->route('article-archives.index');
+     return redirect(session()->get('link'));
    }else{
     return redirect()->route('articles.create');
   }
@@ -176,20 +179,20 @@ class ArticleController extends Controller
          session()->flash('message.content', 'Article dejà en cour de modification!');
          return redirect()->route('articles.index');
        }else{
-        $sources=Source::all('id','title');
-        $categories=Category::all('id','title');
+        $sources=Source::where('published',1)->get(['id','title']);
+        $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
-        return view('article.articles.edit',compact('article','sources','categories','users'));
+        return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
       }
     }else{
       $article->checkout=Auth::id();
       $archive->checkout=Auth::id();
       $archive->save();
       $article->save();
-      $sources=Source::all('id','title');
-      $categories=Category::all('id','title');
+      $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
-      return view('article.articles.edit',compact('article','sources','categories','users'));
+      return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
     }
   }
 
@@ -313,6 +316,8 @@ class ArticleController extends Controller
       $archive->published=2;
       $article->save();
       $archive->save();
+      session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Article mis au brouillon!');
       return redirect()->route('articles.index');
     }
 
@@ -337,12 +342,12 @@ class ArticleController extends Controller
     public function inTrash()
     {
        $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-       return view('article.articles.trash',compact('articles'));
+       return view('article.articles.administrator.trash',compact('articles'));
     }
 
 public function inDraft()
     {
       $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        return view('article.articles.draft',compact('articles'));
+        return view('article.articles.administrator.draft',compact('articles'));
   }
 }

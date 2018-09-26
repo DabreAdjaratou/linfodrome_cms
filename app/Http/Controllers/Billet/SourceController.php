@@ -23,7 +23,7 @@ class SourceController extends Controller
     public function index()
     {
         $sources=Source::all();
-        return view ('billet.sources.index',['sources'=>$sources]);
+        return view ('billet.sources.administrator.index',['sources'=>$sources]);
     }
 
     /**
@@ -33,7 +33,7 @@ class SourceController extends Controller
      */
     public function create()
     {
-        return view('billet.sources.create');
+        return view('billet.sources.administrator.create');
     }
 
     /**
@@ -92,7 +92,7 @@ class SourceController extends Controller
     public function edit($id)
     {
        $source=Source::find($id);
-       return view('billet.sources.edit',compact('source'));
+       return view('billet.sources.administrator.edit',compact('source'));
     }
 
     /**
@@ -181,7 +181,7 @@ if ($request->update) {
     public function inTrash()
     {
      $sources= Source::onlyTrashed()->get(['id','title']);
-       return view('billet.sources.trash',compact('sources'));
+       return view('billet.sources.administrator.trash',compact('sources'));
    
         
     }

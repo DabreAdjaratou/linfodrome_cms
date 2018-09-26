@@ -132,6 +132,12 @@ return [
         'email' => [
         'unique' => 'Cette adresse email existe deja!',
     ],
+    'groups' => [
+        'required' => 'vous devez selectionner au moin un group d\'utilisateurs.',
+    ],
+    'actions' => [
+        'required' => 'vous devez selectionner au moin une action.',
+    ],
     ],
 
     

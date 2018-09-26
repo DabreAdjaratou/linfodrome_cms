@@ -32,7 +32,7 @@ class ArchiveController extends Controller
 
         $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
-   return view('billet.archives.index',['billets'=>$billets]);
+   return view('billet.archives.administrator.index',['billets'=>$billets]);
     }
 
     /**
@@ -86,18 +86,18 @@ class ArchiveController extends Controller
          session()->flash('message.content', 'Billet dejà en cour de modification!');
          return redirect()->route('billet-archives.index');
        }else{
-        $sources=Source::all('id','title');
-        $categories=Category::all('id','title');
+        $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
-        return view('billet.archives.edit',compact('archive','sources','categories','users'));
+        return view('billet.archives.administrator.edit',compact('archive','sources','categories','users'));
       }
     }else{
       $archive->checkout=Auth::id();
       $archive->save();
-      $sources=Source::all('id','title');
-      $categories=Category::all('id','title');
+      $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
-      return view('billet.archives.edit',compact('archive','sources','categories','users'));
+      return view('billet.archives.administrator.edit',compact('archive','sources','categories','users'));
     }
 
       }
@@ -230,19 +230,19 @@ class ArchiveController extends Controller
     public function inTrash()
     {
        $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-       return view('billet.archives.trash',compact('archives'));
+       return view('billet.archives.administrator.trash',compact('archives'));
     }
 
 public function inDraft()
     {
       $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        return view('billet.archives.draft',compact('archives'));
+        return view('billet.archives.administrator.draft',compact('archives'));
   }
 
 
     public function revision()
   {
     $billets= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
-    return view('billet.archives.revision',['billets'=>$billets]);
+    return view('billet.archives.administrator.revision',['billets'=>$billets]);
   }
 }

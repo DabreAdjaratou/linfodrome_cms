@@ -5,8 +5,6 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Group;
-use App\Models\User\Accesslevel;
-// use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 
@@ -29,7 +27,7 @@ class GroupController extends Controller
         $groups = Group::where('parent_id',0)->get();
         $view='groupView';
                
-    return view ('user.groups.index', compact('groups','view'));
+    return view ('user.groups.administrator.index', compact('groups','view'));
 
          }    
     /**
@@ -40,7 +38,7 @@ class GroupController extends Controller
     public function create()
     {
         $parents = Group::all();
-        return view ('user.groups.create',['parents'=>$parents]);
+        return view ('user.groups.administrator.create',['parents'=>$parents]);
     }
 
     /**
@@ -99,7 +97,7 @@ class GroupController extends Controller
     {
         $group=Group::find($id);
         $parents = Group::all();
-        return view ('user.groups.edit',compact('parents','group'));
+        return view ('user.groups.administrator.edit',compact('parents','group'));
     }
 
     /**

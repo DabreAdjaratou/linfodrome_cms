@@ -36,7 +36,7 @@ class ResourceController extends Controller
     }
 }
 
-return view ('user.resources.index', compact('resources'));
+return view ('user.resources.administrator.index', compact('resources'));
 
 
 }
@@ -49,7 +49,7 @@ return view ('user.resources.index', compact('resources'));
     public function create()
     {
         $actions=Action::all();
-        return view ('user.resources.create',compact('actions'));
+        return view ('user.resources.administrator.create',compact('actions'));
     }
 
     /**
@@ -63,6 +63,7 @@ return view ('user.resources.index', compact('resources'));
         $validatedData = $request->validate([
             'title' => 'required|unique:resources|max:100',
             'display_name' => 'required|unique:resources|max:100',
+            'actions'=>'required',
         ]);
         $resource= new Resource;
         $resource->title = $request->title;
@@ -122,7 +123,7 @@ if ($request->save_close) {
         }
     }
     $arrayDiff=array_diff($actions, $resourceActions);
-    return view ('user.resources.edit',['arrayDiff'=>$arrayDiff,'resource'=>$resource,'allActions'=>$allActions]);
+    return view ('user.resources.administrator.edit',['arrayDiff'=>$arrayDiff,'resource'=>$resource,'allActions'=>$allActions]);
 }
 
     /**
@@ -137,6 +138,7 @@ if ($request->save_close) {
         $validatedData = $request->validate([
          'title' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
          'display_name' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
+         'actions'=>'required',
          ]);
         $resource=Resource::find($id);
         $resource->title = $request->title;

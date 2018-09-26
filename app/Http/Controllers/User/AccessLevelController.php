@@ -38,7 +38,7 @@ class AccessLevelController extends Controller
           }
               }
        
-        return view ('user.access-levels.index', compact('accessLevels'));
+        return view ('user.access-levels.administrator.index', compact('accessLevels'));
 
     }
 
@@ -50,7 +50,7 @@ class AccessLevelController extends Controller
     public function create()
     {
          $groups = Group::with('getChildren')->where('parent_id',0)->get();
-        return view ('user.access-levels.create',['groups'=>$groups,'accessLevelView'=>'accessLevelView']);
+        return view ('user.access-levels.administrator.create',['groups'=>$groups,'accessLevelView'=>'accessLevelView']);
     }
 
     /**
@@ -64,6 +64,7 @@ class AccessLevelController extends Controller
 
         $validatedData = $request->validate([
             'title' => 'required|unique:access_levels|max:100',
+            'groups' => 'required',
         ]);
 
         $accessLevel = new AccessLevel;
@@ -122,7 +123,7 @@ return redirect()->route('access-levels.index');
     }
      
     $arrayDiff=array_diff($groups, $accessLevelGroups);
- return view('user.access-levels.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups]);
+ return view('user.access-levels.administrator.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups]);
         
     }
 
@@ -137,6 +138,7 @@ return redirect()->route('access-levels.index');
     {
         $validatedData = $request->validate([
             'title' => 'required|'.Rule::unique('access_levels')->ignore($id, 'id').'|max:100',
+            'groups' => 'required|array',
         ]);
         $accessLevel =AccessLevel::find($id);
         $accessLevel->title = $request->title;

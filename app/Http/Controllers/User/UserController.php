@@ -38,7 +38,7 @@ public function index()
 $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', 1)->get(['id']);
 
 
-return view ('user.users.index', ['users'=>$users]);
+return view ('user.users.administrator.index', ['users'=>$users]);
 }
 
 /**
@@ -48,7 +48,7 @@ return view ('user.users.index', ['users'=>$users]);
  */
 public function create()
 {
-  return view ('user.users.create');
+  return view ('user.users.administrator.create');
 }
 
 /**
@@ -95,7 +95,7 @@ public function edit($id)
   }
 
   $arrayDiff=array_diff($groups, $userGroups);
-  return view('user.users.edit',['arrayDiff'=>$arrayDiff,'user'=>$user,'allGroups'=>$allGroups, 'userGroups'=>$userGroups]);
+  return view('user.users.administrator.edit',['arrayDiff'=>$arrayDiff,'user'=>$user,'allGroups'=>$allGroups, 'userGroups'=>$userGroups]);
 
 }
 
@@ -115,7 +115,8 @@ public function update(Request $request, $id)
     'password' => 'string|min:6|confirmed',
     'is_active'=>'required|integer',
     'image'=>'nullable|image',
-    'require_reset'=>'required|integer',       
+    'require_reset'=>'required|integer',  
+    'groups'=>'required',     
   ]);
  }else{
   $validatedData=$request->validate([
@@ -123,7 +124,8 @@ public function update(Request $request, $id)
     'email' => 'required|string|email|max:255|'.Rule::unique('users')->ignore($id, 'id'),
     'is_active'=>'required|integer',
     'image'=>'nullable|image',
-    'require_reset'=>'required|integer',        
+    'require_reset'=>'required|integer', 
+    'groups'=>'required',         
   ]);
 }
 
@@ -152,11 +154,9 @@ if ($request->update) {
     for ($i=0; $i <count($existingGroups) ; $i++) { 
      $user->getGroups()->detach($existingGroups[$i]);
    }
-   if ($groups) {
      # code...
    for ($i=0; $i <count($groups) ; $i++) { 
      $user->getGroups()->attach($groups[$i]);
-   }
    }
  });
  } catch (Exception $exc) {
@@ -187,7 +187,7 @@ public function destroy($id)
 public function requireResetPassword($id)
 {
   $user=User::find($id);
-  return view('user.users.reset-password',compact('user'));
+  return view('user.users.administrator.reset-password',compact('user'));
 
 }
 

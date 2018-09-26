@@ -34,7 +34,7 @@ class ArchivePolicy
      */
     public function create(User $user)
     {
-        //
+       
     }
 
     /**
@@ -46,7 +46,7 @@ class ArchivePolicy
      */
     public function update(User $user, Archive $archive)
     {
-        //
+       
     }
 
     /**

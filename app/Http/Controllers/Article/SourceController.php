@@ -24,7 +24,7 @@ class SourceController extends Controller
     public function index()
     {
         $sources=Source::all();
-        return view ('article.sources.index',['sources'=>$sources]);
+        return view ('article.sources.administrator.index',['sources'=>$sources]);
     }
 
     /**
@@ -34,7 +34,7 @@ class SourceController extends Controller
      */
     public function create()
     {
-        return view('article.sources.create');
+        return view('article.sources.administrator.create');
     }
 
     /**
@@ -89,7 +89,7 @@ class SourceController extends Controller
     public function edit($id)
     {
        $source=Source::find($id);
-       return view('article.sources.edit',compact('source'));
+       return view('article.sources.administrator.edit',compact('source'));
     }
 
     /**
@@ -180,7 +180,7 @@ if ($request->update) {
     public function inTrash()
     {
      $sources= Source::onlyTrashed()->get(['id','title']);
-       return view('article.sources.trash',compact('sources'));
+       return view('article.sources.administrator.trash',compact('sources'));
    
         
     }

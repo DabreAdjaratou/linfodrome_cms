@@ -26,7 +26,7 @@ class ActionController extends Controller
     {
 
        $actions = Action::all('id','title','display_name');
-       return view ('user.actions.index', ['actions'=>$actions]);
+       return view ('user.actions.administrator.index', ['actions'=>$actions]);
    }
 
     /**
@@ -36,7 +36,7 @@ class ActionController extends Controller
      */
     public function create()
     {
-        return view ('user.actions.create');
+        return view ('user.actions.administrator.create');
     }
 
     /**
@@ -91,7 +91,7 @@ class ActionController extends Controller
     public function edit($id)
     {
         $action=Action::find($id);
-        return view('user.actions.edit',compact('action'));
+        return view('user.actions.administrator.edit',compact('action'));
     }
 
     /**

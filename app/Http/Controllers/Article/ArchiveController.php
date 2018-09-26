@@ -32,7 +32,7 @@ class ArchiveController extends Controller
     public function index()
     {
         $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      return view('article.archives.index',['articles'=>$articles]);
+      return view('article.archives.administrator.index',['articles'=>$articles]);
     }
 
     /**
@@ -86,18 +86,18 @@ class ArchiveController extends Controller
          session()->flash('message.content', 'Article dejà en cour de modification!');
          return redirect()->route('article-archives.index');
        }else{
-        $sources=Source::all('id','title');
-        $categories=Category::all('id','title');
+        $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
-        return view('article.archives.edit',compact('archive','sources','categories','users'));
+        return view('article.archives.administrator.edit',compact('archive','sources','categories','users'));
       }
     }else{
       $archive->checkout=Auth::id();
       $archive->save();
-      $sources=Source::all('id','title');
-      $categories=Category::all('id','title');
+      $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
-      return view('article.archives.edit',compact('archive','sources','categories','users'));
+      return view('article.archives.administrator.edit',compact('archive','sources','categories','users'));
     }
 }
 
@@ -242,13 +242,13 @@ class ArchiveController extends Controller
     public function inTrash()
     {
        $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-       return view('article.archives.trash',compact('archives'));
+       return view('article.archives.administrator.trash',compact('archives'));
     }
 
 public function inDraft()
     {
       $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        return view('article.archives.draft',compact('archives'));
+        return view('article.archives.administrator.draft',compact('archives'));
   }
 
 /**
@@ -260,6 +260,6 @@ public function inDraft()
 
   {
     $articles= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
-    return view('article.archives.revision',['articles'=>$articles]);
+    return view('article.archives.administrator.revision',['articles'=>$articles]);
   }
 }

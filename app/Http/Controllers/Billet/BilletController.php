@@ -32,7 +32,7 @@ class BilletController extends Controller
     {
        $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
-   return view('billet.billets.index',['billets'=>$billets]);
+   return view('billet.billets.administrator.index',['billets'=>$billets]);
     
     }
 
@@ -43,13 +43,14 @@ class BilletController extends Controller
      */
     public function create()
     {
-        $sources=Source::all('id','title');
-        $categories=Category::all('id','title');
+      session()->put('link',url()->previous());
+       $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
         $auth_username = Auth::user()->name;
        
       
-        return view('billet.billets.create',['sources'=>$sources, 'categories'=>$categories,'auth_username'=>$auth_username, 'users'=>$users]);
+        return view('billet.billets.administrator.create',['sources'=>$sources, 'categories'=>$categories,'auth_username'=>$auth_username, 'users'=>$users]);
     }
 
     /**
@@ -133,7 +134,7 @@ class BilletController extends Controller
     
 
        if ($request->save_close) {
-           return redirect()->route('billet-archives.index');
+           return redirect(session()->get('link'));
        }else{
         return redirect()->route('billets.create');
     }
@@ -169,26 +170,26 @@ class BilletController extends Controller
          session()->flash('message.content', 'Billet dejà en cour de modification!');
          return redirect()->route('billets.index');
        }else{
-        $sources=Source::all('id','title');
-        $categories=Category::all('id','title');
+        $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
-        return view('billet.billets.edit',compact('billet','sources','categories','users'));
+        return view('billet.billets.administrator.edit',compact('billet','sources','categories','users'));
       }
     }else{
       $billet->checkout=Auth::id();
       $archive->checkout=Auth::id();
       $archive->save();
       $billet->save();
-      $sources=Source::all('id','title');
-      $categories=Category::all('id','title');
+      $sources=Source::where('published',1)->get(['id','title']);
+      $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
-      return view('billet.billets.edit',compact('billet','sources','categories','users'));
+      return view('billet.billets.administrator.edit',compact('billet','sources','categories','users'));
     }
       $billet= Billet::find($id);
       $sources=Source::all('id','title');
       $categories=Category::all('id','title');
       $users=user::all('id','name');
-      return view('billet.billets.edit',compact('billet','sources','categories','users'));
+      return view('billet.billets.administrator.edit',compact('billet','sources','categories','users'));
     }
 
     /**
@@ -333,13 +334,13 @@ class BilletController extends Controller
     public function inTrash()
     {
        $billets=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-       return view('billet.billets.trash',compact('billets'));
+       return view('billet.billets.administrator.trash',compact('billets'));
     }
 
 public function inDraft()
     {
       $billets=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        return view('billet.billets.draft',compact('billets'));
+        return view('billet.billets.administrator.draft',compact('billets'));
   }
      
 }

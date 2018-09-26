@@ -32,7 +32,7 @@ class VideoController extends Controller
     {
      $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
 
-           return view ('video.videos.index', compact('videos'));
+           return view ('video.videos.administrator.index', compact('videos'));
 
    }
 
@@ -43,10 +43,10 @@ class VideoController extends Controller
      */
     public function create()
     {
-
-      $categories=Category::all();
+      session()->put('link',url()->previous());
+      $categories=Category::where('published',1)->get(['id','title']);
       $users=User::all();
-      return view ('video.videos.create',compact('categories','users'));
+      return view ('video.videos.administrator.create',compact('categories','users'));
     }
 
     /**
@@ -128,7 +128,7 @@ class VideoController extends Controller
     
 
     if ($request->save_close) {
-     return redirect()->route('video-archives.index');
+     return redirect(session()->get('link'));
    }else{
     return redirect()->route('videos.create');
   }
@@ -164,18 +164,18 @@ class VideoController extends Controller
          session()->flash('message.content', 'video dejà en cour de modification!');
          return redirect()->route('videos.index');
        }else{
-        $categories=Category::all('id','title');
+      $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
-        return view('video.videos.edit',compact('video','categories','users'));
+        return view('video.videos.administrator.edit',compact('video','categories','users'));
       }
     }else{
       $video->checkout=Auth::id();
       $archive->checkout=Auth::id();
       $archive->save();
       $video->save();
-      $categories=Category::all('id','title');
+      $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
-      return view('video.videos.edit',compact('video','categories','users'));
+      return view('video.videos.administrator.edit',compact('video','categories','users'));
     }
           }
 
@@ -313,12 +313,12 @@ $archive->checkout=0;
     public function inTrash()
     {
        $videos=Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-       return view('video.videos.trash',compact('videos'));
+       return view('video.videos.administrator.trash',compact('videos'));
     }
 
 public function inDraft()
     {
       $videos=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-        return view('video.videos.draft',compact('videos'));
+        return view('video.videos.administrator.draft',compact('videos'));
   }
   }
