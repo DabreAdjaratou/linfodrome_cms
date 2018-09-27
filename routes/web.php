@@ -23,6 +23,14 @@ Auth::routes();
 Route::get('/administrator', function () {
     return view('layouts/administrator/admin-panel');
 })->name('administrator')->middleware('auth','activeUser');
+
+//Route to media
+Route::get('/administrator/media', function () {
+    return view('layouts/administrator/media');
+})->name('media')->middleware('auth','activeUser');
+Route::get('/administrator/{media}/media-child', function () {
+    return view('layouts/administrator/media-child');
+})->name('media-child')->middleware('auth','activeUser');
 // 
 //redirections
 // Route::redirect('/home', 'register', 301);

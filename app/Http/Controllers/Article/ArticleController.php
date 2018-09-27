@@ -45,6 +45,7 @@ class ArticleController extends Controller
     public function create()
 
     {
+
       session()->put('link',url()->previous());
       // mkdir(storage_path("/path/to/my/dir"),0777,true);
       $sources=Source::where('published',1)->get(['id','title']);
@@ -142,7 +143,8 @@ class ArticleController extends Controller
     session()->flash('message.content', 'Article ajouté avec succès!');
     
     if ($request->save_close) {
-     return redirect(session()->get('link'));
+       return back()->withInput();
+     // return redirect(session()->get('link'));
    }else{
     return redirect()->route('articles.create');
   }
@@ -169,8 +171,11 @@ class ArticleController extends Controller
      */
     public function edit($id)
     {
-      
+   if(url()->previous()==url()->current()){
+   }else{
       session()->put('link',url()->previous());
+     }
+
       $article= Article::find($id);
       $archive=Archive::find($id);
       if($article->checkout!=0){
@@ -223,6 +228,7 @@ class ArticleController extends Controller
       'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
     ]);
+      
      $article=Article::find($id);
      if (is_null($article)) {
      $article=Archive::find($id);

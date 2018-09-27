@@ -55,4 +55,9 @@
 	<li><a href="{{ route('videos.draft') }}">{{ ('Brouillons') }} </a></li>
 </ul>  
 
+<ul>
+	<li><a href="{{ route('media') }}">{{ ('Media') }}</a></li>
+    
+</ul> 
+
 @endsection
