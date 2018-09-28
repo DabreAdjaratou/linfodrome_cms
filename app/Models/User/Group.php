@@ -47,5 +47,51 @@ class Group extends Model
     Public function getAccessLevels(){
     return $this->belongsToMany('App\Models\User\Accesslevel', 'usergroup_accesslevel_map','user_group_id');
     }
+
+    public static function getPermissions($id){
+    $group=Group::with(['getParent','getAccessLevels.getPermissions'])->find($id);
+$permissions=[];
+foreach ($group->getAccessLevels as $a) {
+  foreach ($a->getPermissions as $p) {
+              $permissions[]=$p;
+            }
+}
+
+if ($group->getParent){
+   $p=Group::getParentPermissions($group->getParent);
+   $permissions=array_merge($permissions,$p);
+   // dd($permissions);
+          // foreach ($group->getParent->getAccessLevels as $a) {
+          // print_r($a->getPermissions->toArray());
+        // }
+    // }
+// dd(($permissions));
+}
+return $permissions;
+}
+
+    public static function getParentPermissions(Group $group){
+        $parent=Group::with(['getParent','getAccessLevels.getPermissions'])->find($group->parent_id);
+           $permissions=[];
+           $t=[];
+           if($parent){
+        foreach ($parent->getAccessLevels as $a) {
+        // if($a->getPermissions){
+           // echo $a->getPermissions->count().'<br>';
+            foreach ($a->getPermissions as $p) {
+              $permissions[]=$p;
+            }
+        // echo $a->title;
+        }
+  
+      // print_r(count($permissions));
+        if($parent->getParent){
+      $t=Group::getPermissions($parent->getParent->id);
+        }
+           }
+        // echo 'total:';
+        return array_merge($permissions,$t);
+    }
+
    
 }

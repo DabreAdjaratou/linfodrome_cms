@@ -9,6 +9,9 @@
 <form method="POST" action="{{ route('user-groups.update',['group'=>$group]) }}">
 	@csrf
 	@method('put')
+@can('create', App\Models\Article\Category::class)
+	kjkjjkjkk
+	@endcan
 	<div>
 		<button type="submit" name="update" value="update">{{ ('Modifier') }}</button>
 		<button type="submit" name="cancel" value="cancel"> {{ ('Annuler') }}</button>

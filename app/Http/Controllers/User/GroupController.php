@@ -5,6 +5,8 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Group;
+use App\Models\User\Action;
+use App\Models\User\Resource;
 use Illuminate\Validation\Rule;
 
 
@@ -95,10 +97,24 @@ class GroupController extends Controller
      */
     public function edit($id)
     {
-        $group=Group::find($id);
+        $r=Group::getPermissions($id);
+        dd($r);
+        for ($i=0; $i <count($r); $i++) { 
+            echo $r[$i]['resource_id'];
+            $action=(action::where('title','CREATE')->get(['id','title']))->toArray();
+            echo $action[0]['title'];
+            $resource=Resource::where('title','article')->get(['id','title']);
+            echo $resource[0]['title'];
+
+        }
+
+              $group=Group::find($id);
+// $this->getPermissions($id);
         $parents = Group::all();
         return view ('user.groups.administrator.edit',compact('parents','group'));
     }
+
+
 
     /**
      * Update the specified resource in storage.

@@ -10,9 +10,8 @@
 <a href="{{ route('article-categories.trash') }}">Corbeille</a> 
 
 <div class="uk-margin ">	
-	@can('create', 'App\Models\Article\Category')
+	@can('create', App\Models\Article\Category::class)
     <div>a le droit</div>
-   <div>'na le droit</div>
 @endcan
 </div>
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
