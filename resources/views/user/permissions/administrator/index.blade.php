@@ -39,7 +39,7 @@
 @endforeach
 	
 @section('sidebar')
-
+ @component('layouts.administrator.user-sidebar') @endcomponent 
 @endsection
 
 @section('js')

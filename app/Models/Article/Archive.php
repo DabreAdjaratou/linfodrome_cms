@@ -58,6 +58,4 @@ class Archive extends Model
     {
        return $this->hasMany('App\Models\Article\Revision','article_id');
     }
-
-
 }

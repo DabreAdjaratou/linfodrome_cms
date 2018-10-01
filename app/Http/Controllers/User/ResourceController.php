@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\Resource;
 use App\Models\User\Action;
+use App\Models\User\Permission;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -196,20 +197,28 @@ if ($request->save_close) {
     public function destroy($id)
     {
         $resource=Resource::find($id);
-        $existing=Resource::with('getActions')->where('resources.id',$resource->id)->get();
+        $existing=Resource::with(['getActions','getPermissions'])->where('resources.id',$resource->id)->get();
         foreach ($existing as $e) {
             $existingActions=[];
+            $existingPermissions=[];
             foreach ($e->getActions as $existingAction) {
                $existingActions[]=$existingAction->id;
            }
+           foreach ($e->getPermissions as $existingPermission) {
+                  $existingPermissions[]=$existingPermission->id;
+           }
        }
-
        try {
-         DB::transaction(function () use ($resource,$existingActions) {
+         DB::transaction(function () use ($resource,$existingActions,$existingPermissions) {
           $resource->delete();
           for ($i=0; $i <count($existingActions) ; $i++) { 
              $resource->getActions()->detach($existingActions[$i]);
          }
+
+         // for ($i2=0; $i2 <count($existingPermissions) ; $i2++) { 
+             Permission::destroy($existingPermissions);
+         // }
+
               });
      } catch (Exception $exc) {
         session()->flash('message.type', 'danger');

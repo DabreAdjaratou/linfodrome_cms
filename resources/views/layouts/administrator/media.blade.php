@@ -53,7 +53,7 @@ if (is_dir($dir)) {
        closedir($dh);
    }
 }
-echo str_replace('\\', '/', $folder);
+// echo str_replace('\\', '/', $folder);
 @endphp
 <script type="text/javascript">
 	$('#media').click(function subDirectories(){
@@ -68,3 +68,4 @@ echo str_replace('\\', '/', $folder);
 	})
 
 </script>
+

@@ -86,6 +86,9 @@
 	</div>
 
 </form>
+@section('sidebar')
+ @component('layouts.administrator.billet-sidebar') @endcomponent 
+@endsection
 @section('js')
 
 @endsection

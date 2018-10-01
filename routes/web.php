@@ -24,14 +24,6 @@ Route::get('/administrator', function () {
     return view('layouts/administrator/admin-panel');
 })->name('administrator')->middleware('auth','activeUser');
 
-//Route to media
-Route::get('/administrator/media', function () {
-    return view('layouts/administrator/media');
-})->name('media')->middleware('auth','activeUser');
-Route::get('/administrator/{media}/media-child', function () {
-    return view('layouts/administrator/media-child');
-})->name('media-child')->middleware('auth','activeUser');
-// 
 //redirections
 // Route::redirect('/home', 'register', 301);
 
@@ -125,5 +117,8 @@ Route::resource('banners','Banner\BannerController');
 Route::get('banner-categories/{banner_category}/trash','Banner\CategoryController@putInTrash')->name('banner-categories.put-in-trash');
 Route::get('banner-categories/{banner_category}/restore','Banner\CategoryController@restore')->name('banner-categories.restore');
 Route::get('banner-categories/trash','Banner\CategoryController@inTrash')->name('banner-categories.trash');
-Route::resource('banner-categories','Banner\CategoryController')
-;
+Route::resource('banner-categories','Banner\CategoryController');
+
+//Route to media
+Route::get('/administrator/media','Media\MediaController@index')->name('media')->middleware('auth','activeUser');
+Route::get('/administrator/{media}/media-child','Media\MediaController@mediaChild')->name('media-child')->middleware('auth','activeUser');

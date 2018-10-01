@@ -45,9 +45,15 @@ class Group extends Model {
         return $this->belongsToMany('App\Models\User\AccessLevel', 'usergroup_accesslevel_map', 'user_group_id');
     }
 
+     Public function getUsers() {
+        return $this->belongsToMany('App\Models\User\User', 'user_usergroup_map', 'user_group_id');
+    }
+
+
     public static function getPermissions($id) {
         $group = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
         $permissions = [];
+        $Allpermissions=[];
         foreach ($group->getAccessLevels as $accessLevel) {
             foreach ($accessLevel->getPermissions as $permission) {
                 $permissions[] = $permission;

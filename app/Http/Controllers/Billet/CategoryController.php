@@ -156,7 +156,7 @@ class CategoryController extends Controller
     public function putInTrash($id)
     {
         $category= Category::with(['getBillets','getArchives'])->where('id',$id)->first();
-        if ($category->getBillets->isEmpty() && $category->getArchives->isEmpty()) {
+        if (blank($category->getBillets) && blank($category->getArchives)) {
         
             if($category->delete()){
            session()->flash('message.type', 'success');

@@ -96,6 +96,9 @@
 	</div>
 
 </form>
+@section('sidebar')
+ @component('layouts.administrator.article-sidebar') @endcomponent 
+@endsection
 @section('js')
 
 @endsection

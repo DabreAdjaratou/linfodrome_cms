@@ -143,8 +143,7 @@ class ActionController extends Controller
         try {
          DB::transaction(function () use ($action,$existingResources) {
         $action->delete();
-         
-       for ($i=0; $i <count($existingResources) ; $i++) { 
+         for ($i=0; $i <count($existingResources) ; $i++) { 
              $action->getResources()->detach($existingResources[$i]);
          }
      });

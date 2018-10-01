@@ -27,3 +27,6 @@
 </form>
 
 @endsection
+@section('sidebar')
+ @component('layouts.administrator.billet-sidebar') @endcomponent 
+@endsection

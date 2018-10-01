@@ -41,4 +41,7 @@
 </form>
 
 @endsection
+@section('sidebar')
+ @component('layouts.administrator.user-sidebar') @endcomponent 
+@endsection
 

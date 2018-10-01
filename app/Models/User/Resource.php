@@ -29,6 +29,6 @@ class Resource extends Model
         return $this->belongsToMany('App\Models\User\Action', 'resource_action_map',  'resource_id','action_id');
     }
     public function getPermissions() {
-        return $this->hasMany('App\Models\User\Permission',  'resource_id');
+        return $this->hasMany('App\Models\User\Permission', 'resource_id');
     }
 }

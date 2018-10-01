@@ -6,4 +6,3 @@
     <li><a href="{{route('actions.index')}}">{{ ('Action') }}</a></li>
     <li><a href="{{route('permissions.index')}}">{{ ('Permissions') }}</a></li>
 </ul>
-

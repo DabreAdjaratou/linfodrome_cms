@@ -98,7 +98,6 @@ class GroupController extends Controller
     public function edit($id)
     {
         $r=Group::getPermissions($id);
-//        dd($r);
         for ($i=0; $i <count($r); $i++) { 
             echo $r[$i]['resource_id'];
             $action=Action::where('title','CREATE')->get(['id','title'])->toArray();
@@ -150,7 +149,16 @@ class GroupController extends Controller
      */
     public function destroy($id)
     {
-        //
+       $group=Group::with(['getUsers:id,name','getChildren','getAccessLevels'])->find($id);
+       if(blank($group->getUsers) && blank($group->getChildren) && blank($group->getAccessLevels)){
+        $group->forceDelete();
+        session()->flash('message.type', 'success');
+        session()->flash('message.content', 'Group supprimé avec succès!');
+       }else{
+        session()->flash('message.type', 'danger');
+        session()->flash('message.content', 'Impossible de supprimer ce groupe car il est referencé par d\'autre elements!');
+       }
+       return redirect()->route('user-groups.index');
     }
 
     

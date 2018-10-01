@@ -152,7 +152,7 @@ if ($request->update) {
     public function putInTrash($id)
     {
         $source= Source::with(['getBillets','getArchives'])->where('id',$id)->first();
-        if ($source->getBillets->isEmpty() && $source->getArchives->isEmpty()) {
+        if (blank($source->getBillets) && blank($source->getArchives)) {
         
             if($source->delete()){
            session()->flash('message.type', 'success');

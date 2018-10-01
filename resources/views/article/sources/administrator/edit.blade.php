@@ -25,3 +25,6 @@
 </form>
 
 @endsection
+@section('sidebar')
+ @component('layouts.administrator.article-sidebar') @endcomponent 
+@endsection

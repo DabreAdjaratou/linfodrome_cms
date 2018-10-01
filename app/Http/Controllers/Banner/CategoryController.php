@@ -154,7 +154,7 @@ class CategoryController extends Controller
     public function putInTrash($id)
     {
         $category= Category::with('getBanners')->where('id',$id)->first();
-        if ($category->getBanners->isEmpty()) {
+        if (blank($category->getBanners)) {
         
             if($category->delete()){
            session()->flash('message.type', 'success');

@@ -28,7 +28,9 @@
 			<td class="uk-table-expand"> {{ $article->created_at }}</td>
 			<td class="uk-table-expand">
 				@foreach($article->getRevision as $revision)
-{{$revision}} 
+{{'-'.$revision->type}} 
+{{$revision->getModifier->name}} 
+{{$revision->revised_at}} <br>
 				@endforeach
 			</td>
 			<td></td>
