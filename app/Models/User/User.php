@@ -6,6 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User\Group;
+use App\Models\User\Action;
 
 class User extends Authenticatable
 {
@@ -45,17 +46,17 @@ class User extends Authenticatable
       $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', $id)->get(['id']);
       foreach ($userData as $data) {
        foreach ($data->getGroups as $group) {
-      // dd(blank($group->getAccessLevels));
         if(blank($group->getAccessLevels)){
-       $parentPermissions=Group::getPermissions($group->id);
-           $action=(action::where('title',$action)->get(['id','title']))->toArray();
+       $parentPermissions=Group::getPermissionsIfNoAccessLevel($group->id);
+           $action=Action::where('title',$action)->get(['id','title'])->toArray();
            $resource=Resource::where('title',$resource)->get(['id','title']);
            for ($i=0; $i <count($parentPermissions) ; $i++) { 
-             if ($parentPermissions[$i]['resource_id']==$resource[0]['id'] && $parentPermissions[$i]['action_id']==$action[0]['id'] && $parentPermissions[$i]['access_level_id']==$access->id) {
-              return true;
+             if ($parentPermissions[$i][0]['resource_id']==$resource[0]['id'] && $parentPermissions[$i][0]['action_id']==$action[0]['id'] && $parentPermissions[$i][0]['access_level_id']==$parentPermissions[$i][1]) {
+                     return true;
             }
     }
     }else{
+
  foreach ($group->getAccessLevels as $access) {
          foreach ($access->getPermissions  as $permission) {
           $access_level= $access->title;
@@ -65,11 +66,13 @@ class User extends Authenticatable
             return true;
           }else{
            $parentPermissions=Group::getPermissions($group->id);
-           $action=(action::where('title',$action)->get(['id','title']))->toArray();
-           $resource=Resource::where('title',$resource)->get(['id','title']);
-           for ($i=0; $i <count($parentPermissions) ; $i++) { 
-             if ($parentPermissions[$i]['resource_id']==$resource[0]['id'] && $parentPermissions[$i]['action_id']==$action[0]['id'] && $parentPermissions[$i]['access_level_id']==$access->id) {
-              return true;
+           $actionTitle=Action::where('title',$action)->get(['id','title'])->toArray();
+           $resourceTitle=Resource::where('title',$resource)->get(['id','title'])->toArray();
+//           dd($parentPermissions);
+           for ($i=0; $i <count($parentPermissions) ; $i++) {
+             if ($parentPermissions[$i]['resource_id']==$resourceTitle[0]['id'] && $parentPermissions[$i]['action_id']==$actionTitle[0]['id'] && $parentPermissions[$i]['access_level_id']==$access->id) {
+                           
+                 return true;
         }
             }
           }
@@ -100,7 +103,6 @@ public static function isAdmin($id) {
     }
 
   }
-
 }
 }
 }

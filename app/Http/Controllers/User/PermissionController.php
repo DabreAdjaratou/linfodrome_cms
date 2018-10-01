@@ -151,7 +151,6 @@ if ($validator->fails()) {
                         foreach ($resources as $r) {
                             $title=$r->title;
                             $actions=$request->$title;
-
                             for ($i=0; $i <count($actions) ; $i++) { 
                                $permission= new Permission;
                                $permission->access_level_id = $id;

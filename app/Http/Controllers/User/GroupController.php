@@ -98,10 +98,10 @@ class GroupController extends Controller
     public function edit($id)
     {
         $r=Group::getPermissions($id);
-        dd($r);
+//        dd($r);
         for ($i=0; $i <count($r); $i++) { 
             echo $r[$i]['resource_id'];
-            $action=(action::where('title','CREATE')->get(['id','title']))->toArray();
+            $action=Action::where('title','CREATE')->get(['id','title'])->toArray();
             echo $action[0]['title'];
             $resource=Resource::where('title','article')->get(['id','title']);
             echo $resource[0]['title'];
