@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Billet;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Billet\Revision;
 
 class RevisionController extends Controller
 {
@@ -21,7 +22,8 @@ class RevisionController extends Controller
      */
     public function index()
     {
-        //
+         $revisions=Revision::with(['getModifier:id,name','getBillet:id,title,category_id,created_by,created_at','getBillet.getCategory:id,title','getBillet.getAuthor:id,name'])->get()->groupBy('billet_id');
+           return view('billet.revisions.administrator.index',['revisions'=>$revisions]);
     }
 
     /**

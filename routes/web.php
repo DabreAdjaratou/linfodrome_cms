@@ -28,7 +28,6 @@ Route::get('/administrator', function () {
 // Route::redirect('/home', 'register', 301);
 
 // Route to Article
-Route::get('article-revisions','Article\ArchiveController@revision')->name('article-revisions');
 Route::get('article-archives/{article}/trash','Article\ArchiveController@putInTrash')->name('article-archives.put-in-trash');
 Route::get('article-archives/{article}/restore','Article\ArchiveController@restore')->name('article-archives.restore');
 Route::get('article-archives/{article}/draft','Article\ArchiveController@putInDraft')->name('article-archives.put-in-draft');
@@ -52,8 +51,11 @@ Route::get('article-sources/trash','Article\SourceController@inTrash')->name('ar
 Route::resource('article-sources','Article\SourceController');
 
 
+Route::get('article-revisions','Article\RevisionController@index')->name('article-revisions');
+
+
+
 // Route to Billet
-Route::get('billet-revisions','Billet\ArchiveController@revision')->name('billet-revisions');
 Route::get('billet-archives/{billet}/trash','Billet\ArchiveController@putInTrash')->name('billet-archives.put-in-trash');
 Route::get('billet-archives/{billet}/restore','Billet\ArchiveController@restore')->name('billet-archives.restore');
 Route::get('billet-archives/{billet}/draft','Billet\ArchiveController@putInDraft')->name('billet-archives.put-in-draft');
@@ -78,9 +80,11 @@ Route::get('billet-sources/trash','Billet\SourceController@inTrash')->name('bill
 
 Route::resource('billet-sources','Billet\SourceController');
 
+Route::get('billet-revisions','Billet\RevisionController@index')->name('billet-revisions');
+
+
 
 // Route to Video
-Route::get('video-revisions','Video\ArchiveController@revision')->name('video-revisions');
 Route::get('video-archives/{video}/trash','Video\ArchiveController@putInTrash')->name('video-archives.put-in-trash');
 Route::get('video-archives/{video}/restore','Video\ArchiveController@restore')->name('video-archives.restore');
 Route::get('video-archives/{video}/draft','Video\ArchiveController@putInDraft')->name('video-archives.put-in-draft');
@@ -98,6 +102,9 @@ Route::get('video-categories/{video_category}/restore','Video\CategoryController
 Route::get('video-categories/trash','Video\CategoryController@inTrash')->name('video-categories.trash');
 
 Route::resource('video-categories','Video\CategoryController');
+
+Route::get('video-revisions','Video\RevisionController@index')->name('video-revisions');
+
 
 // Route to User
 Route::resource('access-levels','User\AccessLevelController');
@@ -118,6 +125,8 @@ Route::get('banner-categories/{banner_category}/trash','Banner\CategoryControlle
 Route::get('banner-categories/{banner_category}/restore','Banner\CategoryController@restore')->name('banner-categories.restore');
 Route::get('banner-categories/trash','Banner\CategoryController@inTrash')->name('banner-categories.trash');
 Route::resource('banner-categories','Banner\CategoryController');
+
+
 
 //Route to media
 Route::get('/administrator/media','Media\MediaController@index')->name('media')->middleware('auth','activeUser');

@@ -45,8 +45,7 @@
                          <td> <a href="{{ route('video-archives.edit',['video'=>$video]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
-                        <td> {{$video->views}}</td>
-                         <td> <a href="{{ route('video-archives.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-success">Mettre en Corbeille</span></a>
+             <td> <a href="{{ route('video-archives.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-success">Mettre en Corbeille</span></a>
 
 			</td>
 			

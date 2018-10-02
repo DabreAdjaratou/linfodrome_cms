@@ -29,7 +29,6 @@
 	</thead>
 	<tbody>
 		@foreach($articles as $article)
-		{{ dd(($article))}}
 		  	<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $article->title }}</td>

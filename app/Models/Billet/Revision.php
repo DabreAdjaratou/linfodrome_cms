@@ -26,4 +26,8 @@ class Revision extends Model
        return $this->belongsTo('App\Models\User\User','user_id');
     }
 
+public function getBillet()
+    {
+       return $this->belongsTo('App\Models\Billet\Archive','billet_id')->withTrashed();
+    }
 }

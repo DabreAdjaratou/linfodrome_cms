@@ -283,30 +283,74 @@ $archive->checkout=0;
     
      public function putInDraft($id)
     {
+      try {
+       DB::transaction(function () use ($id) {
       $video=Video::find($id);
       $archive=Archive::find($id);
       $video->published=2;
       $archive->published=2;
       $video->save();
       $archive->save();
+       $revision= new  Revision;
+       $revision->type=explode('@', Route::CurrentRouteAction())[1];
+       $revision->user_id=Auth::id();
+       $revision->video_id=$id;
+       $revision->revised_at=now();
+       $revision->save();
+     });
+       session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Video mis en corbeille!');
+    } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+//           echo $exc->getTraceAsString();
+    }
     return back();
     }
 
     public function putInTrash($id)
     {
+      try {
+       DB::transaction(function () use ($id) {
     $video=Video::find($id)->delete();
     $archive=Archive::find($id)->delete();
+     $revision= new  Revision;
+       $revision->type=explode('@', Route::CurrentRouteAction())[1];
+       $revision->user_id=Auth::id();
+       $revision->video_id=$id;
+       $revision->revised_at=now();
+       $revision->save();
+     });
     session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Article mis en corbeille!');
+    session()->flash('message.content', 'Video mis en corbeille!');
+    } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+//           echo $exc->getTraceAsString();
+    }
     return back();
     }
 
     public function restore($id)
     {
+      try {
+       DB::transaction(function () use ($id) {
       $video=Video::onlyTrashed()->find($id)->restore();
       $archive=Archive::onlyTrashed()->find($id)->restore();
+       $revision= new  Revision;
+       $revision->type=explode('@', Route::CurrentRouteAction())[1];
+       $revision->user_id=Auth::id();
+       $revision->video_id=$id;
+       $revision->revised_at=now();
+       $revision->save();
+     });
       session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Article restaurer!');
+      session()->flash('message.content', 'Video restaurer!');
+      } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la restauration!');
+//           echo $exc->getTraceAsString();
+    }
       return redirect()->route('videos.index');
     }
 

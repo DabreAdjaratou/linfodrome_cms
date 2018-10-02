@@ -1,4 +1,3 @@
-@extends('layouts.administrator.master')
 @php
 
 $dir = base_path('storage\app\images');
@@ -14,10 +13,9 @@ if (is_dir($dir)) {
            // affiche le nom et le type si ce n'est pas un element du systeme
            if( $file != '.' && $file != '..') {
               	if(is_dir(base_path('storage\app\images'.'\\'.$file))){
-              		$folder=$file;
-           		echo "<div><span id='media' uk-icon='icon: folder; ratio: 1.5'></span>$file</div>";
+              		echo "<div id='".$file."' class='folder'><span uk-icon='icon: folder; ratio: 1.5'></span>$file</div>";
            	}else {
-           		echo "<div><span id='media' uk-icon='image'></span>$file</div>";
+           		echo "<div><span id='image' uk-icon='image'></span>$file</div>";
            	}
            }
         
@@ -28,18 +26,13 @@ if (is_dir($dir)) {
 }
 // echo str_replace('\\', '/', $folder);
 @endphp
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 
-<script type="text/javascript">
-  $('#media').click(function subDirectories(){
-  var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("txtHint").innerHTML = this.responseText;
-            }
-        }
-        xmlhttp.open("GET", "{{route('media-child',['media'=>$folder]) }}" , true);
-        xmlhttp.send();
-  })
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $(".folder").click(function(event){
+      var media=$(this).attr('id');
+              $("#txtHint").load("{{route('media-child',['media'=>'folder'])}}".replace('folder',media));
+    });
+});
 </script>

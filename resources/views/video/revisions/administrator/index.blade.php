@@ -1,54 +1,61 @@
 @extends('layouts.administrator.master')
-@section('title', 'Videos list')
+@section('title', 'Videos revisions')
 @section('css')
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
-<h3>  {{ ('Liste des videos') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
+<h3>  {{ ('Liste des revisions de video') }}</h3> @endsection 
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
-            <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-			<th>{{ ('Titre de la video') }}</th>
-			<th>{{ ('Categorie') }}</th>
-			<th>{{ ('A la Une') }}</th>
-			<th>{{ ('Publiée') }}</th>
-			<th>{{ ('journaliste') }}</th>
-			<th>{{ ('crée lé') }}</th>
-			<th>{{ ('Debut publication') }}</th>
-			<th>{{ ('fin publication') }}</th>
-			<th>{{ ('Nbre de vue') }}</th>
-			<th>{{ ('id') }}</th>
-                       
+		<tr>
+			<th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
+			<th>{{ ('Video') }}</th>
+			<th>{{ ('Category') }}</th>
+			<th>{{ ('Auteur') }}</th>
+			<th>{{ ('créé le') }}</th>
+			<th>{{ ('Revisions') }}</th>
+
 		</tr>
 	</thead>
 	<tbody>
-		@foreach($videos as $video)
-		<tr>
-			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-                        <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
-			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
-			<td> {!! ($video->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($video->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
-			<td class="uk-table-expand"> {{$video->getAuthor->name}}</td>
-			<td class="uk-table-expand">{{$video->created_at}}</td>
-			<td class="uk-table-expand">{{ $video->start_publication_at}} </td>
-			<td class="uk-table-expand"> {{$video->stop_publication_at}}</td>
-			<td> {{$video->views}}</td>
-			<td>{{ $video->id }}</td>
-                </tr>
-		@endforeach
-	</tbody>
-	<tfoot>
-	</tfoot>
-</table>
-@section('sidebar')
- @component('layouts.administrator.video-sidebar') @endcomponent 
-@endsection
+		<tr class="uk-text-small">
+			@foreach($revisions as $revision)
+			@for($i=0; $i<count($revision); $i++)
+			@if($i==0)
+			{{-- {{ dd($revision[$i]) }} --}}
+			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
+			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->title }}</td>
+			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->getCategory->title }}</td>
+			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->getAuthor->name }}</td>
+			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->created_at }}</td>
+			
+			<td class="uk-table-expand">
+				{{'-'.$revision[$i]->type}} 
+				{{$revision[$i]->getModifier->name}} 
+				{{$revision[$i]->revised_at}} <br>
+				@else
+				
+				{{'-'.$revision[$i]->type}} 
+				{{$revision[$i]->getModifier->name}} 
+				{{$revision[$i]->revised_at}} <br>
 
-@section('js')
+				@endif
+				@endfor
+			</td>
+			</tr>
 
-@endsection
+			@endforeach
+		</tbody>
+		<tfoot>
+		</tfoot>
+	</table>
+	@section('sidebar')
+	@component('layouts.administrator.video-sidebar') @endcomponent 
+	@endsection
 
-@endsection
+	@section('js')
+
+	@endsection
+
+	@endsection

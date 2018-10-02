@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Video;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Video\Revision;
 
 class RevisionController extends Controller
 {
@@ -21,7 +22,8 @@ class RevisionController extends Controller
      */
     public function index()
     {
-        //
+         $revisions=Revision::with(['getModifier:id,name','getVideo:id,title,category_id,created_by,created_at','getVideo.getCategory:id,title','getVideo.getAuthor:id,name'])->get()->groupBy('video_id');
+           return view('video.revisions.administrator.index',['revisions'=>$revisions]);
     }
 
     /**

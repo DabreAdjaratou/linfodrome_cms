@@ -26,4 +26,9 @@ class Revision extends Model
        return $this->belongsTo('App\Models\User\User','user_id');
     }
 
+     public function getVideo()
+    {
+       return $this->belongsTo('App\Models\Video\Archive','video_id')->withTrashed();
+    }
+
 }

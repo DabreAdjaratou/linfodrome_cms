@@ -33,5 +33,11 @@ class Revision extends Model
        return $this->belongsTo('App\Models\User\User','user_id');
     }
 
+     public function getArticle()
+    {
+       return $this->belongsTo('App\Models\Article\Archive','article_id')->withTrashed();
+    }
+
+
  
 }

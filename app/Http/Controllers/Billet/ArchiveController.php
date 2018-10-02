@@ -30,7 +30,7 @@ class ArchiveController extends Controller
     public function index()
     {
 
-        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
    return view('billet.archives.administrator.index',['billets'=>$billets]);
     }
@@ -153,7 +153,7 @@ class ArchiveController extends Controller
        $revision= new  Revision;
  $revision->type=explode('@', Route::CurrentRouteAction())[1];
  $revision->user_id=Auth::id();
- $revision->$archive_id=$archive->id;
+ $revision->billet_id=$archive->id;
  $revision->revised_at=now();
  $revision->save();
        session()->flash('message.type', 'success');
@@ -194,9 +194,25 @@ class ArchiveController extends Controller
       if ($billet) {
         return redirect()->route('billets.put-in-draft',compact('billet'));
       }else{
+         try {
+       DB::transaction(function () use ($id) {
       $archive=Archive::find($id);
       $archive->published=2;
       $archive->save();
+       $revision= new  Revision;
+ $revision->type=explode('@', Route::CurrentRouteAction())[1];
+ $revision->user_id=Auth::id();
+ $revision->billet_id=$id;
+ $revision->revised_at=now();
+ $revision->save();
+});
+session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Billet mis au brouillon!');
+       } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
+//           echo $exc->getTraceAsString();
+    }
       return redirect()->route('billet-archives.index');
     }
 }
@@ -207,9 +223,23 @@ class ArchiveController extends Controller
       if ($billet) {
         return redirect()->route('billets.put-in-trash',compact('billet'));
       }else{
+         try {
+       DB::transaction(function () use ($id) {
     $archive=Archive::find($id)->delete();
+     $revision= new  Revision;
+ $revision->type=explode('@', Route::CurrentRouteAction())[1];
+ $revision->user_id=Auth::id();
+ $revision->billet_id=$id;
+ $revision->revised_at=now();
+ $revision->save();
+});
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Billet mis en corbeille!');
+    } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+//           echo $exc->getTraceAsString();
+    }
 }
     return redirect()->route('billet-archives.index');
     }
@@ -220,9 +250,23 @@ class ArchiveController extends Controller
       if ($billet) {
         return redirect()->route('billets.restore',compact('billet'));
       }else{
+         try {
+       DB::transaction(function () use ($id) {
       $archive=Archive::onlyTrashed()->find($id)->restore();
+       $revision= new  Revision;
+ $revision->type=explode('@', Route::CurrentRouteAction())[1];
+ $revision->user_id=Auth::id();
+ $revision->billet_id=$id;
+ $revision->revised_at=now();
+ $revision->save();
+});
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'billet restaurer!');
+      } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la restauration!');
+//           echo $exc->getTraceAsString();
+    }
   }
       return redirect()->route('billet-archives.index');
     }
@@ -239,10 +283,4 @@ public function inDraft()
         return view('billet.archives.administrator.draft',compact('archives'));
   }
 
-
-    public function revision()
-  {
-    $billets= Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','created_by','created_at']);
-    return view('billet.archives.administrator.revision',['billets'=>$billets]);
-  }
 }

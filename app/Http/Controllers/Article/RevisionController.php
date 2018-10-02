@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Article;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use APP\Models\Article\Revision;
+use App\Models\Article\Revision;
 
 class RevisionController extends Controller
 {
@@ -22,7 +22,9 @@ class RevisionController extends Controller
      */
     public function index()
     {
-        //
+         $revisions=Revision::with(['getModifier:id,name','getArticle:id,title,category_id,created_by,created_at','getArticle.getCategory:id,title',
+      'getArticle.getAuthor:id,name'])->get()->groupBy('article_id');
+   return view('article.revisions.administrator.index',['revisions'=>$revisions]);
     }
 
     /**

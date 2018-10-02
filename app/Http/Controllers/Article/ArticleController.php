@@ -32,7 +32,7 @@ class ArticleController extends Controller
     public function index()
     {   
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-            
+
       return view('article.articles.administrator.index',['articles'=>$articles]);
 
     }
@@ -45,7 +45,6 @@ class ArticleController extends Controller
     public function create()
 
     {
-
       session()->put('link',url()->previous());
       // mkdir(storage_path("/path/to/my/dir"),0777,true);
       $sources=Source::where('published',1)->get(['id','title']);
@@ -143,7 +142,7 @@ class ArticleController extends Controller
     session()->flash('message.content', 'Article ajouté avec succès!');
     
     if ($request->save_close) {
-       return back()->withInput();
+     return back()->withInput();
      // return redirect(session()->get('link'));
    }else{
     return redirect()->route('articles.create');
@@ -171,35 +170,35 @@ class ArticleController extends Controller
      */
     public function edit($id)
     {
-   if(url()->previous()==url()->current()){
-   }else{
+     if(url()->previous()==url()->current()){
+     }else{
       session()->put('link',url()->previous());
-     }
+    }
 
-      $article= Article::find($id);
-      $archive=Archive::find($id);
-      if($article->checkout!=0){
-        if ($article->checkout!=Auth::id()) {
-         session()->flash('message.type', 'warning');
-         session()->flash('message.content', 'Article dejà en cour de modification!');
-         return redirect()->route('articles.index');
-       }else{
-        $sources=Source::where('published',1)->get(['id','title']);
-        $categories=Category::where('published',1)->get(['id','title']);
-        $users=user::all('id','name');
-        return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
-      }
-    }else{
-      $article->checkout=Auth::id();
-      $archive->checkout=Auth::id();
-      $archive->save();
-      $article->save();
+    $article= Article::find($id);
+    $archive=Archive::find($id);
+    if($article->checkout!=0){
+      if ($article->checkout!=Auth::id()) {
+       session()->flash('message.type', 'warning');
+       session()->flash('message.content', 'Article dejà en cour de modification!');
+       return redirect()->route('articles.index');
+     }else{
       $sources=Source::where('published',1)->get(['id','title']);
       $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
       return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
     }
+  }else{
+    $article->checkout=Auth::id();
+    $archive->checkout=Auth::id();
+    $archive->save();
+    $article->save();
+    $sources=Source::where('published',1)->get(['id','title']);
+    $categories=Category::where('published',1)->get(['id','title']);
+    $users=user::all('id','name');
+    return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
   }
+}
 
     /**
      * Update the specified resource in storage.
@@ -211,27 +210,27 @@ class ArticleController extends Controller
     public function update(Request $request, $id)
     {
       $validatedData = $request->validate([
-      'ontitle'=>'nullable|string',
-      'title' => 'required|string',
-      'category'=>'required|int',
-      'published'=>'nullable',
-      'featured'=>'nullable',
-      'image'=>'image',
-      'image_legend'=>'nullable|string',
-      'video'=>'nullable|string',
-      'gallery_photo'=>'nullable',
-      'introtext'=>'nullable|string',
-      'fulltext'=>'required|string',
-      'source_id'=>'int',
+        'ontitle'=>'nullable|string',
+        'title' => 'required|string',
+        'category'=>'required|int',
+        'published'=>'nullable',
+        'featured'=>'nullable',
+        'image'=>'image',
+        'image_legend'=>'nullable|string',
+        'video'=>'nullable|string',
+        'gallery_photo'=>'nullable',
+        'introtext'=>'nullable|string',
+        'fulltext'=>'required|string',
+        'source_id'=>'int',
         // 'created_by'=>'int',
-      'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-      'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
 
-    ]);
+      ]);
       
-     $article=Article::find($id);
-     if (is_null($article)) {
-     $article=Archive::find($id);
+      $article=Article::find($id);
+      if (is_null($article)) {
+       $article=Archive::find($id);
      }
      $article->ontitle = $request->ontitle;
      $article->title =$request->title;
@@ -277,13 +276,13 @@ class ArticleController extends Controller
            $article->save();
            $archive->save();
            $revision= new  Revision;
-      $revision->type=explode('@', Route::CurrentRouteAction())[1];
-      $revision->user_id=Auth::id();
-      $revision->article_id=$article->id;
-      $revision->revised_at=now();
-      $revision->save();
-        session()->flash('message.type', 'success');
-       session()->flash('message.content', 'Article modifié avec succès!');
+           $revision->type=explode('@', Route::CurrentRouteAction())[1];
+           $revision->user_id=Auth::id();
+           $revision->article_id=$article->id;
+           $revision->revised_at=now();
+           $revision->save();
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Article modifié avec succès!');
          }else{
           session()->flash('message.type', 'danger');
           session()->flash('message.content', 'Modification annulée!');
@@ -307,53 +306,127 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-    $article=Article::onlyTrashed()->find($id)->forceDelete();
-    $archive=Archive::onlyTrashed()->find($id)->forceDelete();
-    session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Article supprimé avec success!');
-    return redirect()->route('articles.trash');
-    }
-
-     public function putInDraft($id)
-    {
-      $article=Article::find($id);
-      $archive=Archive::find($id);
-      $article->published=2;
-      $archive->published=2;
-      $article->save();
-      $archive->save();
+      $article=Article::onlyTrashed()->find($id)->forceDelete();
+      $archive=Archive::onlyTrashed()->find($id)->forceDelete();
       session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Article mis au brouillon!');
-      return redirect()->route('articles.index');
+      session()->flash('message.content', 'Article supprimé avec success!');
+      return redirect()->route('articles.trash');
     }
 
-    public function putInTrash($id)
+    /**
+     * put a resource in the draft.
+     *
+     * @return \Illuminate\Http\Response
+     */
+
+    public function putInDraft($id)
     {
-    $article=Article::find($id)->delete();
-    $archive=Archive::find($id)->delete();
+      try {
+       DB::transaction(function () use ($id) {
+        $article=Article::find($id);
+        $archive=Archive::find($id);
+        $article->published=2;
+        $archive->published=2;
+        $article->save();
+        $archive->save();
+        $revision= new  Revision;
+        $revision->type=explode('@', Route::CurrentRouteAction())[1];
+        $revision->user_id=Auth::id();
+        $revision->article_id=$id;
+        $revision->revised_at=now();
+        $revision->save();
+      });
+
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Article mis au brouillon!');
+     } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
+//           echo $exc->getTraceAsString();
+    }
+
+
+    return redirect()->route('articles.index');
+  }
+
+/**
+     * put a resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
+  public function putInTrash($id)
+  {
+   try {
+    DB::transaction(function () use ($id) {
+      $article=Article::find($id)->delete();
+      $archive=Archive::find($id)->delete();
+      $revision= new  Revision;
+      $revision->type=explode('@', Route::CurrentRouteAction())[1];
+      $revision->user_id=Auth::id();
+      $revision->article_id=$id;
+      $revision->revised_at=now();
+      $revision->save();
+    });
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Article mis en corbeille!');
-    return redirect()->route('articles.index');
-    }
 
-    public function restore($id)
-    {
-      $article=Article::onlyTrashed()->find($id)->restore();
-      $archive=Archive::onlyTrashed()->find($id)->restore();
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Article restaurer!');
-      return redirect()->route('articles.index');
-    }
+  } catch (Exception $exc) {
+    session()->flash('message.type', 'danger');
+    session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+//           echo $exc->getTraceAsString();
+  }
 
-    public function inTrash()
-    {
-       $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-       return view('article.articles.administrator.trash',compact('articles'));
-    }
+  return redirect()->route('articles.index');
+}
+
+/**
+     * restore a resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+public function restore($id)
+{
+ try {
+  DB::transaction(function () use ($id) {
+    $article=Article::onlyTrashed()->find($id)->restore();
+    $archive=Archive::onlyTrashed()->find($id)->restore();
+    $revision= new  Revision;
+    $revision->type=explode('@', Route::CurrentRouteAction())[1];
+    $revision->user_id=Auth::id();
+    $revision->article_id=$id;
+    $revision->revised_at=now();
+    $revision->save();
+  });
+  session()->flash('message.type', 'success');
+  session()->flash('message.content', 'Article restaurer!');
+} catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de la restauration!');
+//           echo $exc->getTraceAsString();
+}
+return redirect()->route('articles.index');
+}
+
+/**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+public function inTrash()
+{
+ $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+ return view('article.articles.administrator.trash',compact('articles'));
+}
+
+/**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
 
 public function inDraft()
-    {
-      $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        return view('article.articles.administrator.draft',compact('articles'));
-  }
+{
+  $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+  return view('article.articles.administrator.draft',compact('articles'));
+}
 }
