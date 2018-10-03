@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Image;
 class ArticleController extends Controller
 {
     /**
@@ -87,7 +88,13 @@ class ArticleController extends Controller
      $article->category_id = $request->category;
      $article->published=$request->published ? $request->published : 0 ;
      $article->featured=$request->featured ? $request->featured : 0 ;
-     $article->image = $request->image->storeAs('images', $request->image->getClientOriginalName()); 
+     $article->image = $request->image->storeAs('images/articles/thumbs/original', $request->image->getClientOriginalName()); 
+     $img1 = Image::make(storage_path('app/images/articles/thumbs/original/'.$request->image->getClientOriginalName()))->resize(300, 420);
+     $img2 = Image::make(storage_path('app/images/articles/thumbs/original/'.$request->image->getClientOriginalName()))->resize(250, 180);
+     $img3 = Image::make(storage_path('app/images/articles/thumbs/original/'.$request->image->getClientOriginalName()))->resize(180, 180);
+     $img1->save(storage_path('app/images/articles/thumbs/resized/'.$request->image->getClientOriginalName()));
+     $img2->save(storage_path('app/images/articles/thumbs/resized/'.$request->image->getClientOriginalName()));
+     $img3->save(storage_path('app/images/articles/thumbs/resized/'.$request->image->getClientOriginalName()));
      // $article->image = $request->image->getClientOriginalName();
      $article->image_legend =$request->image_legend;
      $article->video = $request->video;
@@ -142,8 +149,8 @@ class ArticleController extends Controller
     session()->flash('message.content', 'Article ajouté avec succès!');
     
     if ($request->save_close) {
-     return back()->withInput();
-     // return redirect(session()->get('link'));
+     // return back()->withInput();
+     return redirect(session()->get('link'));
    }else{
     return redirect()->route('articles.create');
   }
@@ -238,7 +245,7 @@ class ArticleController extends Controller
      $article->category_id = $request->category;
      $article->published=$request->published ? $request->published : 0 ;
      $article->featured=$request->featured ? $request->featured : 0 ; 
-     $article->image = $request->image ? $request->image:$article->image;
+     $article->image = $request->image ? $request->image->storeAs('images/articles/thumbs/original', $request->image->getClientOriginalName()):$article->image;
      $article->image_legend =$request->image_legend;
      $article->video = $request->video;
      $article->gallery_photo =$request->gallery_photo;

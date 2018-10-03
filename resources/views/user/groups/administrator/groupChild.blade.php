@@ -32,7 +32,7 @@
 @else  
   <tr> 
     <td><input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox"></td>
-    <td>{{ ucfirst($child->title) }}</td>
+    <td><ul>{{ ucfirst($child->title) }}</ul></td>
      <td> <a href="{{ route('user-groups.edit',['group'=>$child]) }}" ><span class="uk-text-success">Modifier</span></a>
             </td>
             <td> <form action="{{ route('user-groups.destroy',['group'=>$child]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer ce groupe?')">
