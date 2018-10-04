@@ -21,7 +21,7 @@
 			<th>{{ ('Nbre de vue') }}</th>
 			<th>{{ ('Image') }}</th>
                         <th>{{ ('Modifier') }}</th>
-                        <th>{{ ('Brouillon') }}</th>
+                         <th>{{ ('Corbeille') }}</th>
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
@@ -30,8 +30,8 @@
 		<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $billet->title }}</td>
-			<td> {!! ($billet->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($billet->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
+			<td> {{ $billet->featured }}</td>
+			<td> {{ $billet->published }}</td>
 			<td class="uk-table-expand"> {{ $billet->getCategory->title }}</td>
 			<td class="uk-table-expand"> {{ $billet->getAuthor->name }}</td>
 			<td class="uk-table-expand"> {{ $billet->created_at }}</td>

@@ -32,7 +32,7 @@ class ArticleController extends Controller
      */
     public function index()
     {   
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
 
       return view('article.articles.administrator.index',['articles'=>$articles]);
 
@@ -46,7 +46,7 @@ class ArticleController extends Controller
     public function create()
 
     {
-      session()->put('link',url()->previous());
+      // session()->put('link',url()->previous());
       // mkdir(storage_path("/path/to/my/dir"),0777,true);
       $sources=Source::where('published',1)->get(['id','title']);
       $categories=Category::where('published',1)->get(['id','title']);
@@ -150,7 +150,9 @@ class ArticleController extends Controller
     
     if ($request->save_close) {
      // return back()->withInput();
-     return redirect(session()->get('link'));
+     // return redirect(session()->get('link'));
+    return redirect()->route('article-archives.index');
+
    }else{
     return redirect()->route('articles.create');
   }
@@ -177,18 +179,13 @@ class ArticleController extends Controller
      */
     public function edit($id)
     {
-     if(url()->previous()==url()->current()){
-     }else{
-      session()->put('link',url()->previous());
-    }
-
     $article= Article::find($id);
     $archive=Archive::find($id);
     if($article->checkout!=0){
       if ($article->checkout!=Auth::id()) {
        session()->flash('message.type', 'warning');
        session()->flash('message.content', 'Article dejà en cour de modification!');
-       return redirect()->route('articles.index');
+       return redirect()->route('article-archives.index');
      }else{
       $sources=Source::where('published',1)->get(['id','title']);
       $categories=Category::where('published',1)->get(['id','title']);
@@ -243,7 +240,7 @@ class ArticleController extends Controller
      $article->title =$request->title;
      $article->alias =str_slug($request->title, '-');
      $article->category_id = $request->category;
-     $article->published=$request->published ? $request->published : 0 ;
+     $article->published=$request->published ? $request->published : $article->published ;
      $article->featured=$request->featured ? $request->featured : 0 ; 
      $article->image = $request->image ? $request->image->storeAs('images/articles/thumbs/original', $request->image->getClientOriginalName()):$article->image;
      $article->image_legend =$request->image_legend;
@@ -301,8 +298,8 @@ class ArticleController extends Controller
       session()->flash('message.content', 'Erreur lors de la modification!');
 //           echo $exc->getTraceAsString();
     }
+    return redirect()->route('article-archives.index');
 
-    return redirect(session()->get('link'));
   }
 
     /**
@@ -313,16 +310,21 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
+      $revisions= Revision::where('article_id',$id)->get(['id']);
+   foreach ($revisions as $r) {
+    $r->delete();
+   }
       $article=Article::onlyTrashed()->find($id)->forceDelete();
       $archive=Archive::onlyTrashed()->find($id)->forceDelete();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'Article supprimé avec success!');
-      return redirect()->route('articles.trash');
+      return redirect()->route('article-archives.trash');
     }
 
     /**
-     * put a resource in the draft.
+     * put the specified resource in the draft.
      *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
 
@@ -351,14 +353,13 @@ class ArticleController extends Controller
       session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
 //           echo $exc->getTraceAsString();
     }
-
-
-    return redirect()->route('articles.index');
+    return redirect()->route('article-archives.index');
   }
 
 /**
-     * put a resource in the trash.
+     * put the specified resource in the trash.
      *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
   public function putInTrash($id)
@@ -383,12 +384,13 @@ class ArticleController extends Controller
 //           echo $exc->getTraceAsString();
   }
 
-  return redirect()->route('articles.index');
+  return redirect()->route('article-archives.index');
 }
 
 /**
-     * restore a resource.
+     * restore the specified resource from the trash.
      *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
 public function restore($id)
@@ -411,14 +413,16 @@ public function restore($id)
   session()->flash('message.content', 'Erreur lors de la restauration!');
 //           echo $exc->getTraceAsString();
 }
-return redirect()->route('articles.index');
+return redirect()->route('article-archives.trash');
 }
 
+
 /**
-     * Display a listing of the resource.
+     * Display a listing of the resource in the trash.
      *
      * @return \Illuminate\Http\Response
      */
+
 public function inTrash()
 {
  $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
@@ -426,7 +430,7 @@ public function inTrash()
 }
 
 /**
-     * Display a listing of the resource.
+     * Display a listing of the resource in the draft.
      *
      * @return \Illuminate\Http\Response
      */

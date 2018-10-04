@@ -33,8 +33,8 @@
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
                         <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
 			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
-			<td> {!! ($video->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($video->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
+			<td> {{ $video->featured }}</td>
+			<td> {{ $video->published }}</td>
 			<td class="uk-table-expand"> {{ucwords($video->getAuthor->name)}}</td>
 			<td class="uk-table-expand"> {{ucwords($video->getCameraman->name)}}</td>
 			<td class="uk-table-expand"> {{ucwords($video->getEditor->name)}}  </td>

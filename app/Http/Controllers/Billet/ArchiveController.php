@@ -30,7 +30,7 @@ class ArchiveController extends Controller
     public function index()
     {
 
-        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
    return view('billet.archives.administrator.index',['billets'=>$billets]);
     }
@@ -135,7 +135,7 @@ class ArchiveController extends Controller
        $archive->title =$request->title;
        $archive->alias =str_slug($request->title, '-');
        $archive->category_id = $request->category;
-       $archive->published=$request->published ? $request->published : 0 ;
+       $archive->published=$request->published ? $request->published : $archive->published;
        $archive->featured=$request->featured ? $request->featured : 0 ; 
        $archive->image = $request->image;
        $archive->image_legend =$request->image_legend;
@@ -177,17 +177,30 @@ class ArchiveController extends Controller
      */
     public function destroy($id)
     {
+       $revisions= Revision::where('billet_id',$id)->get(['id']);
+   foreach ($revisions as $r) {
+    $r->delete();
+   }
         $billet=Billet::onlyTrashed()->find($id);
-        if($billet){
-            return redirect()->route('billets.destroy',compact('billet'));
+       if($billet){
+       $billet=Billet::onlyTrashed()->find($id)->forceDelete();
+      $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Billet supprimé avec success!');
+      return redirect()->route('billet-archives.trash');
         }else{
     $archive=Archive::onlyTrashed()->find($id)->forceDelete();
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Billet supprimé avec success!');
-    return redirect()->route('billet-archives.index');
+    return redirect()->route('billet-archives.trash');
     }
     }
-
+/**
+     * put the specified resource in the draft.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
      public function putInDraft($id)
     {
       $billet=Billet::find($id);
@@ -216,7 +229,12 @@ session()->flash('message.type', 'success');
       return redirect()->route('billet-archives.index');
     }
 }
-
+/**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function putInTrash($id)
     {
        $billet=Billet::find($id);
@@ -243,10 +261,15 @@ session()->flash('message.type', 'success');
 }
     return redirect()->route('billet-archives.index');
     }
-
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function restore($id)
     {
-         $billet=Billet::find($id);
+         $billet=Billet::onlyTrashed()->find($id);
       if ($billet) {
         return redirect()->route('billets.restore',compact('billet'));
       }else{
@@ -268,15 +291,25 @@ session()->flash('message.type', 'success');
 //           echo $exc->getTraceAsString();
     }
   }
-      return redirect()->route('billet-archives.index');
+      return redirect()->route('billet-archives.trash');
     }
+
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
 
     public function inTrash()
     {
        $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
        return view('billet.archives.administrator.trash',compact('archives'));
     }
-
+/**
+     * Display a listing of the resource in the draft.
+     *
+     * @return \Illuminate\Http\Response
+     */
 public function inDraft()
     {
       $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);

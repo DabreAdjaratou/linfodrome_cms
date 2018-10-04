@@ -148,7 +148,12 @@ class CategoryController extends Controller
         return redirect()->route('video-categories.trash');
     }
     
-    
+    /**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function putInTrash($id)
     {
         $category= Category::with(['getVideos','getArchives'])->where('id',$id)->first();
@@ -167,17 +172,26 @@ class CategoryController extends Controller
         }
   return redirect()->route('video-categories.index');
     }
-
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function restore($id)
     {
       
         Category::onlyTrashed()->find($id)->restore();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'Categorie restaurer!');
-      return redirect()->route('video-categories.index');
+      return redirect()->route('video-categories.trash');
    
     }
-
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function inTrash()
     {
      $categories= Category::onlyTrashed()->get(['id','title']);

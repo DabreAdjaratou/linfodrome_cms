@@ -29,15 +29,15 @@
 			<td class="uk-table-expand"> {{ $revision[$i]->getArticle->getAuthor->name }}</td>
 			<td class="uk-table-expand"> {{ $revision[$i]->getArticle->created_at }}</td>
 			
-			<td class="uk-table-expand">
-				{{'-'.$revision[$i]->type}} 
+			<td>
+				<ul> <li >{{$revision[$i]->type}} 
 				{{$revision[$i]->getModifier->name}} 
-				{{$revision[$i]->revised_at}} <br>
+				{{$revision[$i]->revised_at}}</li></ul>
 				@else
 				
-				{{'-'.$revision[$i]->type}} 
+				<ul><li>{{$revision[$i]->type}} 
 				{{$revision[$i]->getModifier->name}} 
-				{{$revision[$i]->revised_at}} <br>
+				{{$revision[$i]->revised_at}} </li></ul>
 
 				@endif
 				@endfor

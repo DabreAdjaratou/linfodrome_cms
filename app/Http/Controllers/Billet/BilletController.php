@@ -30,7 +30,7 @@ class BilletController extends Controller
      */
     public function index()
     {
-     $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+     $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
      return view('billet.billets.administrator.index',['billets'=>$billets]);
      
    }
@@ -42,7 +42,6 @@ class BilletController extends Controller
      */
     public function create()
     {
-      session()->put('link',url()->previous());
       $sources=Source::where('published',1)->get(['id','title']);
       $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
@@ -131,7 +130,9 @@ class BilletController extends Controller
     
 
     if ($request->save_close) {
-     return redirect(session()->get('link'));
+     // return redirect(session()->get('link'));
+    return redirect()->route('billet-archives.index');
+
    }else{
     return redirect()->route('billets.create');
   }
@@ -158,14 +159,13 @@ class BilletController extends Controller
      */
     public function edit($id)
     {
-      session()->put('link',url()->previous());
       $billet= Billet::find($id);
       $archive=Archive::find($id);
       if($billet->checkout!=0){
         if ($billet->checkout!=Auth::id()) {
          session()->flash('message.type', 'warning');
          session()->flash('message.content', 'Billet dejà en cour de modification!');
-         return redirect()->route('billets.index');
+         return redirect()->route('billet-archives.index');
        }else{
         $sources=Source::where('published',1)->get(['id','title']);
         $categories=Category::where('published',1)->get(['id','title']);
@@ -222,7 +222,7 @@ class BilletController extends Controller
      $billet->title =$request->title;
      $billet->alias =str_slug($request->title, '-');
      $billet->category_id = $request->category;
-     $billet->published=$request->published ? $request->published : 0 ;
+     $billet->published=$request->published ? $request->published : $billet->published;
      $billet->featured=$request->featured ? $request->featured : 0 ; 
      $billet->image = $request->image;
      $billet->image_legend =$request->image_legend;
@@ -278,8 +278,7 @@ class BilletController extends Controller
       session()->flash('message.content', 'Erreur lors de la modification!');
 //           echo $exc->getTraceAsString();
     }
-
-    return redirect(session()->get('link'));
+    return redirect()->route('billet-archives.index');
     
   }
 
@@ -291,13 +290,22 @@ class BilletController extends Controller
      */
     public function destroy($id)
     {
+       $revisions= Revision::where('billet_id',$id)->get(['id']);
+   foreach ($revisions as $r) {
+    $r->delete();
+   }
       $billet=Billet::onlyTrashed()->find($id)->forceDelete();
       $archive=Archive::onlyTrashed()->find($id)->forceDelete();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'Billet supprimé avec success!');
-      return redirect()->route('billets.trash');
+      return redirect()->route('billet-archives.trash');
     }
-    
+    /**
+     * put the specified resource in the draft.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function putInDraft($id)
     {
       try {
@@ -322,9 +330,14 @@ class BilletController extends Controller
       session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
 //           echo $exc->getTraceAsString();
     }
-    return back();
+    return redirect()->route('billet-archives.index');
   }
-
+/**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
   public function putInTrash($id)
   {
     try {
@@ -345,9 +358,14 @@ class BilletController extends Controller
     session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
 //           echo $exc->getTraceAsString();
   }
-  return back();
+    return redirect()->route('billet-archives.index');
 }
-
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
 public function restore($id)
 {
   try {
@@ -369,15 +387,24 @@ public function restore($id)
   session()->flash('message.content', 'Erreur lors de la restauration!');
 //           echo $exc->getTraceAsString();
 }
-return redirect()->route('billets.index');
+return redirect()->route('billet-archives.trash');
 }
 
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
 public function inTrash()
 {
  $billets=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
  return view('billet.billets.administrator.trash',compact('billets'));
 }
-
+/**
+     * Display a listing of the resource in the draft.
+     *
+     * @return \Illuminate\Http\Response
+     */
 public function inDraft()
 {
   $billets=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);

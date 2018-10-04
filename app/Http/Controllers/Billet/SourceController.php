@@ -148,7 +148,12 @@ if ($request->update) {
         return redirect()->route('billet-sources.trash');
     }
     
-    
+    /**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function putInTrash($id)
     {
         $source= Source::with(['getBillets','getArchives'])->where('id',$id)->first();
@@ -167,17 +172,27 @@ if ($request->update) {
         }
   return redirect()->route('billet-sources.index');
     }
-
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function restore($id)
     {
       
         Source::onlyTrashed()->find($id)->restore();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'source restaurer!');
-      return redirect()->route('billet-sources.index');
+      return redirect()->route('billet-sources.trash');
    
     }
 
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function inTrash()
     {
      $sources= Source::onlyTrashed()->get(['id','title']);

@@ -19,6 +19,8 @@
 			<th>{{ ('Nbre de vue') }}</th>
 			<th>{{ ('Image') }}</th>
                         <th>{{ ('Modifier') }}</th>
+                         <th>{{ ('Corbeille') }}</th>
+
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
@@ -35,6 +37,9 @@
 			<td> {{ $article->views }}</td>
 			<td> {{ $article->image }}</td>
                         <td> <a href="{{ route('article-archives.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
+
+			</td>
+			 <td> <a href="{{ route('article-archives.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
 
 			</td>
 			<td>{{ $article->id }}</td>

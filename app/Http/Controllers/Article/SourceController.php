@@ -147,7 +147,12 @@ if ($request->update) {
         return redirect()->route('article-sources.trash');
     }
     
-    
+    /**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function putInTrash($id)
     {
         $source= Source::with(['getArticles','getArchives'])->where('id',$id)->first();
@@ -166,16 +171,27 @@ if ($request->update) {
         }
   return redirect()->route('article-sources.index');
     }
-
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function restore($id)
     {
       
         Source::onlyTrashed()->find($id)->restore();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'source restaurer!');
-      return redirect()->route('article-sources.index');
+      return redirect()->route('article-sources.trash');
    
     }
+
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
 
     public function inTrash()
     {

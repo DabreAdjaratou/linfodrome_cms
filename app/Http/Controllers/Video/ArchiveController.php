@@ -29,7 +29,7 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
         
        return view ('video.archives.administrator.index', compact('videos'));
     }
@@ -127,7 +127,7 @@ class ArchiveController extends Controller
       $video->title =$request->title;
       $video->alias =str_slug($request->title, '-');
       $video->category_id = $request->category;
-      $video->published=$request->published ? $request->published : 0 ;
+      $video->published=$request->published ? $request->published : $video->published;
       $video->featured=$request->featured ? $request->featured : 0 ; 
       $video->image = $request->image ? $request->image:$video->image;
       $video->code = $request->video;
@@ -153,8 +153,6 @@ $video->checkout=0;
         session()->flash('message.type', 'danger');
         session()->flash('message.content', 'Modification annulée!');
     }
-     
-
            return redirect()->route('video-archives.index');
     }
 
@@ -166,17 +164,30 @@ $video->checkout=0;
      */
     public function destroy($id)
     {
+       $revisions= Revision::where('video_id',$id)->get(['id']);
+   foreach ($revisions as $r) {
+    $r->delete();
+   }
         $video=Video::onlyTrashed()->find($id);
         if($video){
-            return redirect()->route('videos.destroy',compact('video'));
+          $video=Video::onlyTrashed()->find($id)->forceDelete();
+    $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Video supprimé avec success!');
+    return redirect()->route('video-archives.trash');
         }else{
     $archive=Archive::onlyTrashed()->find($id)->forceDelete();
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Video supprimé avec success!');
-    return redirect()->route('video-archives.index');
+    return redirect()->route('video-archives.trash');
     }
     }
-
+/**
+     * put the specified resource in the draft.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
      public function putInDraft($id)
     {
       $video=Video::find($id);
@@ -206,7 +217,12 @@ $video->checkout=0;
       return redirect()->route('video-archives.index');
     
 }
-
+/**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function putInTrash($id)
     {
        $video=Video::find($id);
@@ -233,10 +249,16 @@ $video->checkout=0;
 }
     return redirect()->route('video-archives.index');
     }
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
 
     public function restore($id)
     {
-         $video=Video::find($id);
+         $video=Video::onlyTrashed()->find($id);
       if ($video) {
         return redirect()->route('videos.restore',compact('video'));
       }else{
@@ -258,15 +280,23 @@ $video->checkout=0;
 //           echo $exc->getTraceAsString();
     }
   }
-      return redirect()->route('video-archives.index');
+      return redirect()->route('video-archives.trash');
     }
-
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function inTrash()
     {
        $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
        return view('video.archives.administrator.trash',compact('archives'));
     }
-
+/**
+     * Display a listing of the resource in the draft.
+     *
+     * @return \Illuminate\Http\Response
+     */
 public function inDraft()
     {
       $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);

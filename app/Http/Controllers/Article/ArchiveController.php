@@ -31,7 +31,7 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
       return view('article.archives.administrator.index',['articles'=>$articles]);
     }
 
@@ -135,7 +135,7 @@ class ArchiveController extends Controller
       $archive->title =$request->title;
       $archive->alias =str_slug($request->title, '-');
       $archive->category_id = $request->category;
-      $archive->published=$request->published ? $request->published : 0 ;
+      $archive->published=$request->published ? $request->published : $archive->published ;
       $archive->featured=$request->featured ? $request->featured : 0 ; 
       $archive->image = $request->image ? $request->image:$archive->image;
       $archive->image_legend =$request->image_legend;
@@ -186,17 +186,31 @@ class ArchiveController extends Controller
      */
 public function destroy($id)
 {
-  $article=Article::onlyTrashed()->find($id);
+
+  $revisions= Revision::where('article_id',$id)->get(['id']);
+   foreach ($revisions as $r) {
+    $r->delete();
+   }
+   $article=Article::onlyTrashed()->find($id);
   if($article){
-    return redirect()->route('articles.destroy',compact('article'));
+    $article=Article::onlyTrashed()->find($id)->forceDelete();
+      $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Article supprimé avec success!');
+      return redirect()->route('article-archives.trash');
   }else{
     $archive=Archive::onlyTrashed()->find($id)->forceDelete();
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Article supprimé avec success!');
-    return redirect()->route('article-archives.index');
+    return redirect()->route('article-archives.trash');
   }
 }
-
+/**
+     * put the specified resource in the draft.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
 public function putInDraft($id)
 {
   $article=Article::find($id);
@@ -222,10 +236,15 @@ public function putInDraft($id)
       session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
 //           echo $exc->getTraceAsString();
     }
-    return back();
+    return redirect()->route('article-archives.index');
   }
 }
-
+/**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
 public function putInTrash($id)
 {
  $article=Article::find($id);
@@ -250,10 +269,15 @@ public function putInTrash($id)
 //           echo $exc->getTraceAsString();
 }
 }
-return back();
-
+    return redirect()->route('article-archives.index');
 }
 
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
 public function restore($id)
 {
  $article=Article::find($id);
@@ -278,8 +302,14 @@ public function restore($id)
 //           echo $exc->getTraceAsString();
 }
 }
-return redirect()->route('article-archives.index');
+return redirect()->route('article-archives.trash');
 }
+
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
 
 public function inTrash()
 {
@@ -287,6 +317,11 @@ public function inTrash()
  return view('article.archives.administrator.trash',compact('archives'));
 }
 
+/**
+     * Display a listing of the resource in the draft.
+     *
+     * @return \Illuminate\Http\Response
+     */
 public function inDraft()
 {
   $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);

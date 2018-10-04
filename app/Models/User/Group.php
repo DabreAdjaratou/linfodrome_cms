@@ -49,24 +49,37 @@ class Group extends Model {
         return $this->belongsToMany('App\Models\User\User', 'user_usergroup_map', 'user_group_id');
     }
 
-
+/**
+     * get permissions for the specify group. 
+     *the group permissions is the set of permissions of all access levels that group and  it parent belong's to
+     *
+     * @return \Illuminate\Http\Response
+     */
     public static function getPermissions($id) {
         $group = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
         $permissions = [];
         $Allpermissions=[];
+        // get group own permissions via its access levels
         foreach ($group->getAccessLevels as $accessLevel) {
             foreach ($accessLevel->getPermissions as $permission) {
                 $permissions[] = $permission;
             }
         }
-
+// if the group has a prarent, get parent permissions and merge with group permissions and return all permissions
         if ($group->getParent) {
             $parentPermissions = Group::getParentPermissions($group->getParent);
             $Allpermissions = array_merge($permissions, $parentPermissions);
-        }
         return $Allpermissions;
+        }
+        return $permissions;
+
     }
 
+/**
+     * get permissions for the specify group if that group doesn't belong to any access level.
+     * in this case the group inherit of it parent permissions
+     * @return \Illuminate\Http\Response
+     */
     public static function getPermissionsIfNoAccessLevel($id) {
         $group = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
         $parentPermissions = [];

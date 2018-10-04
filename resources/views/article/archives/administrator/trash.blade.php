@@ -30,8 +30,8 @@
   	<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $article->title }}</td>
-			<td> {!! ($article->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($article->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
+			<td> {{ $article->featured }}</td>
+			<td> {{ $article->published }}</td>
 			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
 			<td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
 			<td class="uk-table-expand"> {{ $article->created_at }}</td>
@@ -39,7 +39,7 @@
 			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
 			<td> {{ $article->views }}</td>
 			<td> {{ $article->image }}</td>
-			<td> <form action="{{ route('articles.destroy',['article'=>$article]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cet article?')">
+			<td> <form action="{{ route('article-archives.destroy',['article'=>$article]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cet article?')">
 				@csrf
 				@method('delete')
 <button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>

@@ -31,14 +31,14 @@
 			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->created_at }}</td>
 			
 			<td class="uk-table-expand">
-				{{'-'.$revision[$i]->type}} 
+				<ul> <li >{{$revision[$i]->type}} 
 				{{$revision[$i]->getModifier->name}} 
-				{{$revision[$i]->revised_at}} <br>
+				{{$revision[$i]->revised_at}} </ul> </li >
 				@else
 				
-				{{'-'.$revision[$i]->type}} 
+				<ul> <li >{{$revision[$i]->type}} 
 				{{$revision[$i]->getModifier->name}} 
-				{{$revision[$i]->revised_at}} <br>
+				{{$revision[$i]->revised_at}} </ul> </li>
 
 				@endif
 				@endfor

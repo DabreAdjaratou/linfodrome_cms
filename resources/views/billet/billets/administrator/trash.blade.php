@@ -30,8 +30,8 @@
 		<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $billet->title }}</td>
-			<td> {!! ($billet->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($billet->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
+			<td> {{ $billet->featured }}</td>
+			<td> {{ $billet->published }}</td>
 			<td class="uk-table-expand"> {{ $billet->getCategory->title }}</td>
 			<td class="uk-table-expand"> {{ $billet->getAuthor->name }}</td>
 			<td class="uk-table-expand"> {{ $billet->created_at }}</td>
@@ -43,7 +43,7 @@
 
 			</td>
 			
-			<td> <form action="{{ route('billets.destroy',['billet'=>$billet]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer ce?')">
+			<td> <form action="{{ route('billets.destroy',['billet'=>$billet]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer ce billet?')">
 				@csrf
 				@method('delete')
 <button class="uk-button uk-button-link"><span class="uk-text-danger">Supprimer</span></button>

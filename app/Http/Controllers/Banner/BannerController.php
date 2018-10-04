@@ -202,7 +202,12 @@ class BannerController extends Controller
     return redirect()->route('banners.trash');  
         
     }
-    
+    /**
+     * put the specified resource in the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
      public function putInTrash($id)
     {
     $banner=Banner::find($id)->delete();
@@ -210,15 +215,26 @@ class BannerController extends Controller
     session()->flash('message.content', 'Bannière mis en corbeille!');
     return redirect()->route('banners.index');
     }
-
+/**
+     * restore the specified resource from the trash.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function restore($id)
     {
        $banner=Banner::onlyTrashed()->find($id)->restore();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'Bannière restaurer!');
-      return redirect()->route('banners.index');
+      return redirect()->route('banners.trash');
     
     }
+
+/**
+     * Display a listing of the resource in the trash.
+     *
+     * @return \Illuminate\Http\Response
+     */
 
     public function inTrash()
     {

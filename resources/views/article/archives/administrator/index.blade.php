@@ -32,8 +32,8 @@
 		<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td class="uk-table-expand"> {{ $article->title }}</td>
-			<td> {!! ($article->featured== 1 ? '<span>✔</span>': '<span>✖</span>' )!!}</td>
-			<td> {!! ($article->published== 1 ? '<span> ✔</span>': '<span>✖</span>' )!!}</td>
+			<td> {{ $article->featured }}</td>
+			<td> {{ $article->published }}</td>
 			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
 			<td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
 			<td class="uk-table-expand"> {{ $article->created_at }}</td>
