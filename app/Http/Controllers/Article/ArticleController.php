@@ -46,8 +46,6 @@ class ArticleController extends Controller
     public function create()
 
     {
-      // session()->put('link',url()->previous());
-      // mkdir(storage_path("/path/to/my/dir"),0777,true);
       $sources=Source::where('published',1)->get(['id','title']);
       $categories=Category::where('published',1)->get(['id','title']);
       $users=user::all('id','name');
@@ -88,14 +86,6 @@ class ArticleController extends Controller
      $article->category_id = $request->category;
      $article->published=$request->published ? $request->published : 0 ;
      $article->featured=$request->featured ? $request->featured : 0 ;
-     $article->image = $request->image->storeAs('images/articles/thumbs/original', $request->image->getClientOriginalName()); 
-     $img1 = Image::make(storage_path('app/images/articles/thumbs/original/'.$request->image->getClientOriginalName()))->resize(300, 420);
-     $img2 = Image::make(storage_path('app/images/articles/thumbs/original/'.$request->image->getClientOriginalName()))->resize(250, 180);
-     $img3 = Image::make(storage_path('app/images/articles/thumbs/original/'.$request->image->getClientOriginalName()))->resize(180, 180);
-     $img1->save(storage_path('app/images/articles/thumbs/resized/'.$request->image->getClientOriginalName()));
-     $img2->save(storage_path('app/images/articles/thumbs/resized/'.$request->image->getClientOriginalName()));
-     $img3->save(storage_path('app/images/articles/thumbs/resized/'.$request->image->getClientOriginalName()));
-     // $article->image = $request->image->getClientOriginalName();
      $article->image_legend =$request->image_legend;
      $article->video = $request->video;
      $article->gallery_photo =$request->gallery_photo;
@@ -107,12 +97,20 @@ class ArticleController extends Controller
      $article->start_publication_at = $request->start_publication_at;
      $article->stop_publication_at =$request->stop_publication_at;
      $article->checkout=0;
-
         // Storage::disk('local')->put('Images',$request->image->getClientOriginalName());
      try {
-       DB::transaction(function () use ($article) {
-         $article->save();
-         $lastRecord= Article::latest()->first();
+       DB::transaction(function () use ($article,$request) {
+     $article->save();
+     $imageExtension= '.'.$request->image->extension();
+     if($imageExtension=='.jpeg'){
+      $imageExtension='.jpg';
+     }
+     $filenameWithOutExtension=str_slug(basename($request->image->getClientOriginalName() , $imageExtension),'-');
+     $filename=$filenameWithOutExtension.'-'.$article->id.$imageExtension;
+     $article->image=$filename;
+     $request->image->storeAs('public/images/articles/thumbs/original', $filename);
+     $article->save();
+     $lastRecord= Article::latest()->first();
          $archive= new Archive;
          $archive->id = $lastRecord->id;
          $archive->ontitle = $lastRecord->ontitle;
@@ -137,9 +135,11 @@ class ArticleController extends Controller
 
        // $oldest = Article::oldest()->first();
        // $oldest->delete();
+      
+$this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$imageExtension);
        });
 
-     } catch (Exception $exc) {
+    } catch (Exception $exc) {
       session()->flash('message.type', 'danger');
       session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
@@ -168,7 +168,8 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        //
+
+
     }
 
     /**
@@ -242,7 +243,7 @@ class ArticleController extends Controller
      $article->category_id = $request->category;
      $article->published=$request->published ? $request->published : $article->published ;
      $article->featured=$request->featured ? $request->featured : 0 ; 
-     $article->image = $request->image ? $request->image->storeAs('images/articles/thumbs/original', $request->image->getClientOriginalName()):$article->image;
+     $article->image = $request->image ? $request->image->storeAs('public/images/articles/thumbs/original', $request->image->getClientOriginalName()):$article->image;
      $article->image_legend =$request->image_legend;
      $article->video = $request->video;
      $article->gallery_photo =$request->gallery_photo;
@@ -440,4 +441,14 @@ public function inDraft()
   $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
   return view('article.articles.administrator.draft',compact('articles'));
 }
+
+public function createArticleImages($article_id,$filename ,$filenameWithOutExtension,$imageExtension)
+    {
+     $img1 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(1300, 1300);
+     $img2 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(700, 500);
+     $img3 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(350, 350);
+     $img1->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-l'.$imageExtension));
+     $img2->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-m'.$imageExtension));
+     $img3->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-s'.$imageExtension));
+         }
 }

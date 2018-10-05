@@ -129,5 +129,5 @@ Route::resource('banner-categories','Banner\CategoryController');
 
 
 //Route to media
-Route::get('/administrator/media','Media\MediaController@index')->name('media')->middleware('auth','activeUser');
-Route::get('/administrator/{media}/media-child','Media\MediaController@mediaChild')->name('media-child')->middleware('auth','activeUser');
+Route::get('media','Media\MediaController@index')->name('media')->middleware('auth','activeUser');
+// Route::get('/media/{media}/child','Media\MediaController@mediaChild')->name('media-child')->middleware('auth','activeUser');

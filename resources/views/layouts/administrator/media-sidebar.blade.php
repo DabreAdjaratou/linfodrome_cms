@@ -1,5 +1,4 @@
 @php
-
 $dir = base_path('storage\app\images');
 //  si le dossier pointe existe
 if (is_dir($dir)) {

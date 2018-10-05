@@ -1,4 +1,4 @@
-	<link rel="stylesheet" type="text/css" href="{{asset('css/uikit.css')}}" />
+{{-- 	<link rel="stylesheet" type="text/css" href="{{asset('css/uikit.css')}}" />
 	<link rel="stylesheet" type="text/css" href="{{asset('css/app.css')}}">
 	<script src="{{asset('js/uikit-icons.min.js')}}"></script>
 
@@ -25,7 +25,7 @@
 }); 
 
 </script> --}}
-@php
+{{-- @php
 
 $dir = base_path('storage\app\images');
 //  si le dossier pointe existe
@@ -54,8 +54,8 @@ if (is_dir($dir)) {
    }
 }
 // echo str_replace('\\', '/', $folder);
-@endphp
-<script type="text/javascript">
+@endphp --}}
+{{-- <script type="text/javascript">
 	$('#media').click(function subDirectories(){
   var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function() {
@@ -67,5 +67,6 @@ if (is_dir($dir)) {
         xmlhttp.send();
 	})
 
-</script>
+</script> --}}
 
+  
