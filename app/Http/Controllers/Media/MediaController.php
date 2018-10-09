@@ -13,9 +13,5 @@ $directories=Storage::directories('public/images');
 $files=Storage::files('public/images');
 return view('media.administrator.index',compact('directories','files'));
     }
-
-    public function mediaChild(){
-    	return view('media.administrator.media-child');
-    }
-
+   
 }

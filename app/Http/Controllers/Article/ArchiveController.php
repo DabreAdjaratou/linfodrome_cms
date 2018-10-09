@@ -64,7 +64,8 @@ class ArchiveController extends Controller
      */
     public function show($id)
     {
-        //
+       $article= Archive::find($id);
+       return view('article.archives.public.show',compact('article'));
     }
 
     /**

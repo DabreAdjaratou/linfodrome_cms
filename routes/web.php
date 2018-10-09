@@ -130,4 +130,6 @@ Route::resource('banner-categories','Banner\CategoryController');
 
 //Route to media
 Route::get('media','Media\MediaController@index')->name('media')->middleware('auth','activeUser');
-// Route::get('/media/{media}/child','Media\MediaController@mediaChild')->name('media-child')->middleware('auth','activeUser');
+Route::get('/media-to-load/{media}',function () {
+ return view('media/administrator/media-to-load');
+})->name('media-to-load')->middleware('auth','activeUser');

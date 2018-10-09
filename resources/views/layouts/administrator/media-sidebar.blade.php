@@ -1,37 +1,49 @@
-@php
-$dir = base_path('storage\app\images');
-//  si le dossier pointe existe
-if (is_dir($dir)) {
+ <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jsTree test</title>
+ </head>
+<body>
 
-   // si il contient quelque chose
-   if ($dh = opendir($dir)) {
-
-       // boucler tant que quelque chose est trouve
-       while (($file = readdir($dh)) !== false) {
-
-           // affiche le nom et le type si ce n'est pas un element du systeme
-           if( $file != '.' && $file != '..') {
-              	if(is_dir(base_path('storage\app\images'.'\\'.$file))){
-              		echo "<div id='".$file."' class='folder'><span uk-icon='icon: folder; ratio: 1.5'></span>$file</div>";
-           	}else {
-           		echo "<div><span id='image' uk-icon='image'></span>$file</div>";
-           	}
-           }
-        
-       }
-       // on ferme la connection
-       closedir($dh);
-   }
-}
-// echo str_replace('\\', '/', $folder);
+     {{-- setup a container element --}}
+  <div id="jstree">
+    {{-- in this case the tree is populated from inline HTML --}}
+    <ul>
+      @php
+      $directories=Storage::directories('public/images');
+$files=Storage::files('public/images');
+      @endphp
+@foreach( $directories as $directory)
+  <li><span id="{{ str_replace('/', '@',$directory)}}">{{ str_limit(basename($directory),15) }}</span>
+  @if(Storage::directories($directory))
+@php 
+$subDirectories=Storage::directories($directory);
 @endphp
+@foreach ($subDirectories as $s) 
+  @if ( Storage::directories($s)) 
+     @include('media.administrator.media-child',['directory'=>$s])
+    @endif
+@endforeach
+   @endif
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-$(document).ready(function(){
-    $(".folder").click(function(event){
-      var media=$(this).attr('id');
-              $("#txtHint").load("{{route('media-child',['media'=>'folder'])}}".replace('folder',media));
-    });
-});
-</script>
+    @if(Storage::files($directory))
+  @php                    
+$subfiles= Storage::files($directory);
+@endphp
+@foreach ($subfiles as $sf) 
+<ul><li data-jstree='{"icon":"glyphicon glyphicon-leaf"}' class="uk-text-truncate">
+<span id="{{ str_replace('/', '@',$sf)}}">{{str_limit(basename($sf),15)}}</span></li></ul>
+@endforeach
+     @endif
+  
+    </li>
+  @endforeach
+@foreach( $files as $file)
+      <li data-jstree='{"icon":"glyphicon glyphicon-leaf"}' class="uk-text-truncate">
+       <span id={{ str_replace('/', '@',$file)}}>{{ str_limit(basename($file),15)}}</span></li>
+@endforeach
+          </ul>
+  </div>
+</body>
+</html>
