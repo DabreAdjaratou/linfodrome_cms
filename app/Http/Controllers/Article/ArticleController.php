@@ -442,13 +442,24 @@ public function inDraft()
   return view('article.articles.administrator.draft',compact('articles'));
 }
 
+
 public function createArticleImages($article_id,$filename ,$filenameWithOutExtension,$imageExtension)
     {
-     $img1 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(1300, 1300);
-     $img2 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(700, 500);
-     $img3 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(350, 350);
-     $img1->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-l'.$imageExtension));
-     $img2->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-m'.$imageExtension));
-     $img3->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-s'.$imageExtension));
+define('WEBSERVICE', 'http://api.resmush.it/ws.php?img=');
+$s=storage_path('app/public/images/articles/thumbs/original/'.$filename);
+// dd(WEBSERVICE . $s);
+$o = json_decode(file_get_contents(WEBSERVICE . $s));
+dd($o);
+if(isset($o->error)){
+  die('Error');
+}
+$f=file_get_contents($o->dest);
+Storage::put('$name.jpg', $f);
+      // $img1 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(1300, 1300);
+     // $img2 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(700, 500);
+     // $img3 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(350, 350);
+     // $img1->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-l'.$imageExtension));
+     // $img2->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-m'.$imageExtension));
+     // $img3->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-s'.$imageExtension));
          }
 }
