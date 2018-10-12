@@ -19,7 +19,6 @@
 
 {{-- body --}}
 <body>
-
 {{-- hearder --}}
  @component('layouts.administrator.header') @endcomponent 
 
@@ -28,7 +27,7 @@
 
 {{-- footer --}}
 @component('layouts.administrator.footer') @endcomponent 
-
+<div id="txtHint">   </div>
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.uikit.min.js"></script>
@@ -40,9 +39,11 @@ $(document).ready(function() {
     $('#dataTable_filter label input').addClass('uk-input');
     $('#dataTable_length label select').addClass('uk-select uk-align-left');
 
-$('#dataTable').DataTable();
+$('#dataTable').DataTable({
 
-  });
+
+ }); 
+ }); 
 
 </script>
 

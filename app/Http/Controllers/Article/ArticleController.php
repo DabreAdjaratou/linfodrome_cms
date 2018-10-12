@@ -32,7 +32,7 @@ class ArticleController extends Controller
      */
     public function index()
     {   
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
 
       return view('article.articles.administrator.index',['articles'=>$articles]);
 
@@ -108,7 +108,7 @@ class ArticleController extends Controller
      $filenameWithOutExtension=str_slug(basename($request->image->getClientOriginalName() , $imageExtension),'-');
      $filename=$filenameWithOutExtension.'-'.$article->id.$imageExtension;
      $article->image=$filename;
-     $request->image->storeAs('public/images/articles/thumbs/original', $filename);
+     $request->image->storeAs('public/images/articles/sources', $filename);
      $article->save();
      $lastRecord= Article::latest()->first();
          $archive= new Archive;
@@ -426,7 +426,7 @@ return redirect()->route('article-archives.trash');
 
 public function inTrash()
 {
- $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+ $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
  return view('article.articles.administrator.trash',compact('articles'));
 }
 
@@ -438,7 +438,7 @@ public function inTrash()
 
 public function inDraft()
 {
-  $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+  $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
   return view('article.articles.administrator.draft',compact('articles'));
 }
 
@@ -446,19 +446,21 @@ public function inDraft()
 public function createArticleImages($article_id,$filename ,$filenameWithOutExtension,$imageExtension)
     {
 define('WEBSERVICE', 'http://api.resmush.it/ws.php?img=');
-// $s=asset('storage/images/articles/thumbs/original/'.$filename);
+// $s=asset('storage/images/articles/sources'.$filename);
 $s='http://www.linfodrome.com/media/k2/items/cache/0df43a25328451d5e0cb75a88ba00fd6_L.jpg';
 $o = json_decode(file_get_contents(WEBSERVICE . $s));
-if(isset($o->error)){
-  die('Error');
-}
+if(!isset($o->error)){
 $image=file_get_contents($o->dest);
-Storage::put('public/images/articles/thumbs/original/'.$filename, $image);
-      $img1 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(1300, 1300);
-     $img2 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(700, 500);
-     $img3 = Image::make(storage_path('app/public/images/articles/thumbs/original/'.$filename))->resize(350, 350);
-     $img1->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-l'.$imageExtension));
-     $img2->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-m'.$imageExtension));
-     $img3->save(storage_path('app/public/images/articles/thumbs/resized/'.$filenameWithOutExtension.'-'.$article_id.'-s'.$imageExtension));
+Storage::put('public/images/articles/sources/'.$filename, $image);
+}
+      $imgS = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(65,65);
+     $imgM = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(80,80);
+     $imgL = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(85,85);
+     $imgXL = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(400,210);
+     $imgS->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-65X65'.$imageExtension));
+     $imgM->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-80X80'.$imageExtension));
+     $imgL->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-85X85'.$imageExtension));
+     $imgXL->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-400X210'.$imageExtension));
+
          }
 }

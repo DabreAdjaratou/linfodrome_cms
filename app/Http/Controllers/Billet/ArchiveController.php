@@ -30,7 +30,7 @@ class ArchiveController extends Controller
     public function index()
     {
 
-        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
    
    return view('billet.archives.administrator.index',['billets'=>$billets]);
     }
@@ -302,7 +302,7 @@ session()->flash('message.type', 'success');
 
     public function inTrash()
     {
-       $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+       $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
        return view('billet.archives.administrator.trash',compact('archives'));
     }
 /**
@@ -312,7 +312,7 @@ session()->flash('message.type', 'success');
      */
 public function inDraft()
     {
-      $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
         return view('billet.archives.administrator.draft',compact('archives'));
   }
 

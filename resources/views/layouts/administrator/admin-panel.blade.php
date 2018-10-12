@@ -56,7 +56,7 @@
 </ul>  
 
 <ul>
-	<li><a href="{{ route('media') }}">{{ ('Media') }}</a></li>
+	<li><a href="{{ route('media') }}">{{ ('Medias') }}</a></li>
     
 </ul> 
 

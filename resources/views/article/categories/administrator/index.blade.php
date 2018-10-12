@@ -51,7 +51,6 @@
 @endsection
 
 @section('js')
-
 @endsection
 
 @endsection

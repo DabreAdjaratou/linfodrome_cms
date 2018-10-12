@@ -7,6 +7,8 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Medias') }}</h3> @endsection 
+
+<div>span</div>
 <div id="txtHint">
 
 @foreach($directories as $d)

@@ -26,31 +26,36 @@
 			<th> {{ ('Corbeille') }}</th>
 			<th>{{ ('id') }}</th>                       
 		</tr>
+
 	</thead>
 	<tbody>
-		@foreach($articles as $article)
+		{{-- {{ dd($article2s) }} --}}
+		@foreach($articles2 as $article2)
 		<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $article->title }}</td>
-			<td> {{ $article->featured }}</td>
-			<td> {{ $article->published }}</td>
-			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
-			<td class="uk-table-expand"> {{ $article->created_at }}</td>
-			<td class="uk-table-expand">{{$article->getRevision->last()['getModifier']['name']}} </td>
-			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
-			<td> {{ $article->views }}</td>
-			<td> {{ $article->image }}</td>
-			<td> <a href="{{ route('article-archives.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
+			<td class="uk-table-expand"> {{ $article2->title }}</td>
+			<td> {{ $article2->featured }}</td>
+			<td> {{ $article2->published }}</td>
+			<td> </td>
+			<td> </td>
+			{{-- <td class="uk-table-expand"> {{ $article2->getCategory->title }}</td> --}}
+			{{-- <td class="uk-table-expand"> {{ $article2->getAuthor->name }}</td> --}}
+			<td class="uk-table-expand"> {{ $article2->created_at }}</td>
+<td> </td><td> </td>
+			{{-- <td class="uk-table-expand">{{$article2->getRevision->last()['getModifier']['name']}} </td> --}}
+			{{-- <td class="uk-table-expand">{{$article2->getRevision->last()['revised_at']}}  </td> --}}
+			<td> {{ $article2->views }}</td>
+			<td> {{ $article2->image }}</td>
+			<td> <a href="{{ route('article-archives.edit',['article'=>$article2]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
-                        <td> <a href="{{ route('articles.put-in-draft',['article'=>$article]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
+                        <td> <a href="{{ route('articles.put-in-draft',['article'=>$article2]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
 
 			</td>
-			 <td> <a href="{{ route('article-archives.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+			 <td> <a href="{{ route('article-archives.put-in-trash',['article'=>$article2]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
 
 			</td>
-			<td>{{ $article->id }}</td>
+			<td>{{ $article2->id }}</td>
                 </tr>
 		@endforeach
 	</tbody>

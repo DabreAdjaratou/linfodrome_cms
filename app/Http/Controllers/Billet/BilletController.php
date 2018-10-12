@@ -30,7 +30,7 @@ class BilletController extends Controller
      */
     public function index()
     {
-     $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+     $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
      return view('billet.billets.administrator.index',['billets'=>$billets]);
      
    }
@@ -397,7 +397,7 @@ return redirect()->route('billet-archives.trash');
      */
 public function inTrash()
 {
- $billets=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+ $billets=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
  return view('billet.billets.administrator.trash',compact('billets'));
 }
 /**
@@ -407,7 +407,7 @@ public function inTrash()
      */
 public function inDraft()
 {
-  $billets=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+  $billets=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
   return view('billet.billets.administrator.draft',compact('billets'));
 }
 
