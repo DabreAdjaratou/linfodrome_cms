@@ -40,5 +40,24 @@ class Category extends Model
     {
          return $this->hasMany('App\Models\Article\Archive','category_id');
     }
-
+/**
+     * Returns the action column html for datatables.
+     *
+     * @param \App\Models\Article\Categoy
+     * @return string
+     */
+public static function laratablesCustomEdit($category)
+    {
+        return view('article.categories.administrator.laratableActions.edit',compact('category'))->render();
+    }
+    /**
+     * Returns the action column html for datatables.
+     *
+     * @param \App\Models\Article\Categoy
+     * @return string
+     */
+public static function laratablesCustomTrash($category)
+    {
+        return view('article.categories.administrator.laratableActions.trash',compact('category'))->render();
+    }
 }

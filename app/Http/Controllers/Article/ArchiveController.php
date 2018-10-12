@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Freshbitsweb\Laratables\Laratables;
+
 class ArchiveController extends Controller
 {
   
@@ -29,13 +31,25 @@ class ArchiveController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // public function index()
+    // {
+    //   $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      
+    //   return view('article.archives.administrator.index',['articles'=>$articles]);
+    // }
+
     public function index()
     {
-      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      
-      return view('article.archives.administrator.index',['articles'=>$articles]);
+           
+      return view('article.archives.administrator.index');
     }
 
+    
+ public function laratable()
+    {
+       return Laratables::recordsOf(Archive::class);
+        // return view('article.categories.administrator.index',['categories'=>$categories]);
+    }
     /**
      * Show the form for creating a new resource.
      *

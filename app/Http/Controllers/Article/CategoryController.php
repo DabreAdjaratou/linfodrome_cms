@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Article\Category;
 use Illuminate\Validation\Rule;
+use Freshbitsweb\Laratables\Laratables;
 
 class CategoryController extends Controller
 {
@@ -21,13 +22,22 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // public function index()
+    // {
+    //     $categories=Category::all();
+    //     return view('article.categories.administrator.index',['categories'=>$categories]);
+    // }
     public function index()
     {
-        $categories=Category::all();
-        return view('article.categories.administrator.index',['categories'=>$categories]);
+         return view('article.categories.administrator.index');
+    }
+    public function laratable()
+    {
+       return Laratables::recordsOf(Category::class);
+        // return view('article.categories.administrator.index',['categories'=>$categories]);
     }
 
-    /**
+       /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

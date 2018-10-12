@@ -27,26 +27,11 @@
 
 {{-- footer --}}
 @component('layouts.administrator.footer') @endcomponent 
-<div id="txtHint">   </div>
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.uikit.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-<script type="text/javascript">
-
-$(document).ready(function() {
-    
-    $('#dataTable_filter label input').addClass('uk-input');
-    $('#dataTable_length label select').addClass('uk-select uk-align-left');
-
-$('#dataTable').DataTable({
-
-
- }); 
- }); 
-
-</script>
-
+{{-- <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script> --}}
+@stack('js')
 @yield('js')
 
 </body>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd5880d2e1128c3cbd13bc043535ea80",
+    "content-hash": "70076a01c77c05f6023c9b1dd29eaeb2",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -365,6 +365,53 @@
                 "trusted proxy"
             ],
             "time": "2018-02-07T20:20:57+00:00"
+        },
+        {
+            "name": "freshbitsweb/laratables",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/freshbitsweb/laratables.git",
+                "reference": "5528864b1d15696bf75169d7122831c2b8ab0b02"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/freshbitsweb/laratables/zipball/5528864b1d15696bf75169d7122831c2b8ab0b02",
+                "reference": "5528864b1d15696bf75169d7122831c2b8ab0b02",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.5.*|5.6.*|5.7.*",
+                "php": ">=7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Freshbitsweb\\Laratables\\LaratablesServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Freshbitsweb\\Laratables\\": "src/"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gaurav Makhecha",
+                    "email": "info@freshbits.in"
+                }
+            ],
+            "description": "Ajax support of DataTables for Laravel 5.5+",
+            "time": "2018-10-06T07:39:43+00:00"
         },
         {
             "name": "guzzlehttp/psr7",

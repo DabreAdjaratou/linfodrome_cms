@@ -28,6 +28,7 @@ Route::get('/administrator', function () {
 // Route::redirect('/home', 'register', 301);
 
 // Route to Article
+Route::get('article-archives/laratable','Article\ArchiveController@laratable')->name('article-archives.laratable');
 Route::get('article-archives/{article}/trash','Article\ArchiveController@putInTrash')->name('article-archives.put-in-trash');
 Route::get('article-archives/{article}/restore','Article\ArchiveController@restore')->name('article-archives.restore');
 Route::get('article-archives/{article}/draft','Article\ArchiveController@putInDraft')->name('article-archives.put-in-draft');
@@ -41,6 +42,7 @@ Route::get('articles/draft','Article\ArticleController@inDraft')->name('articles
 Route::get('articles/trash','Article\ArticleController@inTrash')->name('articles.trash');
 Route::resource('articles','Article\ArticleController');
 
+Route::get('article-categories/laratable','Article\CategoryController@laratable')->name('article-categories.laratable');
 Route::get('article-categories/{article_category}/trash','Article\CategoryController@putInTrash')->name('article-categories.put-in-trash');
 Route::get('article-categories/{article_category}/restore','Article\CategoryController@restore')->name('article-categories.restore');
 Route::get('article-categories/trash','Article\CategoryController@inTrash')->name('article-categories.trash');
