@@ -44,8 +44,6 @@
  @component('layouts.administrator.video-sidebar') @endcomponent 
 @endsection
 
-@section('js')
-
 @endsection
 
 @endsection

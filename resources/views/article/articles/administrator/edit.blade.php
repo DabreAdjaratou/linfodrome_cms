@@ -1,6 +1,7 @@
 @extends('layouts.administrator.master')
 @section('title', 'Edit an article')
 @section('css')
+<link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Modifier une article ') }}</h3>@endsection 
@@ -15,7 +16,7 @@
 	</div>
 	<div>	
 		<label for="ontitle">{{('Sur Titre:')}}</label>
-		<input type="text" name="ontitle" placeholder="Sur titre" value="{{ $article->ontitle }}">
+		<input type="text" name="ontitle" placeholder="Sur titre" value="{!! $article->ontitle !!}">
 	</div>
 	<div>
 		<label for="title">{{('Titre:')}}</label>
@@ -57,12 +58,12 @@
 
 	<div>
 		<label for="introtext">{{('Intro text:')}}</label>
-		<input type="text" name="introtext" value="{{ $article->introtext }}" >
+		<input type="text" name="introtext" value="{!! $article->introtext !!}" >
 	</div>
 
 	<div>
 		<label for="fulltext">{{('Content:')}}</label>
-		<textarea name="fulltext" id="fulltext" >{{ $article->fulltext }}</textarea>
+		<textarea name="fulltext" id="fulltext" >{!! $article->fulltext !!}</textarea>
 	</div>
 	<div>
 		<label for="source">{{('Source:')}}</label>
@@ -73,7 +74,9 @@
 			@endforeach
 		</select>
 	</div>
-
+<div>
+	<input name="tags" placeholder="write some tags" value="{{ $article->keywords }}">
+</div>
 	<div>
 	<label for="created_by">{{('Auteur:')}}</label>
 	<span>{{ Auth::User()->name}}</span>
@@ -100,6 +103,11 @@
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @endsection
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
+<script type="text/javascript">
+		$('[name=tags]').tagify({
+		duplicates : false,
+	});
+</script>
 @endsection
 @endsection

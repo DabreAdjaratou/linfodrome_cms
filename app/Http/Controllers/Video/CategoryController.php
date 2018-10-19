@@ -24,7 +24,7 @@ class CategoryController extends Controller
     public function index()
     {
      $categories=Category::all();
-     return view('video.categories.administrator.index',['categories'=>$categories]);   
+     return view('video.categories.administrator.index',compact('categories'));   
     }
 
     /**

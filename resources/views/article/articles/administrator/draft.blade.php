@@ -38,7 +38,7 @@
                          <td> <a href="{{ route('articles.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
 
 			</td>
-			 <td> <a href="{{ route('articles.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+			 <td> <a href="{{ route('articles.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre au brouillon</span></a>
 
 			</td>
 			<td>{{ $article->id }}</td>

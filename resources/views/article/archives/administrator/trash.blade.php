@@ -6,10 +6,10 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des articles en corbeille') }}</h3> @endsection
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small" >	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
+            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
 			<th>{{ ('Titre') }}</th>
 			<th>{{ ('A la une') }}</th>
 			<th>{{ ('Publiée') }}</th>
@@ -28,7 +28,7 @@
 	<tbody>
 		@foreach($archives as $article)
   	<tr class="uk-text-small">
-			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
+			{{-- <td ><input type="checkbox" name="" class="uk-checkbox"></td> --}}
 			<td class="uk-table-expand"> {{ $article->title }}</td>
 			<td> {{ $article->featured }}</td>
 			<td> {{ $article->published }}</td>
@@ -57,6 +57,23 @@
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @endsection
+@push('js')
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+    
+$('#dataTable').DataTable({
+                responsive: true,
+	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]]
+				 }); 
+
+ }); 
+ 
+
+</script>
+@endpush
 
 @section('js')
 

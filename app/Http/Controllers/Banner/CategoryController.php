@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Banner\Category;
 use Illuminate\Validation\Rule;
+use Freshbitsweb\Laratables\Laratables;
+
 
 class CategoryController extends Controller
 {
@@ -24,8 +26,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories=Category::all();
-        return view('banner.categories.administrator.index',['categories'=>$categories]);
+         $categories=Category::all();
+         return view('banner.categories.administrator.index',compact('categories'));
     }
 
     /**

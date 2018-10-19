@@ -13,6 +13,8 @@ use App\Models\Billet\Revision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Freshbitsweb\Laratables\Laratables;
+
 class ArchiveController extends Controller
 {
      /**
@@ -28,12 +30,20 @@ class ArchiveController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-
-        $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-   
-   return view('billet.archives.administrator.index',['billets'=>$billets]);
+    {   
+   return view('billet.archives.administrator.index');
     }
+
+    /**
+    *fetch data for laratable
+    *
+    * @return json response
+    */
+     public function laratableData()
+    {
+       return Laratables::recordsOf(Archive::class);
+    }
+
 
     /**
      * Show the form for creating a new resource.

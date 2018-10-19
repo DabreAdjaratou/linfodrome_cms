@@ -59,4 +59,20 @@
 @section('sidebar')
 @component('layouts.administrator.user-sidebar') @endcomponent 
 @endsection
+@push('js')
+<script type="text/javascript">
+$(document).ready(function() {
+    
+    // $('#dataTable_filter label input').addClass('uk-input');
+    // $('#dataTable_length label select').addClass('uk-select uk-align-left');
+
+$('#dataTable').DataTable({
+     
+    "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                
+                        });
+               
+ }); 
+</script>
+@endpush
 @endsection

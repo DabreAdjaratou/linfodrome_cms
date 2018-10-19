@@ -57,4 +57,81 @@ use SoftDeletes;
     {
        return $this->hasMany('App\Models\Billet\Revision','billet_id');
     }
+    /**
+ * Fetch only billet with condition in the datatables.
+ *
+ * @param \Illuminate\Database\Eloquent\Builder
+ * @param \Illuminate\Database\Eloquent\Builder
+ */
+public static function laratablesQueryConditions($query)
+{
+    return $query->where('published', '<>',2)->orderBy('id','desc');
+}
+/**
+ * Eager load user items of the archive for displaying in the datatables.
+ *
+ * @return callable
+ */
+public static function laratablesGetRevisionRelationQuery()
+{
+    return function ($query) {
+        $query->with('getModifier');
+    };
+}
+
+     /**
+     * Returns the edit action column  html for datatables.
+     *
+     * @param \App\Models\Billet\Archive
+     * @return string
+     */
+public static function laratablesCustomEdit($archive)
+    {
+        return view('billet.archives.administrator.laratableCustumColumns.edit',compact('archive'))->render();
+    }
+   /* *
+     * Returns the put in trash action column html for datatables.
+     *
+     * @param \App\Models\Billet\Archive
+     * @return string
+     */
+public static function laratablesCustomTrash($archive)
+    {
+        return view('billet.archives.administrator.laratableCustumColumns.trash',compact('archive'))->render();
+    }
+
+    /* *
+     * Returns the  put in draft action column html for datatables.
+     *
+     * @param \App\Models\Billet\Archive
+     * @return string
+     */
+public static function laratablesCustomDraft($archive)
+    {
+        return view('billet.archives.administrator.laratableCustumColumns.draft',compact('archive'))->render();
+    }
+ /* *
+     * Returns the last updated by column html for datatables.
+     *
+     * @param \App\Models\Billet\Archive
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedBy($archive)
+    {
+        return view('billet.archives.administrator.laratableCustumColumns.lastUpdatedBy',compact('archive'))->render();
+    }
+    /* *
+     * Returns the ast updated at column html for datatables.
+     *
+     * @param \App\Models\Billet\Archive
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedAt($archive)
+    {
+        return view('billet.archives.administrator.laratableCustumColumns.lastUpdatedAt',compact('archive'))->render();
+    }
+
+
+
+
 }

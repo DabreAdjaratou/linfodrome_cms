@@ -13,6 +13,8 @@ use App\Models\Billet\Revision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Freshbitsweb\Laratables\Laratables;
+
 
 class BilletController extends Controller
 {
@@ -30,10 +32,19 @@ class BilletController extends Controller
      */
     public function index()
     {
-     $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-     return view('billet.billets.administrator.index',['billets'=>$billets]);
+     // $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+     return view('billet.billets.administrator.index');
      
    }
+
+  /*fetch data for laratable
+    *
+    * @return json response
+    */
+     public function laratableData()
+    {
+       return Laratables::recordsOf(Billet::class);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -131,7 +142,7 @@ class BilletController extends Controller
 
     if ($request->save_close) {
      // return redirect(session()->get('link'));
-    return redirect()->route('billet-archives.index');
+    return redirect()->route('billets.index');
 
    }else{
     return redirect()->route('billets.create');
@@ -148,7 +159,21 @@ class BilletController extends Controller
      */
     public function show($id)
     {
-        //
+         $billet= Billet::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+       if (blank($billet)) {
+        $billet= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+       }
+
+        if(blank($billet)){
+dd('billet not find');
+       }
+
+      foreach ($billet as $billet) {
+        # code...
+       $billet->views=$billet->views + 1 ;
+       $billet->save();
+     }
+       return view('billet.billets.public.show',compact('billet'));
     }
 
     /**
@@ -165,7 +190,7 @@ class BilletController extends Controller
         if ($billet->checkout!=Auth::id()) {
          session()->flash('message.type', 'warning');
          session()->flash('message.content', 'Billet dejà en cour de modification!');
-         return redirect()->route('billet-archives.index');
+         return redirect()->route('billets.index');
        }else{
         $sources=Source::where('published',1)->get(['id','title']);
         $categories=Category::where('published',1)->get(['id','title']);
@@ -278,7 +303,7 @@ class BilletController extends Controller
       session()->flash('message.content', 'Erreur lors de la modification!');
 //           echo $exc->getTraceAsString();
     }
-    return redirect()->route('billet-archives.index');
+    return redirect()->route('billets.index');
     
   }
 
@@ -298,7 +323,7 @@ class BilletController extends Controller
       $archive=Archive::onlyTrashed()->find($id)->forceDelete();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'Billet supprimé avec success!');
-      return redirect()->route('billet-archives.trash');
+      return redirect()->route('billets.trash');
     }
     /**
      * put the specified resource in the draft.
@@ -330,7 +355,7 @@ class BilletController extends Controller
       session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
 //           echo $exc->getTraceAsString();
     }
-    return redirect()->route('billet-archives.index');
+    return redirect()->route('billets.index');
   }
 /**
      * put the specified resource in the trash.
@@ -358,7 +383,7 @@ class BilletController extends Controller
     session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
 //           echo $exc->getTraceAsString();
   }
-    return redirect()->route('billet-archives.index');
+    return redirect()->route('billets.index');
 }
 /**
      * restore the specified resource from the trash.
@@ -387,7 +412,7 @@ public function restore($id)
   session()->flash('message.content', 'Erreur lors de la restauration!');
 //           echo $exc->getTraceAsString();
 }
-return redirect()->route('billet-archives.trash');
+return redirect()->route('billets.trash');
 }
 
 /**

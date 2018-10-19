@@ -10,7 +10,6 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-text-small responsive uk-table-justify responsive" >	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre') }}</th>
 			<th>{{ ('A la une') }}</th>
 			<th>{{ ('Publié') }}</th>
@@ -27,40 +26,42 @@
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
-	<tbody>
-		@foreach($billets as $billet)
-		<tr class="uk-text-small">
-			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $billet->title }}</td>
-			<td> {{ $billet->featured }}</td>
-			<td> {{ $billet->published }}</td>
-			<td class="uk-table-expand"> {{ $billet->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $billet->getAuthor->name }}</td>
-			<td class="uk-table-expand"> {{ $billet->created_at }}</td>
-			<td class="uk-table-expand">{{$billet->getRevision->last()['getModifier']['name']}} </td>
-			<td class="uk-table-expand">{{$billet->getRevision->last()['revised_at']}}  </td>
-			<td> {{ $billet->views }}</td>
-			<td> {{ $billet->image }}</td>
-                         <td> <a href="{{ route('billets.edit',['billet'=>$billet]) }}" ><span class="uk-text-success">Modifier</span></a>
-
-			</td>
-                         <td> <a href="{{ route('billets.put-in-draft',['billet'=>$billet]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
-
-			</td>
-			 <td> <a href="{{ route('billets.put-in-trash',['billet'=>$billet]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
-
-			</td>
-			<td>{{ $billet->id }}</td>
-                </tr>
-		@endforeach
-	</tbody>
-	<tfoot>
-	</tfoot>
 </table>
 @section('sidebar')
  @component('layouts.administrator.billet-sidebar') @endcomponent 
 @endsection
+@push('js')
+<script type="text/javascript">
+$(document).ready(function() {
+    
+ $('#dataTable').DataTable({
+	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
+	serverSide: true,
+                processing: true,
+                responsive: true,
+                ajax: "{{ route('billets.laratable') }}",
+                 columns: [
+                    { name: 'title' },
+                    { name: 'featured' },
+                    { name: 'published' },
+                    { name: 'getcategory.title' },
+                    { name: 'getauthor.name' },
+                    { name: 'created_at' },
+                    { name: 'lastupdatedby',orderable: false, searchable: false },
+                    { name: 'lastupdatedat' ,orderable: false, searchable: false},
+                    { name: 'views' },
+                    { name: 'image' },
+                    { name: 'edit', orderable: false, searchable: false },
+                    { name: 'draft', orderable: false, searchable: false },
+                    { name: 'trash', orderable: false, searchable: false },
+                    { name: 'id' },
+                ],
+                });
+				
+ }); 
 
+</script>
+@endpush
 @section('js')
 
 @endsection

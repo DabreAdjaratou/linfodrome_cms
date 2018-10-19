@@ -45,6 +45,80 @@ class Article extends Model
        return $this->hasMany('App\Models\Article\Revision','article_id');
     }
     
+    /**
+ * Fetch articles with condition in the datatables.
+ *
+ * @param \Illuminate\Database\Eloquent\Builder
+ * @param \Illuminate\Database\Eloquent\Builder
+ */
+public static function laratablesQueryConditions($query)
+{
+    return $query->where('published', '<>',2)->orderBy('id','desc');
+}
+/**
+ * Eager load user items of the archive for displaying in the datatables.
+ *
+ * @return callable
+ */
+public static function laratablesGetRevisionRelationQuery()
+{
+    return function ($query) {
+        $query->with('getModifier');
+    };
+}
+  /**
+     * Returns the edit action column  html for datatables.
+     *
+     * @param \App\Models\Article\Article
+     * @return string
+     */
+public static function laratablesCustomEdit($article)
+    {
+        return view('article.articles.administrator.laratableCustumColumns.edit',compact('article'))->render();
+    }
+   /* *
+     * Returns the put in trash action column html for datatables.
+     *
+     * @param \App\Models\Article\Article
+     * @return string
+     */
+public static function laratablesCustomTrash($article)
+    {
+        return view('article.articles.administrator.laratableCustumColumns.trash',compact('article'))->render();
+    }
+
+    /* *
+     * Returns the  put in draft action column html for datatables.
+     *
+     * @param \App\Models\Article\Article
+     * @return string
+     */
+public static function laratablesCustomDraft($article)
+    {
+        return view('article.articles.administrator.laratableCustumColumns.draft',compact('article'))->render();
+    }
+ /* *
+     * Returns the last updated by column html for datatables.
+     *
+     * @param \App\Models\Article\Article
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedBy($article)
+    {
+        return view('article.articles.administrator.laratableCustumColumns.lastUpdatedBy',compact('article'))->render();
+    }
+    /* *
+     * Returns the ast updated at column html for datatables.
+     *
+     * @param \App\Models\Article\Article
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedAt($article)
+    {
+        return view('article.articles.administrator.laratableCustumColumns.lastUpdatedAt',compact('article'))->render();
+    }
+
+
 
     
 }

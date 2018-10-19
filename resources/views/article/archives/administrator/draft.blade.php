@@ -52,6 +52,22 @@
 </table>
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
+
+ @push('js')
+<script type="text/javascript">
+
+$(document).ready(function() {
+    
+$('#dataTable').DataTable({
+	responsive: true,
+	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]]
+				 }); 
+
+ }); 
+ 
+
+</script>
+@endpush
 @endsection
 
 @section('js')

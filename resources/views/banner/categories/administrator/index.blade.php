@@ -21,12 +21,12 @@
                        
 		</tr>
 	</thead>
-	<tbody>
-		@foreach($categories as $category)
+	<tbody> 
+@foreach($categories as $category)
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td> {{ ucfirst($category->title) }}</td>
-			<td> {{ $category->published }}</td>
+			<td>{{ $category->published }} </td>
 			<td> <a href="{{ route('banner-categories.edit',['category'=>$category]) }}" ><span class="uk-text-success">Modifier</span></a>
 			</td>
 			<td> <a href="{{ route('banner-categories.put-in-trash',['category'=>$category]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
@@ -35,14 +35,30 @@
                 </tr>
 		@endforeach
 	</tbody>
-	<tfoot>
-	</tfoot>
-</table>
+		</table>
+
 @section('sidebar')
 @component('layouts.administrator.banner-sidebar') @endcomponent 
 @endsection
 @section('js')
 
 @endsection
+@push('js')
+<script type="text/javascript">
+
+$(document).ready(function() {
+    
+    // $('#dataTable_filter label input').addClass('uk-input');
+    // $('#dataTable_length label select').addClass('uk-select uk-align-left');
+
+$('#dataTable').DataTable({
+	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]]
+				
+            });
+ }); 
+ 
+
+</script>
+@endpush
 
 @endsection

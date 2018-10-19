@@ -54,4 +54,79 @@ class Video extends Model
     {
        return $this->hasMany('App\Models\Video\Revision','video_id');
     }
+
+
+    /**
+ * Fetch articles with condition in the datatables.
+ *
+ * @param \Illuminate\Database\Eloquent\Builder
+ * @param \Illuminate\Database\Eloquent\Builder
+ */
+public static function laratablesQueryConditions($query)
+{
+    return $query->where('published', '<>',2)->orderBy('id','desc');
+}
+/**
+ * Eager load user items of the archive for displaying in the datatables.
+ *
+ * @return callable
+ */
+public static function laratablesGetRevisionRelationQuery()
+{
+    return function ($query) {
+        $query->with('getModifier');
+    };
+}
+    /**
+     * Returns the edit action column  html for datatables.
+     *
+     * @param \App\Models\Video\Video
+     * @return string
+     */
+public static function laratablesCustomEdit($video)
+    {
+        return view('video.videos.administrator.laratableCustumColumns.edit',compact('video'))->render();
+    }
+   /* *
+     * Returns the put in trash action column html for datatables.
+     *
+     * @param \App\Models\Video\Video
+     * @return string
+     */
+public static function laratablesCustomTrash($video)
+    {
+        return view('video.videos.administrator.laratableCustumColumns.trash',compact('video'))->render();
+    }
+
+    /* *
+     * Returns the  put in draft action column html for datatables.
+     *
+     * @param \App\Models\Video\Video
+     * @return string
+     */
+public static function laratablesCustomDraft($video)
+    {
+        return view('video.videos.administrator.laratableCustumColumns.draft',compact('video'))->render();
+    }
+ /* *
+     * Returns the last updated by column html for datatables.
+     *
+     * @param \App\Models\Video\Video
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedBy($video)
+    {
+        return view('video.videos.administrator.laratableCustumColumns.lastUpdatedBy',compact('video'))->render();
+    }
+    /* *
+     * Returns the ast updated at column html for datatables.
+     *
+     * @param \App\Models\Video\Video
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedAt($video)
+    {
+        return view('video.videos.administrator.laratableCustumColumns.lastUpdatedAt',compact('billet'))->render();
+    }
+
 }

@@ -10,7 +10,6 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre de la video') }}</th>
 			<th>{{ ('Categorie') }}</th>
 			<th>{{ ('A la Une') }}</th>
@@ -29,7 +28,7 @@
                        
 		</tr>
 	</thead>
-	<tbody>
+	{{-- <tbody>
 		@foreach($videos as $video)
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
@@ -58,12 +57,48 @@
 		@endforeach
 	</tbody>
 	<tfoot>
-	</tfoot>
+	</tfoot> --}}
 </table>
 @section('sidebar')
  @component('layouts.administrator.video-sidebar') @endcomponent 
 @endsection
+@push('js')
+<script type="text/javascript">
+$(document).ready(function() {
+    
+    // $('#dataTable_filter label input').addClass('uk-input');
+    // $('#dataTable_length label select').addClass('uk-select uk-align-left');
 
+$('#dataTable').DataTable({
+	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
+				serverSide: true,
+                processing: true,
+                responsive: true,
+                ajax: "{{ route('video-archives.laratable') }}", 
+                columns: [
+                    { name: 'title' },
+                    { name: 'getcategory.title' },
+                    { name: 'featured' },
+                    { name: 'published' },
+                    { name: 'getauthor.name' },
+                    { name: 'getcameraman.name' },
+                    { name: 'geteditor.name' },
+                    { name: 'created_at' },
+                    { name: 'start_publication_at' },
+                    { name: 'stop_publication_at' },
+                    { name: 'views' },
+                //     { name: 'lastupdatedby',orderable: false, searchable: false },
+                //     { name: 'lastupdatedat' ,orderable: false, searchable: false},
+                    { name: 'edit', orderable: false, searchable: false },
+                    { name: 'draft', orderable: false, searchable: false },
+                    { name: 'trash', orderable: false, searchable: false },
+                    { name: 'id' },
+                ],
+                });
+               
+ }); 
+</script>
+@endpush
 @section('js')
 
 @endsection

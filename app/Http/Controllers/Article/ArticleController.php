@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Freshbitsweb\Laratables\Laratables;
 use Image;
+
 class ArticleController extends Controller
 {
     /**
@@ -32,10 +34,20 @@ class ArticleController extends Controller
      */
     public function index()
     {   
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      // $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
 
-      return view('article.articles.administrator.index',['articles'=>$articles]);
+      return view('article.articles.administrator.index');
 
+    }
+    
+    /**
+    *fetch data for laratable
+    *
+    * @return json response
+    */
+  public function laratableData()
+    {
+       return Laratables::recordsOf(Article::class);
     }
 
     /**
@@ -92,6 +104,7 @@ class ArticleController extends Controller
      $article->introtext = $request->introtext;
      $article->fulltext =$request->fulltext;
      $article->source_id = $request->source;
+     $article->keywords=$request->tags;
      $article->created_by =$request->created_by ?? $request->auth_userid;
      $article->created_at =now();
      $article->start_publication_at = $request->start_publication_at;
@@ -133,8 +146,8 @@ class ArticleController extends Controller
          $archive->checkout=0;
          $archive->save();
 
-       // $oldest = Article::oldest()->first();
-       // $oldest->delete();
+       $oldest = Article::oldest()->first();
+       $oldest->delete();
       
 $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$imageExtension);
        });
@@ -149,9 +162,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
     session()->flash('message.content', 'Article ajouté avec succès!');
     
     if ($request->save_close) {
-     // return back()->withInput();
-     // return redirect(session()->get('link'));
-    return redirect()->route('article-archives.index');
+         return redirect()->route('articles.index');
 
    }else{
     return redirect()->route('articles.create');
@@ -168,7 +179,21 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
      */
     public function show($id)
     {
+       $article= Article::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+       if (blank($article)) {
+        $article= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+       }
 
+       if(blank($article)){
+dd('article not find');
+       }
+
+      foreach ($article as $article) {
+        # code...
+       $article->views=$article->views + 1 ;
+       $article->save();
+      }
+       return view('article.articles.public.show',compact('article'));
 
     }
 
@@ -186,7 +211,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
       if ($article->checkout!=Auth::id()) {
        session()->flash('message.type', 'warning');
        session()->flash('message.content', 'Article dejà en cour de modification!');
-       return redirect()->route('article-archives.index');
+       return redirect()->route('articles.index');
      }else{
       $sources=Source::where('published',1)->get(['id','title']);
       $categories=Category::where('published',1)->get(['id','title']);
@@ -250,6 +275,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
      $article->introtext = $request->introtext;
      $article->fulltext =$request->fulltext;
      $article->source_id = $request->source;
+     $article->keywords = $request->tags;
      $article->created_by =$request->created_by ?? $request->auth_userid;
      $article->created_at =now();
      $article->start_publication_at = $request->start_publication_at;
@@ -299,7 +325,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
       session()->flash('message.content', 'Erreur lors de la modification!');
 //           echo $exc->getTraceAsString();
     }
-    return redirect()->route('article-archives.index');
+    return redirect()->route('articles.index');
 
   }
 
@@ -319,7 +345,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
       $archive=Archive::onlyTrashed()->find($id)->forceDelete();
       session()->flash('message.type', 'success');
       session()->flash('message.content', 'Article supprimé avec success!');
-      return redirect()->route('article-archives.trash');
+      return redirect()->route('articles.trash');
     }
 
     /**
@@ -354,7 +380,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
       session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
 //           echo $exc->getTraceAsString();
     }
-    return redirect()->route('article-archives.index');
+    return redirect()->route('articles.index');
   }
 
 /**
@@ -385,7 +411,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
 //           echo $exc->getTraceAsString();
   }
 
-  return redirect()->route('article-archives.index');
+  return redirect()->route('articles.index');
 }
 
 /**
@@ -414,7 +440,7 @@ public function restore($id)
   session()->flash('message.content', 'Erreur lors de la restauration!');
 //           echo $exc->getTraceAsString();
 }
-return redirect()->route('article-archives.trash');
+return redirect()->route('articles.trash');
 }
 
 

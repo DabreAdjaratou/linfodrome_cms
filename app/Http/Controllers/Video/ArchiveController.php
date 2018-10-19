@@ -12,6 +12,8 @@ use App\Models\Video\Revision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Freshbitsweb\Laratables\Laratables;
+
 
 class ArchiveController extends Controller
 {
@@ -29,11 +31,19 @@ class ArchiveController extends Controller
      */
     public function index()
     {
-       $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+       // $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
         
-       return view ('video.archives.administrator.index', compact('videos'));
+       return view ('video.archives.administrator.index');
     }
-
+/**
+    *fetch data for laratable
+    *
+    * @return json response
+    */
+     public function laratableData()
+    {
+       return Laratables::recordsOf(Archive::class);
+    }
     /**
      * Show the form for creating a new resource.
      *

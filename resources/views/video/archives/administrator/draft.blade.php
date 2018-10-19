@@ -9,7 +9,7 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
+            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
 			<th>{{ ('Titre de la video') }}</th>
 			<th>{{ ('Categorie') }}</th>
 			<th>{{ ('A la Une') }}</th>
@@ -30,7 +30,7 @@
 	<tbody>
 		@foreach($archives as $video)
 		<tr>
-			<td><input type="checkbox" name="" class="uk-checkbox"></td>
+			{{-- <td><input type="checkbox" name="" class="uk-checkbox"></td> --}}
                         <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
 			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
 			<td> {{ $video->featured }}</td>
@@ -59,9 +59,17 @@
 @section('sidebar')
  @component('layouts.administrator.video-sidebar') @endcomponent 
 @endsection
+@push('js')
+<script type="text/javascript">
 
-@section('js')
+$(document).ready(function() {
+    
+$('#dataTable').DataTable({
+	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]]
+				 }); 
 
-@endsection
+ }); 
+ </script>
+@endpush
 
 @endsection

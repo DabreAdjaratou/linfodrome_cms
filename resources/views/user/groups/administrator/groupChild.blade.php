@@ -1,9 +1,11 @@
+<a href="{{ route('user-groups.create') }}">Nouveau</a> 
+
 @foreach($children as $child)
 @if($view=='view')
   @if(isset($data))
     @if(in_array($child->title,$data))
         <ul>
-            <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" checked>
+            {{-- <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" checked> --}}
             {{ ucfirst($child->title) }}
               @if(count($child->getChildren))
                @include('user.groups.administrator.groupChild',['children' => $child->getChildren,])
@@ -13,7 +15,7 @@
   
       @if(in_array($child->title,$arrayDiff))
         <ul>
-          <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" >
+          {{-- <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" > --}}
           {{ ucfirst($child->title) }}
             @if(count($child->getChildren))
              @include('user.groups.administrator.groupChild',['children' => $child->getChildren,])
@@ -22,7 +24,7 @@
       @endif
   @else
     <ul>
-      <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif>
+      {{-- <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" @if(is_array(old('groups')) && in_array($group->id, old('groups'))) checked @endif> --}}
       {{ ucfirst($child->title) }}
       @if(count($child->getChildren))
         @include('user.groups.administrator.groupChild',['children' => $child->getChildren])
@@ -30,9 +32,9 @@
     </ul>
   @endif
 @else  
-  <tr> 
-    <td><input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox"></td>
-    <td><ul>{{ ucfirst($child->title) }}</ul></td>
+  <tr data-tt-id="{{ $child->id }}" data-tt-parent-id="{{ $child->parent_id }}"> 
+    {{-- <td><input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox"></td> --}}
+    <td>{{ ucfirst($child->title) }}</td>
      <td> <a href="{{ route('user-groups.edit',['group'=>$child]) }}" ><span class="uk-text-success">Modifier</span></a>
             </td>
             <td> <form action="{{ route('user-groups.destroy',['group'=>$child]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer ce groupe?')">
@@ -48,5 +50,10 @@
   @endif
 @endif
 @endforeach
-
+@section('js')
+<script src="{{ asset('js/jquery.treetable.js')}}""></script>
+<script>
+$("#dataTable").treetable();
+</script>
+@endsection
 

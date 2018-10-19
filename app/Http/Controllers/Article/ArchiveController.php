@@ -33,24 +33,30 @@ class ArchiveController extends Controller
      */
     // public function index()
     // {
-    //   $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      
-    //   return view('article.archives.administrator.index',['articles'=>$articles]);
+    //   // $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+    //   $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(100);
+        
+    //   return view('article.archives.administrator.index',compact('articles','allArticles'));
     // }
 
     public function index()
     {
-           
-      return view('article.archives.administrator.index');
+
+           return view('article.archives.administrator.index');
     }
 
     
- public function laratable()
+    /**
+    *fetch data for laratable
+    *
+    * @return json response
+    */
+     public function laratableData()
     {
        return Laratables::recordsOf(Archive::class);
-        // return view('article.categories.administrator.index',['categories'=>$categories]);
     }
-    /**
+
+      /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -79,9 +85,8 @@ class ArchiveController extends Controller
      */
     public function show($id)
     {
-       $article= Archive::find($id);
-       return view('article.archives.public.show',compact('article'));
-    }
+     //  
+     }
 
     /**
      * Show the form for editing the specified resource.

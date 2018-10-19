@@ -8,6 +8,7 @@ use App\Models\Article\Category;
 use Illuminate\Validation\Rule;
 use Freshbitsweb\Laratables\Laratables;
 
+
 class CategoryController extends Controller
 {
      /**
@@ -22,21 +23,15 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    // public function index()
-    // {
-    //     $categories=Category::all();
-    //     return view('article.categories.administrator.index',['categories'=>$categories]);
-    // }
     public function index()
     {
-         return view('article.categories.administrator.index');
+        $categories=Category::all();
+        return view('article.categories.administrator.index',compact('categories'));
     }
-    public function laratable()
+    public function laratableData()
     {
        return Laratables::recordsOf(Category::class);
-        // return view('article.categories.administrator.index',['categories'=>$categories]);
     }
-
        /**
      * Show the form for creating a new resource.
      *

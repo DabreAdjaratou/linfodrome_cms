@@ -12,6 +12,7 @@ use App\Models\Video\Revision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Freshbitsweb\Laratables\Laratables;
 
 
 class VideoController extends Controller
@@ -30,12 +31,20 @@ class VideoController extends Controller
      */
     public function index()
     {
-     $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+     // $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
 
-           return view ('video.videos.administrator.index', compact('videos'));
-
+           return view ('video.videos.administrator.index');
    }
 
+/**
+    *fetch data for laratable
+    *
+    * @return json response
+    */
+     public function laratableData()
+    {
+       return Laratables::recordsOf(Video::class);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -122,7 +131,7 @@ class VideoController extends Controller
     session()->flash('message.content', 'Video ajouté avec succès!');
 
     if ($request->save_close) {
-    return redirect()->route('video-archives.index');
+    return redirect()->route('videos.index');
    }else{
     return redirect()->route('videos.create');
   }
@@ -137,7 +146,22 @@ class VideoController extends Controller
      */
     public function show($id)
     {
-        //
+       $video= Video::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+       if (blank($video)) {
+        $video= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+       }
+
+        if(blank($video)){
+dd('video not find');
+       }
+
+      foreach ($video as $video) {
+       $video->views=$video->views + 1 ;
+       $video->save();
+     }
+       return view('video.videos.public.show',compact('video'));
+
+        
     }
 
     /**
@@ -252,7 +276,7 @@ $archive->checkout=0;
         session()->flash('message.content', 'Erreur lors de la modification!');
 //           echo $exc->getTraceAsString();
        }
-    return redirect()->route('video-archives.index');
+    return redirect()->route('videos.index');
 
     
     }
@@ -273,7 +297,7 @@ $archive->checkout=0;
     $archive=Archive::onlyTrashed()->find($id)->forceDelete();
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Video supprimé avec success!');
-    return redirect()->route('video-archives.trash');
+    return redirect()->route('videos.trash');
     }
     /**
      * put the specified resource in the draft.
@@ -305,7 +329,7 @@ $archive->checkout=0;
       session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
 //           echo $exc->getTraceAsString();
     }
-    return redirect()->route('video-archives.index');
+    return redirect()->route('videos.index');
     }
 /**
      * put the specified resource in the trash.
@@ -333,7 +357,7 @@ $archive->checkout=0;
       session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
 //           echo $exc->getTraceAsString();
     }
-    return redirect()->route('video-archives.index');
+    return redirect()->route('videos.index');
     }
 /**
      * restore the specified resource from the trash.
@@ -361,7 +385,7 @@ $archive->checkout=0;
       session()->flash('message.content', 'Erreur lors de la restauration!');
 //           echo $exc->getTraceAsString();
     }
-      return redirect()->route('video-archives.trash');
+      return redirect()->route('videos.trash');
     }
 /**
      * Display a listing of the resource in the trash.

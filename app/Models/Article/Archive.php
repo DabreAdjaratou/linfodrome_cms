@@ -48,7 +48,7 @@ class Archive extends Model
     {
         return $this->belongsTo('App\Models\Article\Category','category_id');
     }
-
+   
    public function getAuthor()
     {
         return $this->belongsTo('App\Models\User\User','created_by');
@@ -56,6 +56,85 @@ class Archive extends Model
 
     public function getRevision()
     {
-       return $this->hasMany('App\Models\Article\Revision','article_id');
+    return $this->hasMany('App\Models\Article\Revision','article_id');
     }
+
+       
+/**
+ * Fetch articles with condition in the datatables.
+ *
+ * @param \Illuminate\Database\Eloquent\Builder
+ * @param \Illuminate\Database\Eloquent\Builder
+ */
+public static function laratablesQueryConditions($query)
+{
+    return $query->where('published', '<>',2)->orderBy('id','desc');
 }
+/**
+ * Eager load user items of the archive for displaying in the datatables.
+ *
+ * @return callable
+ */
+public static function laratablesGetRevisionRelationQuery()
+{
+    return function ($query) {
+        $query->with('getModifier');
+    };
+}
+    /**
+     * Returns the edit action column  html for datatables.
+     *
+     * @param \App\Models\Article\Archive
+     * @return string
+     */
+public static function laratablesCustomEdit($archive)
+    {
+        return view('article.archives.administrator.laratableCustumColumns.edit',compact('archive'))->render();
+    }
+   /* *
+     * Returns the put in trash action column html for datatables.
+     *
+     * @param \App\Models\Article\Archive
+     * @return string
+     */
+public static function laratablesCustomTrash($archive)
+    {
+        return view('article.archives.administrator.laratableCustumColumns.trash',compact('archive'))->render();
+    }
+
+    /* *
+     * Returns the  put in draft action column html for datatables.
+     *
+     * @param \App\Models\Article\Archive
+     * @return string
+     */
+public static function laratablesCustomDraft($archive)
+    {
+        return view('article.archives.administrator.laratableCustumColumns.draft',compact('archive'))->render();
+    }
+ /* *
+     * Returns the last updated by column html for datatables.
+     *
+     * @param \App\Models\Article\Archive
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedBy($archive)
+    {
+        return view('article.archives.administrator.laratableCustumColumns.lastUpdatedBy',compact('archive'))->render();
+    }
+    /* *
+     * Returns the ast updated at column html for datatables.
+     *
+     * @param \App\Models\Article\Archive
+     * @return string
+     */
+public static function laratablesCustomLastUpdatedAt($archive)
+    {
+        return view('article.archives.administrator.laratableCustumColumns.lastUpdatedAt',compact('archive'))->render();
+    }
+
+
+
+
+
+  }

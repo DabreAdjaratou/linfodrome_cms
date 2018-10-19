@@ -15,11 +15,11 @@
 	</div>
 	<div>	
 		<label for="ontitle">{{('Sur Titre:')}}</label>
-		<input type="text" name="ontitle" placeholder="Sur titre" value="{{ $archive->ontitle }}">
+		<input type="text" name="ontitle" placeholder="Sur titre" value="{!! $archive->ontitle !!}">
 	</div>
 	<div>
 		<label for="title">{{('Titre:')}}</label>
-		<input type="text" name="title" placeholder="Titre"  value="{{ $archive->title }}" required autofocus>
+		<input type="text" name="title" placeholder="Titre"  value="{!! $archive->title !!}" required autofocus>
 	</div>
 	<label for="category">{{('category:')}}</label>
 	<select  name="category" >
@@ -57,12 +57,12 @@
 
 	<div>
 		<label for="introtext">{{('Intro text:')}}</label>
-		<input type="text" name="introtext" value="{{ $archive->introtext }}" >
+		<input type="text" name="introtext" value="{!! $archive->introtext !!}" >
 	</div>
 
 	<div>
 		<label for="fulltext">{{('Content:')}}</label>
-		<textarea name="fulltext" id="fulltext" >{{ $archive->fulltext }}</textarea>
+	<textarea name="fulltext" id="fulltext" >{!! $archive->fulltext !!}</textarea>
 	</div>
 	<div>
 		<label for="source">{{('Source:')}}</label>
@@ -73,7 +73,6 @@
 			@endforeach
 		</select>
 	</div>
-
 	<div>
 	<label for="created_by">{{('Auteur:')}}</label>
 	<span>{{ Auth::User()->name}}</span>
