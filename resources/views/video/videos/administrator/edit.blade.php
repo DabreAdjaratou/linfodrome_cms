@@ -1,6 +1,7 @@
 @extends('layouts.administrator.master')
 @section('title', 'Edit a video')
 @section('css')
+<link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Modifier une video ') }}</h3>@endsection 
@@ -42,7 +43,13 @@
 		<label for="video">{{('Video:')}}</label>
 		<textarea name="video" >{{ $video->code }}</textarea> 
 	</div>
-
+<div>
+		@if($video->keywords)
+	<input name="tags" placeholder="Mots clés" value="{{ $video->keywords }}">
+	@else
+		<input name="tags" placeholder="Mots clés" value="linfodrome.com,linfodrome.ci,linfodrome,abidjan,cote d'ivoire">
+	@endif
+</div>
 	<div>
 	<label for="created_by">{{('Journaliste:')}}</label>
 	    <select name="created_by">
@@ -81,7 +88,11 @@
 	</div>
 
 </form>
+@section('sidebar')
+ @component('layouts.administrator.video-sidebar') @endcomponent 
+@endsection
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
+<script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 @endsection
 @endsection

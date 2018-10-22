@@ -86,29 +86,27 @@ class ArchiveController extends Controller
     {
       $video=Video::find($id);
       if ($video) {
-        return redirect()->route('videos.edit',['video'=>$video]);
+        return redirect()->route('videos.edit',compact('video'));
     }else{
-
         $video=Archive::find($id);
-        if($video->checkout!=0){
-        if ($video->checkout!=Auth::id()) {
-         session()->flash('message.type', 'warning');
-         session()->flash('message.content', 'video dejà en cour de modification!');
-         return redirect()->route('video-archives.index');
-       }else{
+if(is_null($video)){
+die('impossible d\'acceder à la resource demander');
+}else{
+
+        if($video->checkout==0 || $video->checkout==Auth::id()){
+
+        $video->checkout=Auth::id();
+      $video->save();
       $categories=Category::where('published',1)->get(['id','title']);
         $users=user::all('id','name');
         return view('video.archives.administrator.edit',compact('video','categories','users'));
-      }
-    }else{
-      $video->checkout=Auth::id();
-      $video->save();
-      $categories=Category::where('published',1)->get(['id','title']);
-       $users=user::all('id','name');
-       return view ('video.archives.administrator.edit',compact('video','categories','users'));
-    }
-      
-    }
+        }elseif ($video->checkout!=0 || $video->checkout!=Auth::id()) {
+        session()->flash('message.type', 'warning');
+         session()->flash('message.content', 'video dejà en cour de modification!');
+         return redirect()->route('video-archives.index');
+                 }
+}
+        }
 }
 
     /**
@@ -141,6 +139,7 @@ class ArchiveController extends Controller
       $video->featured=$request->featured ? $request->featured : 0 ; 
       $video->image = $request->image ? $request->image:$video->image;
       $video->code = $request->video;
+      $video->keywords = $request->tags;
       $video->created_by =$request->created_by;
       $video->cameraman =$request->cameraman;
       $video->editor =$request->editor;

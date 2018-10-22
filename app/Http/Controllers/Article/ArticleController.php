@@ -205,30 +205,51 @@ dd('article not find');
      */
     public function edit($id)
     {
-    $article= Article::find($id);
-    $archive=Archive::find($id);
-    if($article->checkout!=0){
-      if ($article->checkout!=Auth::id()) {
-       session()->flash('message.type', 'warning');
-       session()->flash('message.content', 'Article dejà en cour de modification!');
-       return redirect()->route('articles.index');
-     }else{
-      $sources=Source::where('published',1)->get(['id','title']);
-      $categories=Category::where('published',1)->get(['id','title']);
-      $users=user::all('id','name');
-      return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
-    }
-  }else{
-    $article->checkout=Auth::id();
-    $archive->checkout=Auth::id();
-    $archive->save();
-    $article->save();
-    $sources=Source::where('published',1)->get(['id','title']);
+
+$article= article::find($id);
+      $archive=Archive::find($id);
+      if(!is_null($article)){
+        if($article->checkout==0 || $article->checkout==Auth::id()){
+          $article->checkout=Auth::id();
+          $archive->checkout=Auth::id();
+          $article->save();
+          $archive->save();
+          $sources=Source::where('published',1)->get(['id','title']);
     $categories=Category::where('published',1)->get(['id','title']);
     $users=user::all('id','name');
-    return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
-  }
-}
+          return view('article.articles.administrator.edit',compact('article','categories','users'));
+        }elseif ($article->checkout!=0 && $article->checkout!=Auth::id()) {
+         session()->flash('message.type', 'warning');
+         session()->flash('message.content', 'Article dejà en cour de modification!');
+         return redirect()->route('articles.index');
+       }
+     } else{
+      return redirect()->route('article-archives.edit',compact('id'));
+    }
+
+$article= article::find($id);
+      $archive=Archive::find($id);
+      if(!is_null($article)){
+        if($article->checkout==0 || $article->checkout==Auth::id()){
+          $article->checkout=Auth::id();
+          $archive->checkout=Auth::id();
+          $article->save();
+          $archive->save();
+            $sources=Source::where('published',1)->get(['id','title']);
+    $categories=Category::where('published',1)->get(['id','title']);
+    $users=user::all('id','name');
+          return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
+        }elseif ($article->checkout!=0 && $article->checkout!=Auth::id()) {
+         session()->flash('message.type', 'warning');
+         session()->flash('message.content', 'Article dejà en cour de modification!');
+         return redirect()->route('article.index');
+       }
+     } else{
+      return redirect()->route('article-archives.edit',compact('id'));
+    }
+
+
+   }
 
     /**
      * Update the specified resource in storage.
@@ -298,6 +319,7 @@ dd('article not find');
          $archive->introtext = $article->introtext;
          $archive->fulltext =$article->fulltext;
          $archive->source_id = $article->source_id;
+           $archive->keywords = $article->keywords;
          $archive->created_by =$article->created_by;
          $archive->created_at =$article->created_at;
          $archive->start_publication_at = $article->start_publication_at;

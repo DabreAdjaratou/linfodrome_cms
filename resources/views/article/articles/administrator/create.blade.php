@@ -100,12 +100,7 @@
 </form>
 @section('js')
 <script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
-<script type="text/javascript">
-	
-	$('[name=tags]').tagify({
-		duplicates : false,
-	});
-
+<script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
  </script>
 @endsection
 @endsection

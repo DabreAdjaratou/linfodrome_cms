@@ -1,6 +1,7 @@
 @extends('layouts.administrator.master')
 @section('title', 'put online a new video')
 @section('css')
+<link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Mettre en ligne une video ') }}</h3>@endsection 
@@ -40,7 +41,9 @@
 		<label for="video">{{('Video:')}}</label>
 		<textarea name="video">{{{ old('video') }}}</textarea> 
 	</div>
-
+<div>
+	<input name="tags" placeholder="write some tags" value="linfodrome.com,linfodrome.ci,linfodrome,abidjan,cote d'ivoire">
+</div>
 	<div>
 	<label for="created_by">{{('Journaliste:')}}</label>
 	    <select name="created_by">
@@ -79,7 +82,12 @@
 	</div>
 
 </form>
-@section('js')
+@section('sidebar')
+ @component('layouts.administrator.video-sidebar') @endcomponent 
+@endsection
 
+@section('js')
+<script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
+<script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 @endsection
 @endsection

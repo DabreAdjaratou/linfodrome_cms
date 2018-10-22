@@ -27,7 +27,7 @@ class Article extends Model
      * @var array
      */
     protected $fillable = [
-        'ontitle','title','category_id','published','featured','image','image_legend','video','gallery_photo','introtext','fulltext','source_id','keywords','created_by','created_at','start_publication_at','stop_publication_at',
+        'ontitle','title','category_id','published','featured','image','image_legend','video','gallery_photo','introtext','fulltext','source_id','keywords','created_by','created_at','checkout','start_publication_at','stop_publication_at',
     ];
 
    public function getCategory()

@@ -152,6 +152,7 @@ class ArchiveController extends Controller
        $archive->introtext = $request->introtext;
        $archive->fulltext =$request->fulltext;
        $archive->source_id = $request->source;
+       $archive->keywords = $request->tags;
        $archive->created_by =$request->created_by ?? $request->auth_userid;
        $archive->created_at =now();
        $archive->start_publication_at = $request->start_publication_at;

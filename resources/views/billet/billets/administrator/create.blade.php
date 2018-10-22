@@ -1,6 +1,7 @@
 @extends('layouts.administrator.master')
 @section('title', 'Create a new billet')
 @section('css')
+<link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Ajouter une billet ') }}</h3>@endsection 
@@ -52,6 +53,9 @@
 <textarea name="fulltext" id="fulltext" >{{ old('fulltext') }}</textarea>
 </div>
 <div>
+	<div>
+	<input name="tags" placeholder="write some tags" value="linfodrome.com,linfodrome.ci,linfodrome,abidjan,cote d'ivoire">
+</div>
 <label for="source">{{('Source:')}}</label>
 <select  name="source" >
 	<option> </option>
@@ -87,6 +91,7 @@
  @component('layouts.administrator.billet-sidebar') @endcomponent 
 @endsection
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
+<script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 @endsection
 @endsection

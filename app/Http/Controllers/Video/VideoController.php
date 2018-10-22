@@ -23,7 +23,7 @@ class VideoController extends Controller
      public function __construct()
      {
        $this->middleware(['auth','activeUser']);
-    }
+     }
     /**
      * Display a listing of the resource.
      *
@@ -33,7 +33,7 @@ class VideoController extends Controller
     {
      // $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
 
-           return view ('video.videos.administrator.index');
+     return view ('video.videos.administrator.index');
    }
 
 /**
@@ -41,10 +41,10 @@ class VideoController extends Controller
     *
     * @return json response
     */
-     public function laratableData()
-    {
-       return Laratables::recordsOf(Video::class);
-    }
+public function laratableData()
+{
+ return Laratables::recordsOf(Video::class);
+}
     /**
      * Show the form for creating a new resource.
      *
@@ -87,9 +87,10 @@ class VideoController extends Controller
       $video->featured=$request->featured ? $request->featured : 0 ; 
       $video->image = $request->image;
       $video->code = $request->video;
+      $video->keywords = $request->tags;
       $video->created_by =$request->created_by;
       $video->cameraman =$request->cameraman;
-       $video->editor =$request->editor;
+      $video->editor =$request->editor;
       $video->created_at =now();
       $video->start_publication_at = $request->start_publication_at;
       $video->stop_publication_at =$request->stop_publication_at;
@@ -109,6 +110,7 @@ class VideoController extends Controller
          $archive->featured =$lastRecord->featured;
          $archive->image = $lastRecord->image;
          $archive->code = $lastRecord->code;
+         $archive->keywords = $lastRecord->keywords;
          $archive->created_by =$lastRecord->created_by;
          $archive->cameraman =$lastRecord->cameraman;
          $archive->editor =$lastRecord->editor;
@@ -131,12 +133,12 @@ class VideoController extends Controller
     session()->flash('message.content', 'Video ajouté avec succès!');
 
     if ($request->save_close) {
-    return redirect()->route('videos.index');
-   }else{
-    return redirect()->route('videos.create');
-  }
+      return redirect()->route('videos.index');
+    }else{
+      return redirect()->route('videos.create');
+    }
 
-}
+  }
 
     /**
      * Display the specified resource.
@@ -146,23 +148,23 @@ class VideoController extends Controller
      */
     public function show($id)
     {
-       $video= Video::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
-       if (blank($video)) {
-        $video= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
-       }
-
-        if(blank($video)){
-dd('video not find');
-       }
-
-      foreach ($video as $video) {
-       $video->views=$video->views + 1 ;
-       $video->save();
-     }
-       return view('video.videos.public.show',compact('video'));
-
-        
+     $video= Video::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+     if (blank($video)) {
+      $video= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
     }
+
+    if(blank($video)){
+      dd('video not find');
+    }
+
+    foreach ($video as $video) {
+     $video->views=$video->views + 1 ;
+     $video->save();
+   }
+   return view('video.videos.public.show',compact('video'));
+
+   
+ }
 
     /**
      * Show the form for editing the specified resource.
@@ -174,26 +176,24 @@ dd('video not find');
     {
       $video= Video::find($id);
       $archive=Archive::find($id);
-      if($video->checkout!=0){
-        if ($video->checkout!=Auth::id()) {
+      if(!is_null($video)){
+        if($video->checkout==0 || $video->checkout==Auth::id()){
+          $video->checkout=Auth::id();
+          $archive->checkout=Auth::id();
+          $video->save();
+          $archive->save();
+          $categories=Category::where('published',1)->get(['id','title']);
+          $users=user::all('id','name');
+          return view('video.videos.administrator.edit',compact('video','categories','users'));
+        }elseif ($video->checkout!=0 && $video->checkout!=Auth::id()) {
          session()->flash('message.type', 'warning');
          session()->flash('message.content', 'video dejà en cour de modification!');
          return redirect()->route('videos.index');
-       }else{
-      $categories=Category::where('published',1)->get(['id','title']);
-        $users=user::all('id','name');
-        return view('video.videos.administrator.edit',compact('video','categories','users'));
-      }
-    }else{
-      $video->checkout=Auth::id();
-      $archive->checkout=Auth::id();
-      $archive->save();
-      $video->save();
-      $categories=Category::where('published',1)->get(['id','title']);
-      $users=user::all('id','name');
-      return view('video.videos.administrator.edit',compact('video','categories','users'));
+       }
+     } else{
+      return redirect()->route('video-archives.edit',compact('id'));
     }
-          }
+  }
 
     /**
      * Update the specified resource in storage.
@@ -225,15 +225,14 @@ dd('video not find');
       $video->featured=$request->featured ? $request->featured : 0 ; 
       $video->image = $request->image ? $request->image : $video->image;
       $video->code = $request->video;
+      $video->keywords = $request->tags;
       $video->created_by =$request->created_by;
       $video->cameraman =$request->cameraman;
       $video->editor =$request->editor;
       $video->created_at =now();
       $video->start_publication_at = $request->start_publication_at;
       $video->stop_publication_at =$request->stop_publication_at;
-$video->checkout=0;
-
-
+      $video->checkout=0;
 
       try {
        DB::transaction(function () use ($video,$request) {
@@ -245,41 +244,42 @@ $video->checkout=0;
          $archive->featured =$video->featured;
          $archive->image = $video->image;
          $archive->code = $video->code;
+         $archive->keywords = $video->tags;
          $archive->created_by =$video->created_by;
          $archive->cameraman =$video->cameraman;
          $archive->editor =$video->editor;
          $archive->created_at =$video->created_at;
          $archive->start_publication_at = $video->start_publication_at;
          $archive->stop_publication_at =$video->stop_publication_at;
-$archive->checkout=0;
+         $archive->checkout=0;
 
-        if ($request->update) {
-       $video->save();
-       $archive->save();
-       $revision= new  Revision;
-       $revision->type=explode('@', Route::CurrentRouteAction())[1];
-       $revision->user_id=Auth::id();
-       $revision->video_id=$video->id;
-       $revision->revised_at=now();
-       $revision->save();
-       session()->flash('message.type', 'success');
-       session()->flash('message.content', 'Video modifié avec succès!');
+         if ($request->update) {
+           $video->save();
+           $archive->save();
+           $revision= new  Revision;
+           $revision->type=explode('@', Route::CurrentRouteAction())[1];
+           $revision->user_id=Auth::id();
+           $revision->video_id=$video->id;
+           $revision->revised_at=now();
+           $revision->save();
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Video modifié avec succès!');
            
-      }else{
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Modification annulée!');
-    }
-     });
-           
-       } catch (Exception $exc) {
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Erreur lors de la modification!');
+         }else{
+          session()->flash('message.type', 'danger');
+          session()->flash('message.content', 'Modification annulée!');
+        }
+      });
+       
+     } catch (Exception $exc) {
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Erreur lors de la modification!');
 //           echo $exc->getTraceAsString();
-       }
+    }
     return redirect()->route('videos.index');
 
     
-    }
+  }
 
     /**
      * Remove the specified resource from storage.
@@ -287,124 +287,124 @@ $archive->checkout=0;
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   public function destroy($id)
+    public function destroy($id)
     {
-       $revisions= Revision::where('video_id',$id)->get(['id']);
-   foreach ($revisions as $r) {
-    $r->delete();
-   }
+     $revisions= Revision::where('video_id',$id)->get(['id']);
+     foreach ($revisions as $r) {
+      $r->delete();
+    }
     $video=Video::onlyTrashed()->find($id)->forceDelete();
     $archive=Archive::onlyTrashed()->find($id)->forceDelete();
     session()->flash('message.type', 'success');
     session()->flash('message.content', 'Video supprimé avec success!');
     return redirect()->route('videos.trash');
-    }
+  }
     /**
      * put the specified resource in the draft.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-     public function putInDraft($id)
+    public function putInDraft($id)
     {
       try {
        DB::transaction(function () use ($id) {
-      $video=Video::find($id);
-      $archive=Archive::find($id);
-      $video->published=2;
-      $archive->published=2;
-      $video->save();
-      $archive->save();
-       $revision= new  Revision;
-       $revision->type=explode('@', Route::CurrentRouteAction())[1];
-       $revision->user_id=Auth::id();
-       $revision->video_id=$id;
-       $revision->revised_at=now();
-       $revision->save();
-     });
+        $video=Video::find($id);
+        $archive=Archive::find($id);
+        $video->published=2;
+        $archive->published=2;
+        $video->save();
+        $archive->save();
+        $revision= new  Revision;
+        $revision->type=explode('@', Route::CurrentRouteAction())[1];
+        $revision->user_id=Auth::id();
+        $revision->video_id=$id;
+        $revision->revised_at=now();
+        $revision->save();
+      });
        session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Video mis au brouillon!');
-    } catch (Exception $exc) {
+       session()->flash('message.content', 'Video mis au brouillon!');
+     } catch (Exception $exc) {
       session()->flash('message.type', 'danger');
       session()->flash('message.content', 'Erreur lors de la mise au brouillon!');
 //           echo $exc->getTraceAsString();
     }
     return redirect()->route('videos.index');
-    }
+  }
 /**
      * put the specified resource in the trash.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function putInTrash($id)
-    {
-      try {
-       DB::transaction(function () use ($id) {
+public function putInTrash($id)
+{
+  try {
+   DB::transaction(function () use ($id) {
     $video=Video::find($id)->delete();
     $archive=Archive::find($id)->delete();
-     $revision= new  Revision;
-       $revision->type=explode('@', Route::CurrentRouteAction())[1];
-       $revision->user_id=Auth::id();
-       $revision->video_id=$id;
-       $revision->revised_at=now();
-       $revision->save();
-     });
-    session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Video mis en corbeille!');
-    } catch (Exception $exc) {
-      session()->flash('message.type', 'danger');
-      session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+    $revision= new  Revision;
+    $revision->type=explode('@', Route::CurrentRouteAction())[1];
+    $revision->user_id=Auth::id();
+    $revision->video_id=$id;
+    $revision->revised_at=now();
+    $revision->save();
+  });
+   session()->flash('message.type', 'success');
+   session()->flash('message.content', 'Video mis en corbeille!');
+ } catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
 //           echo $exc->getTraceAsString();
-    }
-    return redirect()->route('videos.index');
-    }
+}
+return redirect()->route('videos.index');
+}
 /**
      * restore the specified resource from the trash.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore($id)
-    {
-      try {
-       DB::transaction(function () use ($id) {
-      $video=Video::onlyTrashed()->find($id)->restore();
-      $archive=Archive::onlyTrashed()->find($id)->restore();
-       $revision= new  Revision;
-       $revision->type=explode('@', Route::CurrentRouteAction())[1];
-       $revision->user_id=Auth::id();
-       $revision->video_id=$id;
-       $revision->revised_at=now();
-       $revision->save();
-     });
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Video restaurer!');
-      } catch (Exception $exc) {
-      session()->flash('message.type', 'danger');
-      session()->flash('message.content', 'Erreur lors de la restauration!');
+public function restore($id)
+{
+  try {
+   DB::transaction(function () use ($id) {
+    $video=Video::onlyTrashed()->find($id)->restore();
+    $archive=Archive::onlyTrashed()->find($id)->restore();
+    $revision= new  Revision;
+    $revision->type=explode('@', Route::CurrentRouteAction())[1];
+    $revision->user_id=Auth::id();
+    $revision->video_id=$id;
+    $revision->revised_at=now();
+    $revision->save();
+  });
+   session()->flash('message.type', 'success');
+   session()->flash('message.content', 'Video restaurer!');
+ } catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de la restauration!');
 //           echo $exc->getTraceAsString();
-    }
-      return redirect()->route('videos.trash');
-    }
+}
+return redirect()->route('videos.trash');
+}
 /**
      * Display a listing of the resource in the trash.
      *
      * @return \Illuminate\Http\Response
      */
-    public function inTrash()
-    {
-       $videos=Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-       return view('video.videos.administrator.trash',compact('videos'));
-    }
+public function inTrash()
+{
+ $videos=Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+ return view('video.videos.administrator.trash',compact('videos'));
+}
 /**
      * Display a listing of the resource in the draft.
      *
      * @return \Illuminate\Http\Response
      */
 public function inDraft()
-    {
-      $videos=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-        return view('video.videos.administrator.draft',compact('videos'));
-  }
-  }
+{
+  $videos=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+  return view('video.videos.administrator.draft',compact('videos'));
+}
+}

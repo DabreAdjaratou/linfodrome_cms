@@ -1,6 +1,7 @@
 @extends('layouts.administrator.master')
 @section('title', 'Edit an article')
 @section('css')
+<link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Modifier une article ') }}</h3>@endsection 
@@ -74,6 +75,13 @@
 		</select>
 	</div>
 	<div>
+		@if($archive->keywords)
+	<input name="tags" placeholder="Mots clés" value="{{ $archive->keywords }}">
+	@else
+		<input name="tags" placeholder="Mots clés" value="linfodrome.com,linfodrome.ci,linfodrome,abidjan,cote d'ivoire">
+	@endif
+</div>
+	<div>
 	<label for="created_by">{{('Auteur:')}}</label>
 	<span>{{ Auth::User()->name}}</span>
         <input type="hidden" name="auth_userid" value="{{ Auth::id() }}">
@@ -99,6 +107,7 @@
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @endsection
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
+<script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 @endsection
 @endsection

@@ -1,6 +1,7 @@
 @extends('layouts.administrator.master')
 @section('title', 'Edit an billet')
 @section('css')
+<link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Modifier une billet ') }}</h3>@endsection 
@@ -55,6 +56,12 @@
 		<textarea name="fulltext" id="fulltext" >{{ $billet->fulltext }}</textarea>
 	</div>
 	<div>
+		@if($billet->keywords)
+	<input name="tags" placeholder="Mots clés" value="{{ $billet->keywords }}">
+	@else
+		<input name="tags" placeholder="Mots clés" value="linfodrome.com,linfodrome.ci,linfodrome,abidjan,cote d'ivoire">
+	@endif
+	<div>
 		<label for="source">{{('Source:')}}</label>
 		<select  name="source" >
 			<option> </option>
@@ -87,6 +94,7 @@
 
 </form>
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
+<script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 @endsection
 @endsection

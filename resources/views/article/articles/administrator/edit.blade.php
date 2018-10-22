@@ -74,8 +74,13 @@
 			@endforeach
 		</select>
 	</div>
+
 <div>
-	<input name="tags" placeholder="write some tags" value="{{ $article->keywords }}">
+	@if($article->keywords)
+	<input name="tags" placeholder="Mots clés" value="{{ $article->keywords }}">
+	@else
+		<input name="tags" placeholder="Mots clés" value="linfodrome.com,linfodrome.ci,linfodrome,abidjan,cote d'ivoire">
+	@endif
 </div>
 	<div>
 	<label for="created_by">{{('Auteur:')}}</label>
@@ -104,10 +109,7 @@
 @endsection
 @section('js')
 <script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
-<script type="text/javascript">
-		$('[name=tags]').tagify({
-		duplicates : false,
-	});
+<script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 </script>
 @endsection
 @endsection
