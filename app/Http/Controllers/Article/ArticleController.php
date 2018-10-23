@@ -189,7 +189,6 @@ dd('article not find');
        }
 
       foreach ($article as $article) {
-        # code...
        $article->views=$article->views + 1 ;
        $article->save();
       }
@@ -206,7 +205,7 @@ dd('article not find');
     public function edit($id)
     {
 
-$article= article::find($id);
+      $article=Article::find($id);
       $archive=Archive::find($id);
       if(!is_null($article)){
         if($article->checkout==0 || $article->checkout==Auth::id()){
@@ -217,37 +216,15 @@ $article= article::find($id);
           $sources=Source::where('published',1)->get(['id','title']);
     $categories=Category::where('published',1)->get(['id','title']);
     $users=user::all('id','name');
-          return view('article.articles.administrator.edit',compact('article','categories','users'));
+          return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
         }elseif ($article->checkout!=0 && $article->checkout!=Auth::id()) {
          session()->flash('message.type', 'warning');
          session()->flash('message.content', 'Article dejà en cour de modification!');
          return redirect()->route('articles.index');
        }
-     } else{
+    } else{
       return redirect()->route('article-archives.edit',compact('id'));
-    }
-
-$article= article::find($id);
-      $archive=Archive::find($id);
-      if(!is_null($article)){
-        if($article->checkout==0 || $article->checkout==Auth::id()){
-          $article->checkout=Auth::id();
-          $archive->checkout=Auth::id();
-          $article->save();
-          $archive->save();
-            $sources=Source::where('published',1)->get(['id','title']);
-    $categories=Category::where('published',1)->get(['id','title']);
-    $users=user::all('id','name');
-          return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
-        }elseif ($article->checkout!=0 && $article->checkout!=Auth::id()) {
-         session()->flash('message.type', 'warning');
-         session()->flash('message.content', 'Article dejà en cour de modification!');
-         return redirect()->route('article.index');
-       }
-     } else{
-      return redirect()->route('article-archives.edit',compact('id'));
-    }
-
+  }
 
    }
 

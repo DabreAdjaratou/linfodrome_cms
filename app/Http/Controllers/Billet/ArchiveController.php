@@ -85,33 +85,28 @@ class ArchiveController extends Controller
      */
     public function edit($id)
     {
-      $billet= Billet::find($id);
-      if($billet){
-        return redirect()->route('billets.edit',['billet'=>$billet]);
+     $billet=Billet::find($id);
+      if ($billet) {
+        return redirect()->route('billets.edit',compact('billet'));
       }else{
- $archive=Archive::find($id);
-      if($archive->checkout!=0){
-        if ($archive->checkout!=Auth::id()) {
-         session()->flash('message.type', 'warning');
-         session()->flash('message.content', 'Billet dejà en cour de modification!');
-         return redirect()->route('billet-archives.index');
-       }else{
-        $sources=Source::where('published',1)->get(['id','title']);
-      $categories=Category::where('published',1)->get(['id','title']);
-        $users=user::all('id','name');
-        return view('billet.archives.administrator.edit',compact('archive','sources','categories','users'));
+        $archive=Archive::find($id);
+        if(is_null($archive)){
+          die('impossible d\'acceder à la resource demander');
+        }else{
+          if($archive->checkout==0 || $archive->checkout==Auth::id()){
+            $archive->checkout=Auth::id();
+            $archive->save();
+             $sources=Source::where('published',1)->get(['id','title']);
+            $categories=Category::where('published',1)->get(['id','title']);
+            $users=user::all('id','name');
+            return view('billet.archives.administrator.edit',compact('archive','sources','categories','users'));
+          }elseif ($archive->checkout!=0 && $archive->checkout!=Auth::id()) {
+            session()->flash('message.type', 'warning');
+            session()->flash('message.content', 'Billet dejà en cour de modification!');
+            return redirect()->route('billet-archives.index');
+          }
+        }
       }
-    }else{
-      $archive->checkout=Auth::id();
-      $archive->save();
-      $sources=Source::where('published',1)->get(['id','title']);
-      $categories=Category::where('published',1)->get(['id','title']);
-      $users=user::all('id','name');
-      return view('billet.archives.administrator.edit',compact('archive','sources','categories','users'));
-    }
-
-      }
-      
     }
 
     /**

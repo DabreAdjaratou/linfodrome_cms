@@ -118,8 +118,8 @@ public function laratableData()
          $archive->start_publication_at = $lastRecord->start_publication_at;
          $archive->stop_publication_at =$lastRecord->stop_publication_at;
          $archive->save();
-         // $oldest = Video::oldest()->first();
-         // $oldest->delete();
+         $oldest = Video::oldest()->first();
+         $oldest->delete();
        });
 
      } catch (Exception $exc) {

@@ -32,7 +32,7 @@
 		@foreach($banners as $banner)
 			<tr class="uk-text-small">
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> {{ $banner->title }}</td>
+			<td><a href="{{ route('banners.edit',['banner'=>$banner]) }}" > {{ $banner->title }}</a></td>
 			<td> {{ $banner->published }}</td>
 			<td> {{ $banner->getCategory->title }}</td>
 			@if($banner->type==0)

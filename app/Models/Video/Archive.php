@@ -72,7 +72,7 @@ class Archive extends Model
 
 
 /**
- * Fetch articles with condition in the datatables.
+ * Fetch videos with condition in the datatables.
  *
  * @param \Illuminate\Database\Eloquent\Builder
  * @param \Illuminate\Database\Eloquent\Builder
@@ -99,9 +99,9 @@ public static function laratablesGetRevisionRelationQuery()
      * @param \App\Models\Video\Video
      * @return string
      */
-public static function laratablesCustomEdit($video)
+public static function laratablesCustomEdit($archive)
     {
-        return view('video.videos.administrator.laratableCustumColumns.edit',compact('video'))->render();
+        return view('video.archives.administrator.laratableCustumColumns.edit',compact('archive'))->render();
     }
    /* *
      * Returns the put in trash action column html for datatables.
@@ -109,9 +109,9 @@ public static function laratablesCustomEdit($video)
      * @param \App\Models\Video\Video
      * @return string
      */
-public static function laratablesCustomTrash($video)
+public static function laratablesCustomTrash($archive)
     {
-        return view('video.videos.administrator.laratableCustumColumns.trash',compact('video'))->render();
+        return view('video.archives.administrator.laratableCustumColumns.trash',compact('archive'))->render();
     }
 
     /* *
@@ -120,30 +120,18 @@ public static function laratablesCustomTrash($video)
      * @param \App\Models\Video\Video
      * @return string
      */
-public static function laratablesCustomDraft($video)
+public static function laratablesCustomDraft($archive)
     {
-        return view('video.videos.administrator.laratableCustumColumns.draft',compact('video'))->render();
+        return view('video.archives.administrator.laratableCustumColumns.draft',compact('archive'))->render();
     }
- /* *
-     * Returns the last updated by column html for datatables.
-     *
-     * @param \App\Models\Video\Video
-     * @return string
-     */
-public static function laratablesCustomLastUpdatedBy($video)
-    {
-        return view('video.videos.administrator.laratableCustumColumns.lastUpdatedBy',compact('video'))->render();
-    }
+
     /* *
-     * Returns the ast updated at column html for datatables.
+     * Returns clikable title  for datatables.
      *
-     * @param \App\Models\Video\Video
-     * @return string
+     * * @return string
      */
-public static function laratablesCustomLastUpdatedAt($video)
-    {
-        return view('video.videos.administrator.laratableCustumColumns.lastUpdatedAt',compact('video'))->render();
-    }
-
-
+public function laratablesTitle()
+{
+    return "<a href=".route("video-archives.edit",["archive"=>$this->id]).">".$this->title."</a>";
 }
+ }

@@ -24,7 +24,7 @@
 		@foreach($categories as $category)
 		<tr>
 			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> {{ ucfirst($category->title) }}</td>
+			<td><a href="{{ route('video-categories.edit',['category'=>$category]) }}" > {{ ucfirst($category->title) }}</a></td>
 			<td>{{ $category->published }} </td>
 			<td> <a href="{{ route('video-categories.edit',['category'=>$category]) }}" ><span class="uk-text-success">Modifier</span></a>
 			</td>

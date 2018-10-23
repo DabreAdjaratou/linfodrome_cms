@@ -56,7 +56,7 @@ public static function laratablesQueryConditions($query)
     return $query->where('published', '<>',2)->orderBy('id','desc');
 }
 /**
- * Eager load user items of the archive for displaying in the datatables.
+ * Eager load revision item for displaying in the datatables.
  *
  * @return callable
  */
@@ -108,7 +108,7 @@ public static function laratablesCustomLastUpdatedBy($article)
         return view('article.articles.administrator.laratableCustumColumns.lastUpdatedBy',compact('article'))->render();
     }
     /* *
-     * Returns the ast updated at column html for datatables.
+     * Returns the last updated at column html for datatables.
      *
      * @param \App\Models\Article\Article
      * @return string
@@ -119,6 +119,15 @@ public static function laratablesCustomLastUpdatedAt($article)
     }
 
 
+ /* *
+     * Returns clikable title  for datatables.
+     *
+     * * @return string
+     */
+public function laratablesTitle()
+{
+    return "<a href=".route("articles.edit",["article"=>$this->id]).">".$this->title."</a>";
+}
 
     
 }

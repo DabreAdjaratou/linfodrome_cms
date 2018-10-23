@@ -57,26 +57,8 @@
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @endsection
-@push('js')
-<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-
-<script type="text/javascript">
-
-$(document).ready(function() {
-    
-$('#dataTable').DataTable({
-                responsive: true,
-	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]]
-				 }); 
-
- }); 
- 
-
-</script>
-@endpush
-
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/custom-datatable.js')}}" ></script>
 @endsection
 
 @endsection

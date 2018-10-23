@@ -123,7 +123,7 @@ public static function laratablesCustomLastUpdatedBy($archive)
         return view('article.archives.administrator.laratableCustumColumns.lastUpdatedBy',compact('archive'))->render();
     }
     /* *
-     * Returns the ast updated at column html for datatables.
+     * Returns the last updated at column html for datatables.
      *
      * @param \App\Models\Article\Archive
      * @return string
@@ -133,7 +133,15 @@ public static function laratablesCustomLastUpdatedAt($archive)
         return view('article.archives.administrator.laratableCustumColumns.lastUpdatedAt',compact('archive'))->render();
     }
 
-
+/* *
+     * Returns clikable title  for datatables.
+     *
+     * * @return string
+     */
+public function laratablesTitle()
+{
+    return "<a href=".route("article-archives.edit",["archive"=>$this->id]).">".$this->title."</a>";
+}
 
 
 

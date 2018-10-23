@@ -11,7 +11,7 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
+            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
 			<th>{{ ('Titre') }}</th>
 			<th> {{ ('Publiée') }}</th>
 			<th>{{ ('Modifier') }}</th>
@@ -23,8 +23,8 @@
 	<tbody>
 		@foreach($sources as $source)
 		<tr>
-			<td><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td> {{ucfirst($source->title) }}</td>
+			{{-- <td><input type="checkbox" name="" class="uk-checkbox"></td> --}}
+			<td><a href="{{ route('article-sources.edit',['source'=>$source]) }}" > {{ucfirst($source->title) }}</a></td>
 			<td> {{ $source->published }}</td>
 			<td> <a href="{{ route('article-sources.edit',['source'=>$source]) }}" ><span class="uk-text-success">Modifier</span></a>
 

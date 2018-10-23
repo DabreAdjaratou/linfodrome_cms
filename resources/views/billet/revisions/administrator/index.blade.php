@@ -9,7 +9,7 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
 		<tr>
-			<th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
+			{{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
 			<th>{{ ('Billet') }}</th>
 			<th>{{ ('Category') }}</th>
 			<th>{{ ('Auteur') }}</th>
@@ -23,14 +23,13 @@
 			@foreach($revisions as $revision)
 			@for($i=0; $i<count($revision); $i++)
 			@if($i==0)
-			{{-- {{ dd($revision[$i]) }} --}}
-			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getBillet->title }}</td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getBillet->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getBillet->getAuthor->name }}</td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getBillet->created_at }}</td>
+			{{-- <td ><input type="checkbox" name="" class="uk-checkbox"></td> --}}
+			<td><a href="{{ route('billet-revisions.show',['revision'=>$revision[$i]]) }}" > {{ $revision[$i]->getBillet->title }}</a></td>
+			<td> {{ $revision[$i]->getBillet->getCategory->title }}</td>
+			<td> {{ $revision[$i]->getBillet->getAuthor->name }}</td>
+			<td> {{ $revision[$i]->getBillet->created_at }}</td>
 			
-			<td class="uk-table-expand">
+			<td>
 				<ul> <li >{{$revision[$i]->type}} 
 				{{$revision[$i]->getModifier->name}} 
 				{{$revision[$i]->revised_at}}</ul> </li >

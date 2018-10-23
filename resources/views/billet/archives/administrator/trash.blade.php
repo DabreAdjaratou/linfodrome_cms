@@ -58,9 +58,8 @@
 @section('sidebar')
  @component('layouts.administrator.billet-sidebar') @endcomponent 
 @endsection
-
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/custom-datatable.js')}}" ></script>
 @endsection
 
 @endsection

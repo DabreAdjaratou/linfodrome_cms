@@ -96,33 +96,31 @@ class ArchiveController extends Controller
      */
     public function edit($id)
     {
-      $article=Article::find($id);
-      if($article){
-       return redirect()->route('articles.edit',['article'=>$article]);
-     }else{
-      $archive=Archive::find($id);
-      if($archive->checkout!=0){
-        if ($archive->checkout!=Auth::id()) {
-         session()->flash('message.type', 'warning');
-         session()->flash('message.content', 'Article dejà en cour de modification!');
-         return redirect()->route('article-archives.index');
-       }else{
-        $sources=Source::where('published',1)->get(['id','title']);
-        $categories=Category::where('published',1)->get(['id','title']);
-        $users=user::all('id','name');
-        return view('article.archives.administrator.edit',compact('archive','sources','categories','users'));
-      }
-    }else{
-      $archive->checkout=Auth::id();
-      $archive->save();
-      $sources=Source::where('published',1)->get(['id','title']);
-      $categories=Category::where('published',1)->get(['id','title']);
-      $users=user::all('id','name');
-      return view('article.archives.administrator.edit',compact('archive','sources','categories','users'));
-    }
-  }
 
+     $article=Article::find($id);
+      if ($article) {
+        return redirect()->route('articles.edit',compact('article'));
+      }else{
+        $archive=Archive::find($id);
+        if(is_null($archive)){
+          die('impossible d\'acceder à la resource demander');
+        }else{
+          if($archive->checkout==0 || $archive->checkout==Auth::id()){
+            $archive->checkout=Auth::id();
+            $archive->save();
+             $sources=Source::where('published',1)->get(['id','title']);
+            $categories=Category::where('published',1)->get(['id','title']);
+            $users=user::all('id','name');
+            return view('article.archives.administrator.edit',compact('archive','sources','categories','users'));
+          }elseif ($archive->checkout!=0 && $archive->checkout!=Auth::id()) {
+            session()->flash('message.type', 'warning');
+            session()->flash('message.content', 'Article dejà en cour de modification!');
+            return redirect()->route('article-archives.index');
+          }
+        }
+      }
 }
+      
 
     /**
      * Update the specified resource in storage.

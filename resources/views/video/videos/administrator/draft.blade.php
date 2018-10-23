@@ -9,7 +9,7 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
+            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
 			<th>{{ ('Titre de la video') }}</th>
 			<th>{{ ('Categorie') }}</th>
 			<th>{{ ('A la Une') }}</th>
@@ -30,7 +30,7 @@
 	<tbody>
 		@foreach($videos as $video)
 		<tr>
-			<td><input type="checkbox" name="" class="uk-checkbox"></td>
+			{{-- <td><input type="checkbox" name="" class="uk-checkbox"></td> --}}
                         <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
 			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
 			<td> {{ $video->featured }}</td>
@@ -62,7 +62,6 @@
 @endsection
 
 @section('js')
-
+<script type="text/javascript" src="{{asset('js/custom-datatable.js')}}" ></script>
 @endsection
-
 @endsection

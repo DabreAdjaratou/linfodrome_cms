@@ -58,7 +58,7 @@ use SoftDeletes;
        return $this->hasMany('App\Models\Billet\Revision','billet_id');
     }
     /**
- * Fetch only billet with condition in the datatables.
+ * Fetch  billets with condition in the datatables.
  *
  * @param \Illuminate\Database\Eloquent\Builder
  * @param \Illuminate\Database\Eloquent\Builder
@@ -132,6 +132,14 @@ public static function laratablesCustomLastUpdatedAt($archive)
     }
 
 
-
+/* *
+     * Returns clikable title  for datatables.
+     *
+     * * @return string
+     */
+public function laratablesTitle()
+{
+    return "<a href=".route("billet-archives.edit",["archive"=>$this->id]).">".$this->title."</a>";
+}
 
 }

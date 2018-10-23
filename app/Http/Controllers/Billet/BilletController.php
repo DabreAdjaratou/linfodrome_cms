@@ -128,8 +128,8 @@ class BilletController extends Controller
          $archive->start_publication_at = $lastRecord->start_publication_at;
          $archive->stop_publication_at =$lastRecord->stop_publication_at;
          $archive->save();
-       // $oldest = Billet::oldest()->first();
-       // $oldest->delete();
+       $oldest = Billet::oldest()->first();
+       $oldest->delete();
        });
        
      } catch (Exception $exc) {
@@ -186,34 +186,27 @@ dd('billet not find');
      */
     public function edit($id)
     {
-      $billet= Billet::find($id);
+
+      $billet=Billet::find($id);
       $archive=Archive::find($id);
-      if($billet->checkout!=0){
-        if ($billet->checkout!=Auth::id()) {
+      if(!is_null($billet)){
+        if($billet->checkout==0 || $billet->checkout==Auth::id()){
+          $billet->checkout=Auth::id();
+          $archive->checkout=Auth::id();
+          $billet->save();
+          $archive->save();
+          $sources=Source::where('published',1)->get(['id','title']);
+          $categories=Category::where('published',1)->get(['id','title']);
+          $users=user::all('id','name');
+          return view('billet.billets.administrator.edit',compact('billet','sources','categories','users'));
+        }elseif ($billet->checkout!=0 && $billet->checkout!=Auth::id()) {
          session()->flash('message.type', 'warning');
          session()->flash('message.content', 'Billet dejà en cour de modification!');
          return redirect()->route('billets.index');
-       }else{
-        $sources=Source::where('published',1)->get(['id','title']);
-        $categories=Category::where('published',1)->get(['id','title']);
-        $users=user::all('id','name');
-        return view('billet.billets.administrator.edit',compact('billet','sources','categories','users'));
-      }
-    }else{
-      $billet->checkout=Auth::id();
-      $archive->checkout=Auth::id();
-      $archive->save();
-      $billet->save();
-      $sources=Source::where('published',1)->get(['id','title']);
-      $categories=Category::where('published',1)->get(['id','title']);
-      $users=user::all('id','name');
-      return view('billet.billets.administrator.edit',compact('billet','sources','categories','users'));
-    }
-    $billet= Billet::find($id);
-    $sources=Source::all('id','title');
-    $categories=Category::all('id','title');
-    $users=user::all('id','name');
-    return view('billet.billets.administrator.edit',compact('billet','sources','categories','users'));
+       }
+    } else{
+      return redirect()->route('billet-archives.edit',compact('id'));
+  }
   }
 
     /**

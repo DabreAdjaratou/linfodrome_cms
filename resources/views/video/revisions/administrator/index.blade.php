@@ -25,12 +25,12 @@
 			@if($i==0)
 			{{-- {{ dd($revision[$i]) }} --}}
 			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->title }}</td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->getAuthor->name }}</td>
-			<td class="uk-table-expand"> {{ $revision[$i]->getVideo->created_at }}</td>
+			<td><a href="{{ route('video-revisions.show',['revision'=>$revision[$i]]) }}" > {{ $revision[$i]->getVideo->title }}</td>
+			<td> {{ $revision[$i]->getVideo->getCategory->title }}</td>
+			<td> {{ $revision[$i]->getVideo->getAuthor->name }}</td>
+			<td> {{ $revision[$i]->getVideo->created_at }}</td>
 			
-			<td class="uk-table-expand">
+			<td>
 				<ul> <li >{{$revision[$i]->type}} 
 				{{$revision[$i]->getModifier->name}} 
 				{{$revision[$i]->revised_at}} </ul> </li >

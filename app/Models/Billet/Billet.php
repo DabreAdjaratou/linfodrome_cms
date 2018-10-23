@@ -50,7 +50,7 @@ class Billet extends Model
     }
     
 /**
- * Fetch articles with condition in the datatables.
+ * Fetch billets with condition in the datatables.
  *
  * @param \Illuminate\Database\Eloquent\Builder
  * @param \Illuminate\Database\Eloquent\Builder
@@ -122,9 +122,13 @@ public static function laratablesCustomLastUpdatedAt($billet)
         return view('billet.billets.administrator.laratableCustumColumns.lastUpdatedAt',compact('billet'))->render();
     }
 
-
-
-
-
-
+/* *
+     * Returns clikable title  for datatables.
+     *
+     * * @return string
+     */
+public function laratablesTitle()
+{
+    return "<a href=".route("billets.edit",["billet"=>$this->id]).">".$this->title."</a>";
+}
 }

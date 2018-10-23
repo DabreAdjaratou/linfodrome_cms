@@ -108,25 +108,5 @@ public static function laratablesCustomDraft($video)
     {
         return view('video.videos.administrator.laratableCustumColumns.draft',compact('video'))->render();
     }
- /* *
-     * Returns the last updated by column html for datatables.
-     *
-     * @param \App\Models\Video\Video
-     * @return string
-     */
-public static function laratablesCustomLastUpdatedBy($video)
-    {
-        return view('video.videos.administrator.laratableCustumColumns.lastUpdatedBy',compact('video'))->render();
-    }
-    /* *
-     * Returns the ast updated at column html for datatables.
-     *
-     * @param \App\Models\Video\Video
-     * @return string
-     */
-public static function laratablesCustomLastUpdatedAt($video)
-    {
-        return view('video.videos.administrator.laratableCustumColumns.lastUpdatedAt',compact('billet'))->render();
-    }
-
+ 
 }

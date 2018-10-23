@@ -55,8 +55,9 @@ Route::get('article-sources/trash','Article\SourceController@inTrash')->name('ar
 Route::resource('article-sources','Article\SourceController');
 
 
-Route::get('article-revisions','Article\RevisionController@index')->name('article-revisions');
-
+Route::resource('article-revisions','Article\RevisionController')->only([
+    'index', 'show'
+]);
 
 
 // Route to Billet
@@ -86,9 +87,10 @@ Route::get('billet-sources/{billet_source}/restore','Billet\SourceController@res
 Route::get('billet-sources/trash','Billet\SourceController@inTrash')->name('billet-sources.trash');
 Route::resource('billet-sources','Billet\SourceController');
 
-Route::get('billet-revisions','Billet\RevisionController@index')->name('billet-revisions');
 
-
+Route::resource('billet-revisions','Billet\RevisionController')->only([
+    'index', 'show'
+]);
 
 // Route to Video
 Route::get('video-archives/laratable','Video\ArchiveController@laratableData')->name('video-archives.laratable');
@@ -112,8 +114,9 @@ Route::get('video-categories/trash','Video\CategoryController@inTrash')->name('v
 
 Route::resource('video-categories','Video\CategoryController');
 
-Route::get('video-revisions','Video\RevisionController@index')->name('video-revisions');
-
+Route::resource('video-revisions','Video\RevisionController')->only([
+	'index', 'show'
+]);
 
 // Route to User
 Route::resource('access-levels','User\AccessLevelController');

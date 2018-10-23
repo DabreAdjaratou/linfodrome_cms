@@ -77,7 +77,7 @@ $('#dataTable').DataTable({
                 responsive: true,
                 ajax: "{{ route('article-archives.laratable') }}",
                 columns: [
-                    { name: 'title' },
+                    { name: 'title'},
                     { name: 'featured' },
                     { name: 'published' },
                     { name: 'getcategory.title' },

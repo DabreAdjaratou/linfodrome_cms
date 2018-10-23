@@ -17,7 +17,7 @@
 	<li><a href="{{ route('article-archives.index') }}">{{ ('Archives') }}</a></li>
 	<li><a href="{{ route('article-categories.index') }}">{{ ('Categories d\'articles') }}</a></li>   
 	<li><a href="{{ route('article-sources.index') }}">{{ ('Sources') }} </a></li>
-	<li><a href="{{ route('article-revisions') }}">{{ ('Revions des articles') }} </a></li>
+	<li><a href="{{ route('article-revisions.index') }}">{{ ('Revions des articles') }} </a></li>
 	<li><a href="{{ route('articles.trash') }}">{{ ('Articles en corbeille') }} </a></li>
 	<li><a href="{{ route('articles.draft') }}">{{ ('Brouillons') }} </a></li>
 </ul>
@@ -33,7 +33,7 @@
     <li><a href="{{ route('billet-archives.index') }}">{{ ('Archives') }}</a></li>
 	<li><a href="{{ route('billet-categories.index') }}">{{ ('Categories de billets') }}</a></li>   
 	<li><a href="{{ route('billet-sources.index') }}">{{ ('Sources de billets') }}</a></li>
-	<li><a href="{{ route('billet-revisions') }}">{{ ('Revisions de billets') }}</a></li>
+	<li><a href="{{ route('billet-revisions.index') }}">{{ ('Revisions de billets') }}</a></li>
 	<li><a href="{{ route('billets.trash') }}">{{ ('Billets en corbeille') }} </a></li>
 	<li><a href="{{ route('billets.draft') }}">{{ ('Brouillons') }} </a></li>
 
@@ -50,7 +50,7 @@
 	<li><a href="{{ route('videos.index') }}">{{ ('Videos') }}</a></li>
     <li><a href="{{ route('video-archives.index') }}">{{ ('Archives') }}</a></li>
 	<li><a href="{{ route('video-categories.index') }}">{{ ('Categories de videos') }}</a></li>   
-	<li><a href="{{ route('video-revisions') }}">{{ ('Revisions de videos') }}</a></li>
+	<li><a href="{{ route('video-revisions.index') }}">{{ ('Revisions de videos') }}</a></li>
 	<li><a href="{{ route('videos.trash') }}">{{ ('Video en corbeille') }} </a></li>
 	<li><a href="{{ route('videos.draft') }}">{{ ('Brouillons') }} </a></li>
 </ul>  
