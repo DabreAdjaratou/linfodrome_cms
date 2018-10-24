@@ -34,9 +34,9 @@ class ArticleController extends Controller
      */
     public function index()
     {   
-      // $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
 
-      return view('article.articles.administrator.index');
+      return view('article.articles.administrator.index',compact('articles'));
 
     }
     
@@ -49,7 +49,12 @@ class ArticleController extends Controller
     {
        return Laratables::recordsOf(Article::class);
     }
+public function test(){
+// $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+$articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
 
+return view('article.articles.administrator.test',compact('articles'));
+}
     /**
      * Show the form for creating a new resource.
      *

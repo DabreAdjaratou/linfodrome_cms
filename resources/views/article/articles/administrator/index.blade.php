@@ -7,6 +7,7 @@
 @parent
 <h3>  {{ ('Liste des articles') }}</h3> @endsection
 <a href="{{ route('articles.create') }}">Nouveau</a> 
+<input type="text" name="title" id="title">
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>
@@ -35,30 +36,34 @@
 <script type="text/javascript">
 $(document).ready(function() {
     
- $('#dataTable').DataTable({
+ var table=$('#dataTable').DataTable({
 	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
-	serverSide: true,
-                processing: true,
-                responsive: true,
-                ajax: "{{ route('articles.laratable') }}",
+                ajax: "{{ route('articles.test') }}",
                  columns: [
-                    { name: 'title' },
-                    { name: 'featured' },
-                    { name: 'published' },
-                    { name: 'getcategory.title' },
-                    { name: 'getauthor.name' },
-                    { name: 'created_at' },
-                    { name: 'lastupdatedby',orderable: false, searchable: false },
-                    { name: 'lastupdatedat' ,orderable: false, searchable: false},
-                    { name: 'views' },
-                    { name: 'image' },
-                    { name: 'edit', orderable: false, searchable: false },
-                    { name: 'draft', orderable: false, searchable: false },
-                    { name: 'trash', orderable: false, searchable: false },
-                    { name: 'id' },
+                 { data: 'id' },
+                 // { data: 'name' },
+                 // { data: 'position' },
+                 // { data: 'salary' },
+                    // { data: 'title' },
+                    // { data: 'featured' },
+                    // { data: 'published' },
+                    // { data: 'getcategory.title' },
+                    // { data: 'getauthor.name' },
+                    // { data: 'created_at' },
+                    // { data: 'lastupdatedby',orderable: false, searchable: false },
+                    // { data: 'lastupdatedat' ,orderable: false, searchable: false},
+                    // { data: 'views' },
+                    // { data: 'image' },
+                    // { data: 'edit', orderable: false, searchable: false },
+                    // { data: 'draft', orderable: false, searchable: false },
+                    // { data: 'trash', orderable: false, searchable: false },
+                    // { data: 'id' },
                 ],
                 });
 				
+                 $('#title').on( 'keyup', function (event) {
+    table.columns( 1 ).search( this.value ).draw();
+ }); 
  }); 
 
 </script>
@@ -71,3 +76,11 @@ $(document).ready(function() {
 @endsection
 
 @endsection
+@php
+$fp = fopen(base_path('/resources/views/article/articles/administrator/test.blade.php'), 'w');
+foreach ($articles as $a) {
+    $data=json_encode($a).',';
+fwrite($fp,$data);
+}
+fclose($fp);
+@endphp

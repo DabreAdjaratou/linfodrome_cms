@@ -109,4 +109,25 @@ public static function laratablesCustomDraft($video)
         return view('video.videos.administrator.laratableCustumColumns.draft',compact('video'))->render();
     }
  
+  /* *
+     * Returns clikable title  for datatables.
+     *
+     * * @return string
+     */
+public function laratablesTitle()
+{
+    return "<a href=".route("videos.edit",["video"=>$this->id]).">".$this->title."</a>";
+}
+
+/**
+ * Adds the condition for searching the name of the user in the query.
+ *
+ * @param \Illuminate\Database\Eloquent\Builder
+ * @param string search term
+ * @param \Illuminate\Database\Eloquent\Builder
+ */
+// public static function laratablesSearchTitle($query, $searchValue)
+// {
+//     return $query->orWhere('title', 'like', '%'. $searchValue);
+// }
 }

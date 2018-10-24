@@ -36,6 +36,7 @@ Route::get('article-archives/draft','Article\ArchiveController@inDraft')->name('
 Route::get('article-archives/trash','Article\ArchiveController@inTrash')->name('article-archives.trash');
 Route::resource('article-archives','Article\ArchiveController');
 
+Route::get('articles/test','Article\ArticleController@test')->name('articles.test');
 Route::get('articles/laratable','Article\ArticleController@laratableData')->name('articles.laratable');
 Route::get('articles/{article}/trash','Article\ArticleController@putInTrash')->name('articles.put-in-trash');
 Route::get('articles/{article}/restore','Article\ArticleController@restore')->name('articles.restore');
