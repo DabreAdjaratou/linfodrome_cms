@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Freshbitsweb\Laratables\Laratables;
+use Yajra\Datatables\Datatables;
 use Image;
 
 class ArticleController extends Controller
@@ -32,30 +33,52 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($pageLength)
     {   
-      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-
-      return view('article.articles.administrator.index',compact('articles'));
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate($pageLength);
+      $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
+      return view('article.articles.administrator.index',compact('articles','tableInfo'));
 
     }
+
+     public function list($pageLength)
+    {   
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate($pageLength);
+      $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
+      $entries=[25,50,100];
+      return view('article.articles.administrator.index',compact('articles','tableInfo','entries'));
+
+    }
+
+    public function sort($sortValue,$perPage){
+            $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy($sortValue, 'asc')->paginate(25);
+      // dd($articles);
+      $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
+      $entries=[25,50,100];
+    return view('article.articles.administrator.sort',compact('articles','entries'));
+    }
     
+
     /**
     *fetch data for laratable
     *
     * @return json response
     */
-  public function laratableData()
+  public function laratableData(Request $request)
     {
-       return Laratables::recordsOf(Article::class);
-    }
-public function test(){
-// $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-$articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
 
-return view('article.articles.administrator.test',compact('articles'));
-}
-    /**
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->select(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+
+       return Datatables::of($articles)->addColumn('action', function ($article) {
+                return '<a href="#edit-'.$article->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> Edit</a>';
+            })
+            ->editColumn('id', 'ID: {{$id}}')
+            ->removeColumn('password')
+            ->make();
+    
+    }
+
+      /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

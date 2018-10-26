@@ -43,7 +43,13 @@ Route::get('articles/{article}/restore','Article\ArticleController@restore')->na
 Route::get('articles/{article}/draft','Article\ArticleController@putInDraft')->name('articles.put-in-draft');
 Route::get('articles/draft','Article\ArticleController@inDraft')->name('articles.draft');
 Route::get('articles/trash','Article\ArticleController@inTrash')->name('articles.trash');
-Route::resource('articles','Article\ArticleController');
+
+Route::get('articles/sort/{sortValue}/{perPage}/{ordering)','Article\ArticleController@sort')->name('articles.sort');
+Route::get('articles/list/{pageLength}','Article\ArticleController@list')->name('articles.list');
+
+Route::resource('articles','Article\ArticleController')->only([
+    'index','show','edit','update','create','delete','store'
+]);
 
 Route::get('article-categories/{article_category}/trash','Article\CategoryController@putInTrash')->name('article-categories.put-in-trash');
 Route::get('article-categories/{article_category}/restore','Article\CategoryController@restore')->name('article-categories.restore');

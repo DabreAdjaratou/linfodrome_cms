@@ -27,21 +27,19 @@
 			<th>{{ ('id') }}</th>                       
 		</tr>
 	</thead>
-    {{-- <tbody>
+    <tbody>
         @foreach($articles as $article)
         <tr class="uk-text-small">
             <td ><input type="checkbox" name="" class="uk-checkbox"></td>
             <td class="uk-table-expand"> {{ $article->title }}</td>
             <td> {{ $article->featured }}</td>
             <td> {{ $article->published }}</td>
-            <td> </td>
-            <td> </td> --}}
-            {{-- <td class="uk-table-expand"> {{ $article->getCategory->title }}</td> --}}
-            {{-- <td class="uk-table-expand"> {{ $article->getAuthor->name }}</td> --}}
-           {{-- <td class="uk-table-expand"> {{ $article->created_at }}</td> --}}
-            {{-- <td class="uk-table-expand">{{$article->getRevision->last()['getModifier']['name']}} </td> --}}
-            {{-- <td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td> --}}
-            {{-- <td> {{ $article->views }}</td>
+             <td> </td><td> </td>
+{{--             <td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
+            <td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
+    --}}        <td class="uk-table-expand"> {{ $article->created_at }}</td>
+            <td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
+            <td> {{ $article->views }}</td>
             <td> {{ $article->image }}</td>
             <td> <a href="{{ route('article-archives.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
             </td>
@@ -51,10 +49,10 @@
             </td>
             <td>{{ $article->id }}</td>
                 </tr>
-        @endforeach --}}
-  {{--  </tbody>
+        @endforeach
+   </tbody>
     <tfoot>
-    </tfoot> --}}
+    </tfoot>
 </table>
 
 
@@ -68,32 +66,11 @@ $(document).ready(function() {
     
     // $('#dataTable_filter label input').addClass('uk-input');
     // $('#dataTable_length label select').addClass('uk-select uk-align-left');
+  var category= $('#cat').value;
+  var title= $('#title').value;
 
-$('#dataTable').DataTable({
-     
-	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
-				serverSide: true,
-                processing: true,
-                responsive: true,
-                ajax: "{{ route('article-archives.laratable') }}",
-                columns: [
-                    { name: 'title'},
-                    { name: 'featured' },
-                    { name: 'published' },
-                    { name: 'getcategory.title' },
-                    { name: 'getauthor.name' },
-                    { name: 'created_at' },
-                    { name: 'lastupdatedby',orderable: false, searchable: false },
-                    { name: 'lastupdatedat' ,orderable: false, searchable: false},
-                    { name: 'views' },
-                    { name: 'image' },
-                    { name: 'edit', orderable: false, searchable: false },
-                    { name: 'draft', orderable: false, searchable: false },
-                    { name: 'trash', orderable: false, searchable: false },
-                    { name: 'id' },
-                ],
-                        });
-               
+var table=$('#dataTable').DataTable();
+            
  }); 
 </script>
 @endpush

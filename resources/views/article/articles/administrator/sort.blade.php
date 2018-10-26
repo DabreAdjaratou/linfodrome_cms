@@ -17,26 +17,27 @@
 <option value="{{ $entries[$i] }}" @if($entries[$i] == $articles->perPage())  selected @endif>{{ $entries[$i] }}</option>
   @endfor
 </select> <label> lignes</label>
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
-	<thead>
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >   
+    <thead>
             <tr>
-			<th>{{ ('Titre') }} <i class="fas fa-sort" id='title'></i></th>
-			<th>{{ ('A la une') }}<i class="fas fa-sort" id='featured'></i></th>
-			<th>{{ ('Publiée') }}<i class="fas fa-sort" id='published'></i></th>
-			<th>{{ ('Category') }}</th>
-			<th>{{ ('Auteur') }}</th>
-			<th>{{ ('créé le') }}<i class="fas fa-sort" id='created_at'></i></th>
-			<th>{{ ('Dernière modification') }}</i></th>
-			<th>{{ ('Modifié le') }}</i></th>
-			<th>{{ ('Nbre de vue') }}<i class="fas fa-sort" id='views'></i></th>
-			<th>{{ ('Image') }}</th>
-			<th>{{ ('Modifier') }}</th>
+            <th>{{ ('Titre') }} <i class="fas fa-sort" id='title'></i></th>
+            <th>{{ ('A la une') }}<i class="fas fa-sort" id='featured'></i></th>
+            <th>{{ ('Publiée') }}<i class="fas fa-sort" id='published'></i></th>
+            <th>{{ ('Category') }}<i class="fas fa-sort" id='category'></i></th>
+            <th>{{ ('Auteur') }}<i class="fas fa-sort" id='auteur'></i></th>
+            <th>{{ ('créé le') }}<i class="fas fa-sort" id='created_at'></i></th>
+            <th>{{ ('Dernière modification') }}<i class="fas fa-sort" id='updated_by'></i></th>
+            <th>{{ ('Modifié le') }}<i class="fas fa-sort" id='updated_at'></i></th>
+            <th>{{ ('Nbre de vue') }}<i class="fas fa-sort" id='views'></i></th>
+            <th>{{ ('Image') }}</th>
+            <th>{{ ('Modifier') }}</th>
       <th>{{ ('brouillon') }}</th>
-			<th>{{ ('Corbeille') }}</th>
-			<th>{{ ('id') }}</th>                       
-		</tr>
-	</thead>
-	<tbody>
+            <th>{{ ('Corbeille') }}</th>
+            <th>{{ ('id') }}</th>                       
+        </tr>
+    </thead>
+    <tbody>
+        {{ dd($articles) }}
         @foreach($articles as $article)
         <tr class="uk-text-small">
             {{-- <td ><input type="checkbox" name="" class="uk-checkbox"></td> --}}
@@ -81,14 +82,14 @@ $(document).ready(function() {
   info:false
  });
 
-$('select#entries').on('change',function(){
+$('#entries').on('change',function(){
    
             $("#tableContainer").load("{{route('articles.list',['pageLength'=>'length'])}}".replace('length',this.value));
        
 });
 
-$('i.fa-sort').on('click',function(){
-            $("#tableContainer").load("{{route('articles.sort',['sortValue'=>'value','perPage'=>'number'])}}".replace('value',this.id).replace('number',{{ $articles->perPage() }}));
+$('.fa-sort').on('click',function(){
+            $("#tableContainer").load("{{route('articles.sort',['sort'=>'sortValue'])}}".replace('length',this.id));
        
 });
  }); 

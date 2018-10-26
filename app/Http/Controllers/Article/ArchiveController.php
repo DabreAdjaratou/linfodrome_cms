@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Freshbitsweb\Laratables\Laratables;
+use Yajra\Datatables\Datatables;
 
 class ArchiveController extends Controller
 {
@@ -41,8 +42,8 @@ class ArchiveController extends Controller
 
     public function index()
     {
-
-           return view('article.archives.administrator.index');
+$articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25);
+           return view('article.archives.administrator.index',compact('articles'));
     }
 
     
@@ -53,9 +54,9 @@ class ArchiveController extends Controller
     */
      public function laratableData()
     {
-       return Laratables::recordsOf(Archive::class);
+      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+       return Datatables::of($articles)->make();
     }
-
       /**
      * Show the form for creating a new resource.
      *
