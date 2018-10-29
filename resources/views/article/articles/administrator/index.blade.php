@@ -55,15 +55,15 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>
-			<th>{{ ('Titre') }} <i class="fas fa-sort" id='title'></i></th>
-			<th>{{ ('A la une') }}<i class="fas fa-sort" id='featured'></i></th>
-			<th>{{ ('Publiée') }}<i class="fas fa-sort" id='published'></i></th>
+			<th id='title' class="tableSort">{{ ('Titre') }} <i class="fas fa-caret-up"></i></th>
+			<th id="featured" class="tableSort">{{ ('A la une') }}<i class="fas fa-caret-up"></i></i></th>
+			<th id="published" class="tableSort">{{ ('Publiée') }}<i class="fas fa-caret-up"></i></i></th>
 			<th>{{ ('Category') }}</th>
 			<th>{{ ('Auteur') }}</th>
-			<th>{{ ('créé le') }}<i class="fas fa-sort" id='created_at'></i></th>
-			<th>{{ ('Dernière modification') }}</i></th>
+			<th id="created_at" class="tableSort">{{ ('créé le') }}<i class="fas fa-caret-up"></i></i></th>
+			<th >{{ ('Dernière modification') }}</i></th>
 			<th>{{ ('Modifié le') }}</i></th>
-			<th>{{ ('Nbre de vue') }}<i class="fas fa-sort" id='views'></i></th>
+			<th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-caret-up"></i></i></th>
 			<th>{{ ('Image') }}</th>
 			<th>{{ ('Modifier') }}</th>
       <th>{{ ('brouillon') }}</th>
@@ -118,9 +118,10 @@ searchAndSort($sortField);
        
 });
 
-$('.fa-sort').on('click',function(e){
-e.preventDefault();
+$('.tableSort').on('click',function(e){
+  e.preventDefault();
 var sortField=e.target.id;
+$("#"+ sortField +" i" ).toggleClass('fas fa-caret-up');
 searchAndSort(sortField);        
 
 });
@@ -150,6 +151,7 @@ var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","sea
           }
      });   
 }
+
 
 
 

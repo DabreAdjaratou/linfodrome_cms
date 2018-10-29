@@ -52,7 +52,7 @@ class ArticleController extends Controller
        $searchByFeaturedState=$data->searchByFeaturedState;
        $searchByPublishedState= $data->searchByPublishedState;
        $searchByUser=$data->searchByUser;
-        $sortField=$data->sortField;
+       $sortField=$data->sortField;
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
 //         
     if($searchByCategory){
@@ -88,13 +88,6 @@ class ArticleController extends Controller
 
     }
 
-    public function sort($sortValue,$perPage){
-            $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy($sortValue, 'asc')->paginate(25);
-      // dd($articles->count());
-      $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
-      $entries=[25,50,100];
-    return view('article.articles.administrator.sort',compact('articles','entries'));
-    }
     
 
     /**

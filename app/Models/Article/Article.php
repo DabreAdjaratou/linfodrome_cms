@@ -162,7 +162,12 @@ public function laratablesTitle()
      */
     public function scopeOfPublishedState($query, $publishedState)
     {
+        if($publishedState==1){
+
         return $query->where('published', $publishedState);
+        }else{
+        return $query->where('published', '<>', 1);
+    }
     }   
     /**
      * Scope a query to only include articles that match to  a given author.

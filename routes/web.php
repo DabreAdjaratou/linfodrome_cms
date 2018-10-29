@@ -44,9 +44,7 @@ Route::get('articles/{article}/draft','Article\ArticleController@putInDraft')->n
 Route::get('articles/draft','Article\ArticleController@inDraft')->name('articles.draft');
 Route::get('articles/trash','Article\ArticleController@inTrash')->name('articles.trash');
 
-Route::get('articles/sort/{sortValue}/{perPage}/{ordering)','Article\ArticleController@sort')->name('articles.sort');
 Route::post('articles/list','Article\ArticleController@list')->name('articles.list');
-Route::post('articles/liste','Article\ArticleController@liste')->name('articles.liste');
 
 Route::resource('articles','Article\ArticleController')->only([
     'index','show','edit','update','create','delete','store'
