@@ -10,12 +10,13 @@
 @section('content')
 @section ('pageTitle')
 @parent
+
 <div id='tableContainer'>
 <h3>  {{ ('Liste des articles') }}</h3> @endsection
 <a href="{{ route('articles.create') }}">Nouveau</a> 
 
   <label> Affiché </label>
-<select id=entries name="entries"> 
+  <select id=entries name="entries" class="searchValue"> 
   @for($i=0; $i<sizeof($entries);$i++)
 <option value="{{ $entries[$i] }}" @if($entries[$i] == $articles->perPage())  selected @endif>{{ $entries[$i] }}</option>
   @endfor
@@ -35,10 +36,11 @@
     <option value="0" @if(isset($searchByFeaturedState) && $searchByFeaturedState==0) selected @endif>Pas à la une</option>
     <option value="1" @if(isset($searchByFeaturedState) && $searchByFeaturedState==1) selected @endif>A la une</option>
 </select>
+
 <select name="searchByPublishedState" id="searchByPublishedState" class="searchValue">
     <option value="">-- Etat de publication --</option>
-    <option value="0" @if(isset($searchByPublishedState) && $searchByPublishedState==0) selected @endif>Not published</option>
-    <option value="1" @if(isset($searchByPublishedState) && $earchByPublishedState==1) selected @endif>Published</option>
+    <option value="0" @if(isset($searchByPublishedState) && $searchByPublishedState==0) selected @endif>Non publié</option>
+    <option value="1" @if(isset($searchByPublishedState) && $searchByPublishedState==1) selected @endif>Publié</option>
 </select>
 
 <select name="searchByUser" id="searchByUser" class="searchValue">
@@ -109,8 +111,21 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-$('select#entries').on('change',function(e){
+$('.searchValue').on('change',function(e){
 e.preventDefault();
+$sortField="";
+searchAndSort($sortField);        
+       
+});
+
+$('.fa-sort').on('click',function(e){
+e.preventDefault();
+var sortField=e.target.id;
+searchAndSort(sortField);        
+
+});
+
+function searchAndSort(sortField){
 var entries=$('#entries').val();
 var globalSearch=$('#globalSearch').val();
 var searchByCategory=$('#searchByCategory').val();
@@ -119,7 +134,7 @@ var searchByPublishedState=$('#searchByPublishedState').val();
 var searchByUser=$('#searchByUser').val();
 
 
-var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":"'+ searchByFeaturedState + '","searchByPublishedState":"'+ searchByPublishedState + '","searchByUser":"'+ searchByUser + '"}'; 
+var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":"'+ searchByFeaturedState + '","searchByPublishedState":"'+ searchByPublishedState + '","searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'"}'; 
                $.ajax({
           headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -134,9 +149,9 @@ var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","sea
               $('#tableContainer').html(response);
           }
      });   
-           
-       
-});
+}
+
+
 
 });
 </script>

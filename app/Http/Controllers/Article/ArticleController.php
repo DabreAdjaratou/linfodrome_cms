@@ -50,11 +50,11 @@ class ArticleController extends Controller
        $pageLength=$data->entries;
        $searchByCategory= $data->searchByCategory;
        $searchByFeaturedState=$data->searchByFeaturedState;
-               $searchByPublishedState= $data->searchByPublishedState;
-               $searchByUser=$data->searchByUser;
-//      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->ofCategory($searchByCategory)->ofFeaturedState($searchByFeaturedState)->ofPublishedState($searchByPublishedState)->ofUser($searchByUser)->orderBy('id', 'desc');
+       $searchByPublishedState= $data->searchByPublishedState;
+       $searchByUser=$data->searchByUser;
+        $sortField=$data->sortField;
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
-//              
+//         
     if($searchByCategory){
         $articles =$articles->ofCategory($searchByCategory);
     }
@@ -63,13 +63,17 @@ class ArticleController extends Controller
       $articles =$articles->ofFeaturedState($searchByFeaturedState);   
     }
     if($searchByPublishedState){
+
       $articles =$articles->ofPublishedState($searchByPublishedState);   
     }
     if($searchByUser){
       $articles =$articles->ofUser($searchByUser);   
     }
-//    
+    if($sortField){
+    $articles = $articles->orderBy($sortField, 'desc')->paginate($pageLength);
+    }else{
       $articles = $articles->orderBy('id', 'desc')->paginate($pageLength);
+    }
       $numberOfItemSFound=$articles->count();
       if($numberOfItemSFound==0){
       $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
@@ -80,7 +84,7 @@ class ArticleController extends Controller
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']);
-      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users','searchByCategory','searchByFeaturedState','$searchByPublishedState','searchByUser'));
+      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser'));
 
     }
 
