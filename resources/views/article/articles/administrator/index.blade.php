@@ -27,28 +27,27 @@
 <select name="searchByCategory" id="searchByCategory" class="searchValue">
         <option value="">-- Categorie --</option>
     @foreach($categories as $category)
-    <option value="{{$category->id}}">{{$category->title}}</option>
+    <option value="{{$category->id}}" @if(isset($searchByCategory) && $category->id==$searchByCategory) selected @endif>{{$category->title}}</option>
     @endforeach
 </select>
 <select name="searchByFeaturedState" id="searchByFeaturedState" class="searchValue">
     <option value="">-- Vedette --</option>
-    <option value="0">Pas à la une</option>
-    <option value="1">A la une</option>
+    <option value="0" @if(isset($searchByFeaturedState) && $searchByFeaturedState==0) selected @endif>Pas à la une</option>
+    <option value="1" @if(isset($searchByFeaturedState) && $searchByFeaturedState==1) selected @endif>A la une</option>
 </select>
 <select name="searchByPublishedState" id="searchByPublishedState" class="searchValue">
     <option value="">-- Etat de publication --</option>
-    <option value="0">Not published</option>
-    <option value="1">Published</option>
+    <option value="0" @if(isset($searchByPublishedState) && $searchByPublishedState==0) selected @endif>Not published</option>
+    <option value="1" @if(isset($searchByPublishedState) && $earchByPublishedState==1) selected @endif>Published</option>
 </select>
-<input type="text">
-<datalist>
+
 <select name="searchByUser" id="searchByUser" class="searchValue">
     <option value="">-- User --</option>
 @foreach($users as $user)
-<option value="{{$user->id}}">{{$user->name}}</option>
+<option value="{{$user->id}}" @if(isset($searchByUser) && $user->id==$searchByUser) selected @endif>{{$user->name}}</option>
     @endforeach
     </select>
-</datalist>
+
 </div>
 <div>
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
@@ -102,19 +101,11 @@
 </div>
 <p>  {{ $tableInfo}} </p>
 {{ $articles->links() }}
-<div id="div1"></div> <select class="selectpicker">
-  <option>Mustard</option>
-  <option>Ketchup</option>
-  <option>Barbecue</option>
-</select>
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @push('js')
  <script src="http://malsup.github.com/jquery.form.js"></script> 
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/i18n/defaults-*.min.js"></script>
-
+ 
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -147,42 +138,6 @@ var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","sea
        
 });
 
-//jQuery extension method:
-jQuery.fn.filterByText = function(textbox) {
-  return this.each(function() {
-    var select = this;
-    var options = [];
-    $(select).find('option').each(function() {
-      options.push({
-        value: $(this).val(),
-        text: $(this).text()
-      });
-    });
-    $(select).data('options', options);
-
-    $(textbox).bind('change keyup', function() {
-      var options = $(select).empty().data('options');
-      var search = $.trim($(this).val());
-      var regex = new RegExp(search, "gi");
-
-      $.each(options, function(i) {
-        var option = options[i];
-        if (option.text.match(regex) !== null) {
-          $(select).append(
-            $('<option>').text(option.text).val(option.value)
-          );
-        }
-      });
-    });
-  });
-};
-
-// You could use it like this:
-
-$(function() {
-  $('select#searchUser').filterByText($('input'));
-});
-$('.selectpicker').selectpicker();
 });
 </script>
 @endpush

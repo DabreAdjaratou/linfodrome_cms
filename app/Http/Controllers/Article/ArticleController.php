@@ -52,20 +52,41 @@ class ArticleController extends Controller
        $searchByFeaturedState=$data->searchByFeaturedState;
                $searchByPublishedState= $data->searchByPublishedState;
                $searchByUser=$data->searchByUser;
-               dd($searchByUser);
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name' =>function($query) {
-      $query->where('users.name', $searchByUser);},'getCategory'])->ofCategory($searchByCategory)->ofFeaturedState($searchByFeaturedState)->ofPublishedState($searchByPublishedState)->ofUser($searchByUser)->orderBy('id', 'desc')->paginate($pageLength);
-      $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
+//      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->ofCategory($searchByCategory)->ofFeaturedState($searchByFeaturedState)->ofPublishedState($searchByPublishedState)->ofUser($searchByUser)->orderBy('id', 'desc');
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+//              
+    if($searchByCategory){
+        $articles =$articles->ofCategory($searchByCategory);
+    }
+    
+    if($searchByFeaturedState){
+      $articles =$articles->ofFeaturedState($searchByFeaturedState);   
+    }
+    if($searchByPublishedState){
+      $articles =$articles->ofPublishedState($searchByPublishedState);   
+    }
+    if($searchByUser){
+      $articles =$articles->ofUser($searchByUser);   
+    }
+//    
+      $articles = $articles->orderBy('id', 'desc')->paginate($pageLength);
+      $numberOfItemSFound=$articles->count();
+      if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+      }else{
+              $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+  
+      }
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']);
-      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users'));
+      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users','searchByCategory','searchByFeaturedState','$searchByPublishedState','searchByUser'));
 
     }
 
     public function sort($sortValue,$perPage){
             $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy($sortValue, 'asc')->paginate(25);
-      // dd($articles);
+      // dd($articles->count());
       $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
       $entries=[25,50,100];
     return view('article.articles.administrator.sort',compact('articles','entries'));
