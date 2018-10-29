@@ -3,6 +3,9 @@
 @extends('layouts.administrator.master')
 @section('title', 'Articles list')
 @section('css')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+
 @endsection
 @section('content')
 @section ('pageTitle')
@@ -10,13 +13,44 @@
 <div id='tableContainer'>
 <h3>  {{ ('Liste des articles') }}</h3> @endsection
 <a href="{{ route('articles.create') }}">Nouveau</a> 
-{{-- <input type="text" name="title" id="title"> --}}
-<label> Affiché </label>
-<select id=entries> 
+
+  <label> Affiché </label>
+<select id=entries name="entries"> 
   @for($i=0; $i<sizeof($entries);$i++)
 <option value="{{ $entries[$i] }}" @if($entries[$i] == $articles->perPage())  selected @endif>{{ $entries[$i] }}</option>
   @endfor
 </select> <label> lignes</label>
+
+
+<div class="uk-float-left">
+<input type="text" name="globalsearch" id="globalSearch" class="searchValue">
+<select name="searchByCategory" id="searchByCategory" class="searchValue">
+        <option value="">-- Categorie --</option>
+    @foreach($categories as $category)
+    <option value="{{$category->id}}">{{$category->title}}</option>
+    @endforeach
+</select>
+<select name="searchByFeaturedState" id="searchByFeaturedState" class="searchValue">
+    <option value="">-- Vedette --</option>
+    <option value="0">Pas à la une</option>
+    <option value="1">A la une</option>
+</select>
+<select name="searchByPublishedState" id="searchByPublishedState" class="searchValue">
+    <option value="">-- Etat de publication --</option>
+    <option value="0">Not published</option>
+    <option value="1">Published</option>
+</select>
+<input type="text">
+<datalist>
+<select name="searchByUser" id="searchByUser" class="searchValue">
+    <option value="">-- User --</option>
+@foreach($users as $user)
+<option value="{{$user->id}}">{{$user->name}}</option>
+    @endforeach
+    </select>
+</datalist>
+</div>
+<div>
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>
@@ -64,37 +98,95 @@
     </tfoot>
 
 </table>
+    </div>
 </div>
 <p>  {{ $tableInfo}} </p>
 {{ $articles->links() }}
-<div id="div1"></div>
+<div id="div1"></div> <select class="selectpicker">
+  <option>Mustard</option>
+  <option>Ketchup</option>
+  <option>Barbecue</option>
+</select>
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @push('js')
+ <script src="http://malsup.github.com/jquery.form.js"></script> 
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/i18n/defaults-*.min.js"></script>
+
+
 <script type="text/javascript">
 $(document).ready(function() {
-    
- var table=$('#dataTable').DataTable({
-  paging:false,
-  searching:false,
-  ordering:false,
-  info:false
- });
+$('select#entries').on('change',function(e){
+e.preventDefault();
+var entries=$('#entries').val();
+var globalSearch=$('#globalSearch').val();
+var searchByCategory=$('#searchByCategory').val();
+var searchByFeaturedState=$('#searchByFeaturedState').val();
+var searchByPublishedState=$('#searchByPublishedState').val();
+var searchByUser=$('#searchByUser').val();
 
-$('select#entries').on('change',function(){
-   
-            $("#tableContainer").load("{{route('articles.list',['pageLength'=>'length'])}}".replace('length',this.value));
+
+var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":"'+ searchByFeaturedState + '","searchByPublishedState":"'+ searchByPublishedState + '","searchByUser":"'+ searchByUser + '"}'; 
+               $.ajax({
+          headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          url: '{{route('articles.list')}}',
+          dataType : 'html',
+          type: 'POST',
+          data: data,
+          contentType: false, 
+          processData: false,
+          success:function(response) {
+              $('#tableContainer').html(response);
+          }
+     });   
+           
        
 });
 
-$('i.fa-sort').on('click',function(){
-            $("#tableContainer").load("{{route('articles.sort',['sortValue'=>'value','perPage'=>'number'])}}".replace('value',this.id).replace('number',{{ $articles->perPage() }}));
-       
+//jQuery extension method:
+jQuery.fn.filterByText = function(textbox) {
+  return this.each(function() {
+    var select = this;
+    var options = [];
+    $(select).find('option').each(function() {
+      options.push({
+        value: $(this).val(),
+        text: $(this).text()
+      });
+    });
+    $(select).data('options', options);
+
+    $(textbox).bind('change keyup', function() {
+      var options = $(select).empty().data('options');
+      var search = $.trim($(this).val());
+      var regex = new RegExp(search, "gi");
+
+      $.each(options, function(i) {
+        var option = options[i];
+        if (option.text.match(regex) !== null) {
+          $(select).append(
+            $('<option>').text(option.text).val(option.value)
+          );
+        }
+      });
+    });
+  });
+};
+
+// You could use it like this:
+
+$(function() {
+  $('select#searchUser').filterByText($('input'));
 });
- }); 
+$('.selectpicker').selectpicker();
+});
 </script>
 @endpush
-
+ <!--$("#tableContainer").load("{{route('articles.list')}}");-->
 @endsection
 
 @section('js')

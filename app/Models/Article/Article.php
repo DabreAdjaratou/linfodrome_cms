@@ -129,5 +129,50 @@ public function laratablesTitle()
     return "<a href=".route("articles.edit",["article"=>$this->id]).">".$this->title."</a>";
 }
 
+ /**
+     * Scope a query to only include articles that match to  a given category.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfCategory($query, $category)
+    {
+        return $query->where('category_id', $category);
+    }   
     
+    /**
+     * Scope a query to only include articles that match to  a given featured state.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfFeaturedState($query, $featuredState)
+    {
+        return $query->where('featured', $featuredState);
+    }   
+    
+    /**
+     * Scope a query to only include articles that match to  a given published state.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfPublishedState($query, $publishedState)
+    {
+        return $query->where('published', $publishedState);
+    }   
+    /**
+     * Scope a query to only include articles that match to  a given author.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfUser($query, $user)
+    {
+        return $query->where('created_by', $user);
+    }   
 }

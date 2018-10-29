@@ -13,7 +13,7 @@
 			</form> 
 
 <ul>
-	<li><a href="{{ route('articles.index',['pageLength'=>0]) }}">{{ ('Articles') }}</a></li>
+	<li><a href="{{ route('articles.index') }}">{{ ('Articles') }}</a></li>
 	<li><a href="{{ route('article-archives.index') }}">{{ ('Archives') }}</a></li>
 	<li><a href="{{ route('article-categories.index') }}">{{ ('Categories d\'articles') }}</a></li>   
 	<li><a href="{{ route('article-sources.index') }}">{{ ('Sources') }} </a></li>

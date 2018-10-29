@@ -6,6 +6,7 @@
             <name>laravel</name>
         </data>
         <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>crsf</word>
             <word>endsection</word>
             <word>foreach</word>
             <word>php</word>

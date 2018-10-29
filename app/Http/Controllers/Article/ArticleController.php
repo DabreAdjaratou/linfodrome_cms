@@ -33,20 +33,33 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($pageLength)
+    public function index()
     {   
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate($pageLength);
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25);
       $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
-      return view('article.articles.administrator.index',compact('articles','tableInfo'));
+      $entries=[25,50,100];
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']);
+      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users'));
 
     }
 
-     public function list($pageLength)
-    {   
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate($pageLength);
+    public function list(Request $request){ 
+//        dd($request->getContent());
+       $data=json_decode($request->getContent());
+       $pageLength=$data->entries;
+       $searchByCategory= $data->searchByCategory;
+       $searchByFeaturedState=$data->searchByFeaturedState;
+               $searchByPublishedState= $data->searchByPublishedState;
+               $searchByUser=$data->searchByUser;
+               dd($searchByUser);
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name' =>function($query) {
+      $query->where('users.name', $searchByUser);},'getCategory'])->ofCategory($searchByCategory)->ofFeaturedState($searchByFeaturedState)->ofPublishedState($searchByPublishedState)->ofUser($searchByUser)->orderBy('id', 'desc')->paginate($pageLength);
       $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
       $entries=[25,50,100];
-      return view('article.articles.administrator.index',compact('articles','tableInfo','entries'));
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']);
+      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users'));
 
     }
 
