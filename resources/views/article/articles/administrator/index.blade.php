@@ -5,12 +5,11 @@
 @section('css')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
-
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
 @section ('pageTitle')
 @parent
-
 <div id='tableContainer'>
 <h3>  {{ ('Liste des articles') }}</h3> @endsection
 <a href="{{ route('articles.create') }}">Nouveau</a> 
@@ -23,7 +22,7 @@
 </select> <label> lignes</label>
 
 
-<div class="uk-float-left">
+<div>
 <input type="text" name="globalsearch" id="globalSearch" class="searchValue">
 <select name="searchByCategory" id="searchByCategory" class="searchValue">
         <option value="">-- Categorie --</option>
@@ -32,13 +31,13 @@
     @endforeach
 </select>
 <select name="searchByFeaturedState" id="searchByFeaturedState" class="searchValue">
-    <option value="">-- Vedette --</option>
+    <option value="null" >-- Vedette --</option>
     <option value="0" @if(isset($searchByFeaturedState) && $searchByFeaturedState==0) selected @endif>Pas à la une</option>
     <option value="1" @if(isset($searchByFeaturedState) && $searchByFeaturedState==1) selected @endif>A la une</option>
 </select>
 
 <select name="searchByPublishedState" id="searchByPublishedState" class="searchValue">
-    <option value="">-- Etat de publication --</option>
+    <option value="null">-- Etat de publication --</option>
     <option value="0" @if(isset($searchByPublishedState) && $searchByPublishedState==0) selected @endif>Non publié</option>
     <option value="1" @if(isset($searchByPublishedState) && $searchByPublishedState==1) selected @endif>Publié</option>
 </select>
@@ -107,24 +106,10 @@
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @push('js')
  <script src="http://malsup.github.com/jquery.form.js"></script> 
- 
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
-$('.searchValue').on('change',function(e){
-e.preventDefault();
-$sortField="";
-searchAndSort($sortField);        
-       
-});
-
-$('.tableSort').on('click',function(e){
-  e.preventDefault();
-var sortField=e.target.id;
-$("#"+ sortField +" i" ).toggleClass('fas fa-caret-up');
-searchAndSort(sortField);        
-
-});
 
 function searchAndSort(sortField){
 var entries=$('#entries').val();
@@ -135,7 +120,7 @@ var searchByPublishedState=$('#searchByPublishedState').val();
 var searchByUser=$('#searchByUser').val();
 
 
-var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":"'+ searchByFeaturedState + '","searchByPublishedState":"'+ searchByPublishedState + '","searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'"}'; 
+var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'"}'; 
                $.ajax({
           headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -150,11 +135,25 @@ var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","sea
               $('#tableContainer').html(response);
           }
      });   
-}
+};
 
+// searchAndSort(sortField='id');
 
+$('.searchValue').on('change',function(e){
+e.preventDefault();
+searchAndSort(sortField='id');        
+       
+});
 
+$('.tableSort').on('click',function(e){
+  e.preventDefault();
+var sortField=e.target.id;
+$("#"+ sortField +" i" ).toggleClass('fas fa-caret-up');
+searchAndSort(sortField);        
 
+});
+
+$("#searchByUser").select2();
 });
 </script>
 @endpush

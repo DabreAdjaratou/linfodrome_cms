@@ -150,7 +150,11 @@ public function laratablesTitle()
      */
     public function scopeOfFeaturedState($query, $featuredState)
     {
+        if($featuredState==1){
         return $query->where('featured', $featuredState);
+        }else{
+        return $query->where('featured','<>',1);
+        }
     }   
     
     /**
@@ -162,13 +166,13 @@ public function laratablesTitle()
      */
     public function scopeOfPublishedState($query, $publishedState)
     {
-        if($publishedState==1){
-
+        
+if($publishedState==1){
         return $query->where('published', $publishedState);
-        }else{
-        return $query->where('published', '<>', 1);
-    }
-    }   
+       }else{
+        return $query->where('published','<>',1);
+        }  
+ }   
     /**
      * Scope a query to only include articles that match to  a given author.
      *

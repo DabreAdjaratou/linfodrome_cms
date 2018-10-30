@@ -49,21 +49,19 @@ class ArticleController extends Controller
        $data=json_decode($request->getContent());
        $pageLength=$data->entries;
        $searchByCategory= $data->searchByCategory;
-       $searchByFeaturedState=$data->searchByFeaturedState;
+       $searchByFeaturedState= $data->searchByFeaturedState;
        $searchByPublishedState= $data->searchByPublishedState;
        $searchByUser=$data->searchByUser;
        $sortField=$data->sortField;
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
-//         
     if($searchByCategory){
         $articles =$articles->ofCategory($searchByCategory);
     }
     
-    if($searchByFeaturedState){
+    if(!is_null($searchByFeaturedState)){
       $articles =$articles->ofFeaturedState($searchByFeaturedState);   
     }
-    if($searchByPublishedState){
-
+    if(!is_null($searchByPublishedState)){
       $articles =$articles->ofPublishedState($searchByPublishedState);   
     }
     if($searchByUser){
