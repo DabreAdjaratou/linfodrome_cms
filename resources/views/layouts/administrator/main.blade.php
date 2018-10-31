@@ -1,4 +1,6 @@
-<div class="uk-container uk-container-large">
+
+
+<div class="">
 	@yield('pageTitle')
 	@if ($errors->any())
     <div class="">  {{-- alerte --}}

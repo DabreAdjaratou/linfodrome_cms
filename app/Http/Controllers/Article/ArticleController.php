@@ -35,7 +35,7 @@ class ArticleController extends Controller
      */
     public function index()
     {   
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25);
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
       $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
@@ -44,18 +44,18 @@ class ArticleController extends Controller
 
     }
 
-    public function list(Request $request){ 
-//        dd($request->getContent());
-       $data=json_decode($request->getContent());
-       $pageLength=$data->entries;
-       $searchByCategory= $data->searchByCategory;
-       $searchByFeaturedState= $data->searchByFeaturedState;
-       $searchByPublishedState= $data->searchByPublishedState;
-       $searchByUser=$data->searchByUser;
-       $sortField=$data->sortField;
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
-    if($searchByCategory){
-        $articles =$articles->ofCategory($searchByCategory);
+    public function searchAndSort(Request $request){ 
+     $data=json_decode($request->getContent());
+     $pageLength=$data->entries;
+     $searchByCategory= $data->searchByCategory;
+     $searchByFeaturedState= $data->searchByFeaturedState;
+     $searchByPublishedState= $data->searchByPublishedState;
+     $searchByUser=$data->searchByUser;
+     $sortField=$data->sortField;
+     $order=$data->order;
+     $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+     if($searchByCategory){
+      $articles =$articles->ofCategory($searchByCategory);
     }
     
     if(!is_null($searchByFeaturedState)){
@@ -68,43 +68,43 @@ class ArticleController extends Controller
       $articles =$articles->ofUser($searchByUser);   
     }
     if($sortField){
-    $articles = $articles->orderBy($sortField, 'desc')->paginate($pageLength);
+      $articles = $articles->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }else{
-      $articles = $articles->orderBy('id', 'desc')->paginate($pageLength);
+      $articles = $articles->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }
-      $numberOfItemSFound=$articles->count();
-      if($numberOfItemSFound==0){
+    $numberOfItemSFound=$articles->count();
+    if($numberOfItemSFound==0){
       $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
-      }else{
-              $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
-  
-      }
-      $entries=[25,50,100];
-      $categories= Category::where('published','<>',2)->get(['id','title']);
-      $users= User::get(['id','name']);
-      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser'));
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
 
     }
+    $entries=[25,50,100];
+    $categories= Category::where('published','<>',2)->get(['id','title']);
+    $users= User::get(['id','name']);
+    return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser'));
 
-    
+  }
+
+
 
     /**
     *fetch data for laratable
     *
     * @return json response
     */
-  public function laratableData(Request $request)
+    public function laratableData(Request $request)
     {
 
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->select(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
 
-       return Datatables::of($articles)->addColumn('action', function ($article) {
-                return '<a href="#edit-'.$article->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> Edit</a>';
-            })
-            ->editColumn('id', 'ID: {{$id}}')
-            ->removeColumn('password')
-            ->make();
-    
+      return Datatables::of($articles)->addColumn('action', function ($article) {
+        return '<a href="#edit-'.$article->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> Edit</a>';
+      })
+      ->editColumn('id', 'ID: {{$id}}')
+      ->removeColumn('password')
+      ->make();
+
     }
 
       /**
@@ -112,14 +112,14 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+      public function create()
 
-    {
-      $sources=Source::where('published',1)->get(['id','title']);
-      $categories=Category::where('published',1)->get(['id','title']);
-      $users=user::all('id','name');
-      return view('article.articles.administrator.create',compact('sources','categories','users'));
-    }
+      {
+        $sources=Source::where('published',1)->get(['id','title']);
+        $categories=Category::where('published',1)->get(['id','title']);
+        $users=user::all('id','name');
+        return view('article.articles.administrator.create',compact('sources','categories','users'));
+      }
 
     /**
      * Store a newly created resource in storage.
@@ -170,46 +170,46 @@ class ArticleController extends Controller
         // Storage::disk('local')->put('Images',$request->image->getClientOriginalName());
      try {
        DB::transaction(function () use ($article,$request) {
-     $article->save();
-     $imageExtension= '.'.$request->image->extension();
-     if($imageExtension=='.jpeg'){
-      $imageExtension='.jpg';
-     }
-     $filenameWithOutExtension=str_slug(basename($request->image->getClientOriginalName() , $imageExtension),'-');
-     $filename=$filenameWithOutExtension.'-'.$article->id.$imageExtension;
-     $article->image=$filename;
-     $request->image->storeAs('public/images/articles/sources', $filename);
-     $article->save();
-     $lastRecord= Article::latest()->first();
-         $archive= new Archive;
-         $archive->id = $lastRecord->id;
-         $archive->ontitle = $lastRecord->ontitle;
-         $archive->title =$lastRecord->title;
-         $archive->alias =$lastRecord->alias;
-         $archive->category_id = $lastRecord->category_id;
-         $archive->published = $lastRecord->published;
-         $archive->featured =$lastRecord->featured;
-         $archive->image = $lastRecord->image;
-         $archive->image_legend =$lastRecord->image_legend;
-         $archive->video = $lastRecord->video;
-         $archive->gallery_photo =$lastRecord->gallery_photo;
-         $archive->introtext = $lastRecord->introtext;
-         $archive->fulltext =$lastRecord->fulltext;
-         $archive->source_id = $lastRecord->source_id;
-         $archive->created_by =$lastRecord->created_by;
-         $archive->created_at =$lastRecord->created_at;
-         $archive->start_publication_at = $lastRecord->start_publication_at;
-         $archive->stop_publication_at =$lastRecord->stop_publication_at;
-         $archive->checkout=0;
-         $archive->save();
+         $article->save();
+         $imageExtension= '.'.$request->image->extension();
+         if($imageExtension=='.jpeg'){
+          $imageExtension='.jpg';
+        }
+        $filenameWithOutExtension=str_slug(basename($request->image->getClientOriginalName() , $imageExtension),'-');
+        $filename=$filenameWithOutExtension.'-'.$article->id.$imageExtension;
+        $article->image=$filename;
+        $request->image->storeAs('public/images/articles/sources', $filename);
+        $article->save();
+        $lastRecord= Article::latest()->first();
+        $archive= new Archive;
+        $archive->id = $lastRecord->id;
+        $archive->ontitle = $lastRecord->ontitle;
+        $archive->title =$lastRecord->title;
+        $archive->alias =$lastRecord->alias;
+        $archive->category_id = $lastRecord->category_id;
+        $archive->published = $lastRecord->published;
+        $archive->featured =$lastRecord->featured;
+        $archive->image = $lastRecord->image;
+        $archive->image_legend =$lastRecord->image_legend;
+        $archive->video = $lastRecord->video;
+        $archive->gallery_photo =$lastRecord->gallery_photo;
+        $archive->introtext = $lastRecord->introtext;
+        $archive->fulltext =$lastRecord->fulltext;
+        $archive->source_id = $lastRecord->source_id;
+        $archive->created_by =$lastRecord->created_by;
+        $archive->created_at =$lastRecord->created_at;
+        $archive->start_publication_at = $lastRecord->start_publication_at;
+        $archive->stop_publication_at =$lastRecord->stop_publication_at;
+        $archive->checkout=0;
+        $archive->save();
 
-       $oldest = Article::oldest()->first();
-       $oldest->delete();
-      
-$this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$imageExtension);
-       });
+        $oldest = Article::oldest()->first();
+        $oldest->delete();
 
-    } catch (Exception $exc) {
+        $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$imageExtension);
+      });
+
+     } catch (Exception $exc) {
       session()->flash('message.type', 'danger');
       session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
@@ -219,7 +219,7 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
     session()->flash('message.content', 'Article ajouté avec succès!');
     
     if ($request->save_close) {
-         return redirect()->route('articles.index');
+     return redirect()->route('articles.index');
 
    }else{
     return redirect()->route('articles.create');
@@ -236,22 +236,22 @@ $this->createArticleImages($article->id,$filename,$filenameWithOutExtension,$ima
      */
     public function show($id)
     {
-       $article= Article::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
-       if (blank($article)) {
-        $article= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
-       }
-
-       if(blank($article)){
-dd('article not find');
-       }
-
-      foreach ($article as $article) {
-       $article->views=$article->views + 1 ;
-       $article->save();
-      }
-       return view('article.articles.public.show',compact('article'));
-
+     $article= Article::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+     if (blank($article)) {
+      $article= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
     }
+
+    if(blank($article)){
+      dd('article not find');
+    }
+
+    foreach ($article as $article) {
+     $article->views=$article->views + 1 ;
+     $article->save();
+   }
+   return view('article.articles.public.show',compact('article'));
+
+ }
 
     /**
      * Show the form for editing the specified resource.
@@ -271,19 +271,19 @@ dd('article not find');
           $article->save();
           $archive->save();
           $sources=Source::where('published',1)->get(['id','title']);
-    $categories=Category::where('published',1)->get(['id','title']);
-    $users=user::all('id','name');
+          $categories=Category::where('published',1)->get(['id','title']);
+          $users=user::all('id','name');
           return view('article.articles.administrator.edit',compact('article','sources','categories','users'));
         }elseif ($article->checkout!=0 && $article->checkout!=Auth::id()) {
          session()->flash('message.type', 'warning');
          session()->flash('message.content', 'Article dejà en cour de modification!');
          return redirect()->route('articles.index');
        }
-    } else{
+     } else{
       return redirect()->route('article-archives.edit',compact('id'));
-  }
+    }
 
-   }
+  }
 
     /**
      * Update the specified resource in storage.
@@ -353,7 +353,7 @@ dd('article not find');
          $archive->introtext = $article->introtext;
          $archive->fulltext =$article->fulltext;
          $archive->source_id = $article->source_id;
-           $archive->keywords = $article->keywords;
+         $archive->keywords = $article->keywords;
          $archive->created_by =$article->created_by;
          $archive->created_at =$article->created_at;
          $archive->start_publication_at = $article->start_publication_at;
@@ -394,9 +394,9 @@ dd('article not find');
     public function destroy($id)
     {
       $revisions= Revision::where('article_id',$id)->get(['id']);
-   foreach ($revisions as $r) {
-    $r->delete();
-   }
+      foreach ($revisions as $r) {
+        $r->delete();
+      }
       $article=Article::onlyTrashed()->find($id)->forceDelete();
       $archive=Archive::onlyTrashed()->find($id)->forceDelete();
       session()->flash('message.type', 'success');
@@ -445,29 +445,29 @@ dd('article not find');
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-  public function putInTrash($id)
-  {
-   try {
-    DB::transaction(function () use ($id) {
-      $article=Article::find($id)->delete();
-      $archive=Archive::find($id)->delete();
-      $revision= new  Revision;
-      $revision->type=explode('@', Route::CurrentRouteAction())[1];
-      $revision->user_id=Auth::id();
-      $revision->article_id=$id;
-      $revision->revised_at=now();
-      $revision->save();
-    });
-    session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Article mis en corbeille!');
+public function putInTrash($id)
+{
+ try {
+  DB::transaction(function () use ($id) {
+    $article=Article::find($id)->delete();
+    $archive=Archive::find($id)->delete();
+    $revision= new  Revision;
+    $revision->type=explode('@', Route::CurrentRouteAction())[1];
+    $revision->user_id=Auth::id();
+    $revision->article_id=$id;
+    $revision->revised_at=now();
+    $revision->save();
+  });
+  session()->flash('message.type', 'success');
+  session()->flash('message.content', 'Article mis en corbeille!');
 
-  } catch (Exception $exc) {
-    session()->flash('message.type', 'danger');
-    session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+} catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
 //           echo $exc->getTraceAsString();
-  }
+}
 
-  return redirect()->route('articles.index');
+return redirect()->route('articles.index');
 }
 
 /**
@@ -526,23 +526,23 @@ public function inDraft()
 
 
 public function createArticleImages($article_id,$filename ,$filenameWithOutExtension,$imageExtension)
-    {
-define('WEBSERVICE', 'http://api.resmush.it/ws.php?img=');
+{
+  define('WEBSERVICE', 'http://api.resmush.it/ws.php?img=');
 // $s=asset('storage/images/articles/sources'.$filename);
-$s='http://www.linfodrome.com/media/k2/items/cache/0df43a25328451d5e0cb75a88ba00fd6_L.jpg';
-$o = json_decode(file_get_contents(WEBSERVICE . $s));
-if(!isset($o->error)){
-$image=file_get_contents($o->dest);
-Storage::put('public/images/articles/sources/'.$filename, $image);
-}
-      $imgS = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(65,65);
-     $imgM = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(80,80);
-     $imgL = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(85,85);
-     $imgXL = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(400,210);
-     $imgS->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-65X65'.$imageExtension));
-     $imgM->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-80X80'.$imageExtension));
-     $imgL->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-85X85'.$imageExtension));
-     $imgXL->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-400X210'.$imageExtension));
+  $s='http://www.linfodrome.com/media/k2/items/cache/0df43a25328451d5e0cb75a88ba00fd6_L.jpg';
+  $o = json_decode(file_get_contents(WEBSERVICE . $s));
+  if(!isset($o->error)){
+    $image=file_get_contents($o->dest);
+    Storage::put('public/images/articles/sources/'.$filename, $image);
+  }
+  $imgS = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(65,65);
+  $imgM = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(80,80);
+  $imgL = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(85,85);
+  $imgXL = Image::make(storage_path('app/public/images/articles/sources/'.$filename))->resize(400,210);
+  $imgS->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-65X65'.$imageExtension));
+  $imgM->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-80X80'.$imageExtension));
+  $imgL->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-85X85'.$imageExtension));
+  $imgXL->save(storage_path('app/public/images/articles/thumbs/'.$filenameWithOutExtension.'-'.$article_id.'-400X210'.$imageExtension));
 
-         }
+}
 }

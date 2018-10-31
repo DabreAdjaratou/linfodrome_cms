@@ -9,6 +9,7 @@
 @endsection
 @section('content')
 @section ('pageTitle')
+<input type="hidden" name="order" id="order" value="desc">
 @parent
 <div id='tableContainer'>
 <h3>  {{ ('Liste des articles') }}</h3> @endsection
@@ -51,18 +52,18 @@
 
 </div>
 <div>
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
+<table id="dataTable" class="uk-table-hover uk-table-striped" >	
 	<thead>
             <tr>
-			<th id='title' class="tableSort">{{ ('Titre') }} <i class="fas fa-caret-up"></i></th>
-			<th id="featured" class="tableSort">{{ ('A la une') }}<i class="fas fa-caret-up"></i></i></th>
-			<th id="published" class="tableSort">{{ ('Publiée') }}<i class="fas fa-caret-up"></i></i></th>
+			<th id='title' class="tableSort">{{ ('Titre') }} <i class="fas fa-sort"></i></th>
+			<th id="featured" class="tableSort">{{ ('A la une') }}<i class="fas fa-sort"></i></i></th>
+			<th id="published" class="tableSort">{{ ('Publiée') }}<i class="fas fa-sort"></i></i></th>
 			<th>{{ ('Category') }}</th>
 			<th>{{ ('Auteur') }}</th>
-			<th id="created_at" class="tableSort">{{ ('créé le') }}<i class="fas fa-caret-up"></i></i></th>
+			<th id="created_at" class="tableSort">{{ ('créé le') }}<i class="fas fa-sort"></i></i></th>
 			<th >{{ ('Dernière modification') }}</i></th>
 			<th>{{ ('Modifié le') }}</i></th>
-			<th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-caret-up"></i></i></th>
+			<th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-sort"></i></i></th>
 			<th>{{ ('Image') }}</th>
 			<th>{{ ('Modifier') }}</th>
       <th>{{ ('brouillon') }}</th>
@@ -78,7 +79,7 @@
             <td> {{ $article->featured }}</td>
             <td> {{ $article->published }}</td>
             <td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
-            <td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
+            <td class="uk-table-expand">{{ $article->getAuthor->name }} </td>
            <td class="uk-table-expand"> {{ $article->created_at }}</td>
             <td class="uk-table-expand">{{$article->getRevision->last()['getModifier']['name']}} </td>
             <td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
@@ -105,7 +106,7 @@
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @push('js')
- <script src="http://malsup.github.com/jquery.form.js"></script> 
+ {{-- <script src="http://malsup.github.com/jquery.form.js"></script>  --}}
  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
 <script type="text/javascript">
@@ -118,14 +119,15 @@ var searchByCategory=$('#searchByCategory').val();
 var searchByFeaturedState=$('#searchByFeaturedState').val();
 var searchByPublishedState=$('#searchByPublishedState').val();
 var searchByUser=$('#searchByUser').val();
+var order=$('#order').val();
 
 
-var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'"}'; 
+var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'"}'; 
                $.ajax({
           headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           },
-          url: '{{route('articles.list')}}',
+          url: '{{route('articles.search-and-sort')}}',
           dataType : 'html',
           type: 'POST',
           data: data,
@@ -135,9 +137,9 @@ var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","sea
               $('#tableContainer').html(response);
           }
      });   
+
 };
 
-// searchAndSort(sortField='id');
 
 $('.searchValue').on('change',function(e){
 e.preventDefault();
@@ -148,16 +150,21 @@ searchAndSort(sortField='id');
 $('.tableSort').on('click',function(e){
   e.preventDefault();
 var sortField=e.target.id;
-$("#"+ sortField +" i" ).toggleClass('fas fa-caret-up');
+var order=$('#order').val();
 searchAndSort(sortField);        
-
+if(order=='asc'){
+                $('#order').val('desc')
+               }
+               if (order=='desc') {
+                 $('#order').val('asc')
+               }
 });
-
 $("#searchByUser").select2();
-});
+
+  });
 </script>
 @endpush
- <!--$("#tableContainer").load("{{route('articles.list')}}");-->
+ 
 @endsection
 
 @section('js')
