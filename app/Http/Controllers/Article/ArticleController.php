@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use Freshbitsweb\Laratables\Laratables;
-use Yajra\Datatables\Datatables;
 use Image;
 
 class ArticleController extends Controller
@@ -33,28 +31,56 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {   
+        if(url()->full() ==  action('Article\ArticleController@index')){
       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
       $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']);
       return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users'));
+        } else {
+            $pageLength=$request->pageLength;
+            $searchByTitle=$request->searchByTitle;
+            $searchByCategory=$request->searchByCategory;
+            $searchByFeaturedState=$request->searchByFeaturedState;
+            $searchByPublishedState=$request->searchByPublishedState;
+            $searchByUser=$request->searchByUser;
+            $sortField=$request->sortField;
+            $order=$request->order;
+            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('article.articles.administrator.index',$filterResult);
 
+        }
+      
     }
 
     public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());
      $pageLength=$data->entries;
+     $searchByTitle= $data->searchByTitle;
      $searchByCategory= $data->searchByCategory;
      $searchByFeaturedState= $data->searchByFeaturedState;
      $searchByPublishedState= $data->searchByPublishedState;
      $searchByUser=$data->searchByUser;
      $sortField=$data->sortField;
      $order=$data->order;
-     $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
-     if($searchByCategory){
+     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('article.articles.administrator.index',$filterResult);
+
+     
+  }
+
+  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+          $searchByUser,$sortField,$order) {
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+    if($searchByTitle){
+      $articles =$articles->ofTitle($searchByTitle);
+    }
+      if($searchByCategory){
       $articles =$articles->ofCategory($searchByCategory);
     }
     
@@ -72,6 +98,16 @@ class ArticleController extends Controller
     }else{
       $articles = $articles->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }
+    $articles->withPath('articles');
+    $articles->appends([
+        'pageLength' => $pageLength,
+        'searchByTitle' => $searchByTitle,
+        'searchByCategory' => $searchByCategory,
+        'searchByFeaturedState' => $searchByFeaturedState,
+        'searchByPublishedState' => $searchByPublishedState,
+        'searchByUser' => $searchByUser,
+        'sortField' => $sortField,
+        'order' => $order])->links();
     $numberOfItemSFound=$articles->count();
     if($numberOfItemSFound==0){
       $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
@@ -82,32 +118,12 @@ class ArticleController extends Controller
     $entries=[25,50,100];
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
-    return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser'));
+    
+    return compact('articles','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser');
 
   }
 
-
-
-    /**
-    *fetch data for laratable
-    *
-    * @return json response
-    */
-    public function laratableData(Request $request)
-    {
-
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->select(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-
-      return Datatables::of($articles)->addColumn('action', function ($article) {
-        return '<a href="#edit-'.$article->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> Edit</a>';
-      })
-      ->editColumn('id', 'ID: {{$id}}')
-      ->removeColumn('password')
-      ->make();
-
-    }
-
-      /**
+         /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

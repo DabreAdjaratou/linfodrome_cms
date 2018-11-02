@@ -24,7 +24,7 @@
 
 
 <div>
-<input type="text" name="globalsearch" id="globalSearch" class="searchValue">
+    <input type="text" name="searchByTitle" id="searchByTitle" class="searchValue" @if(isset($searchByTitle)) value="{{$searchByTitle}}" @endif><button  id="searchByTitleButton" name="searchByTitleButton">chercher</button>
 <select name="searchByCategory" id="searchByCategory" class="searchValue">
         <option value="">-- Categorie --</option>
     @foreach($categories as $category)
@@ -114,7 +114,7 @@ $(document).ready(function() {
 
 function searchAndSort(sortField){
 var entries=$('#entries').val();
-var globalSearch=$('#globalSearch').val();
+var searchByTitle=$('#searchByTitle').val();
 var searchByCategory=$('#searchByCategory').val();
 var searchByFeaturedState=$('#searchByFeaturedState').val();
 var searchByPublishedState=$('#searchByPublishedState').val();
@@ -122,7 +122,7 @@ var searchByUser=$('#searchByUser').val();
 var order=$('#order').val();
 
 
-var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'"}'; 
+var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'"}'; 
                $.ajax({
           headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -140,8 +140,13 @@ var data= '{"entries":"'+ entries + '","globalSearch":"'+ globalSearch + '","sea
 
 };
 
-
 $('.searchValue').on('change',function(e){
+e.preventDefault();
+searchAndSort(sortField='id');        
+       
+});
+
+$('#searchByTitleButton').on('click',function(e){
 e.preventDefault();
 searchAndSort(sortField='id');        
        
