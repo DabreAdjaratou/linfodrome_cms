@@ -13,7 +13,6 @@ use App\Models\Billet\Revision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Freshbitsweb\Laratables\Laratables;
 
 
 class BilletController extends Controller
@@ -30,23 +29,100 @@ class BilletController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-     // $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-     return view('billet.billets.administrator.index');
-     
-   }
+  
+   public function index(Request $request)
+    {   
+        if(url()->full() ==  action('Billet\BilletController@index')){
+      $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $tableInfo="Affichage de 1 à ".$billets->perPage()." lignes sur ".$billets->total();
+      $entries=[25,50,100];
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']);
+      return view('billet.billets.administrator.index',compact('billets','tableInfo','entries','categories','users'));
+        } else {
+            $pageLength=$request->pageLength;
+            $searchByTitle=$request->searchByTitle;
+            $searchByCategory=$request->searchByCategory;
+            $searchByFeaturedState=$request->searchByFeaturedState;
+            $searchByPublishedState=$request->searchByPublishedState;
+            $searchByUser=$request->searchByUser;
+            $sortField=$request->sortField;
+            $order=$request->order;
+            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('billet.billets.administrator.index',$filterResult);
 
-  /*fetch data for laratable
-    *
-    * @return json response
-    */
-     public function laratableData()
-    {
-       return Laratables::recordsOf(Billet::class);
+        }
+      
     }
 
-    /**
+public function searchAndSort(Request $request){ 
+     $data=json_decode($request->getContent());
+     $pageLength=$data->entries;
+     $searchByTitle= $data->searchByTitle;
+     $searchByCategory= $data->searchByCategory;
+     $searchByFeaturedState= $data->searchByFeaturedState;
+     $searchByPublishedState= $data->searchByPublishedState;
+     $searchByUser=$data->searchByUser;
+     $sortField=$data->sortField;
+     $order=$data->order;
+     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('billet.billets.administrator.index',$filterResult);
+
+     
+  }
+
+  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+          $searchByUser,$sortField,$order) {
+      $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+    if($searchByTitle){
+      $billets =$billets->ofTitle($searchByTitle);
+    }
+      if($searchByCategory){
+      $billets =$billets->ofCategory($searchByCategory);
+    }
+    
+    if(!is_null($searchByFeaturedState)){
+      $billets =$billets->ofFeaturedState($searchByFeaturedState);   
+    }
+    if(!is_null($searchByPublishedState)){
+      $billets =$billets->ofPublishedState($searchByPublishedState);   
+    }
+    if($searchByUser){
+      $billets =$billets->ofUser($searchByUser);   
+    }
+    if($sortField){
+      $billets = $billets->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+    }else{
+      $billets = $billets->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+    }
+    $billets->withPath('billets');
+    $billets->appends([
+        'pageLength' => $pageLength,
+        'searchByTitle' => $searchByTitle,
+        'searchByCategory' => $searchByCategory,
+        'searchByFeaturedState' => $searchByFeaturedState,
+        'searchByPublishedState' => $searchByPublishedState,
+        'searchByUser' => $searchByUser,
+        'sortField' => $sortField,
+        'order' => $order])->links();
+    $numberOfItemSFound=$billets->count();
+    if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$billets->total();
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$billets->total();
+
+    }
+    $entries=[25,50,100];
+    $categories= Category::where('published','<>',2)->get(['id','title']);
+    $users= User::get(['id','name']);
+    
+    return compact('billets','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser');
+
+  }
+
+  /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

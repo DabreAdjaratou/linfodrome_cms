@@ -12,8 +12,6 @@ use App\Models\Video\Revision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Freshbitsweb\Laratables\Laratables;
-
 
 class ArchiveController extends Controller
 {
@@ -29,21 +27,98 @@ class ArchiveController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-       // $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+     public function index(Request $request)
+    {   
+        if(url()->full() ==  action('Video\ArchiveController@index')){
+      $videos = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+      $tableInfo="Affichage de 1 à ".$videos->perPage()." lignes sur ".$videos->total();
+      $entries=[25,50,100];
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']);
+      return view('video.archives.administrator.index',compact('videos','tableInfo','entries','categories','users'));
+        } else {
+            $pageLength=$request->pageLength;
+            $searchByTitle=$request->searchByTitle;
+            $searchByCategory=$request->searchByCategory;
+            $searchByFeaturedState=$request->searchByFeaturedState;
+            $searchByPublishedState=$request->searchByPublishedState;
+            $searchByUser=$request->searchByUser;
+            $sortField=$request->sortField;
+            $order=$request->order;
+            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('video.archives.administrator.index',$filterResult);
+
+        }
       
-     return view ('video.archives.administrator.index');
-   }
-/**
-    *fetch data for laratable
-    *
-    * @return json response
-    */
-public function laratableData()
-{
- return Laratables::recordsOf(Archive::class);
-}
+    }
+
+public function searchAndSort(Request $request){ 
+     $data=json_decode($request->getContent());
+     $pageLength=$data->entries;
+     $searchByTitle= $data->searchByTitle;
+     $searchByCategory= $data->searchByCategory;
+     $searchByFeaturedState= $data->searchByFeaturedState;
+     $searchByPublishedState= $data->searchByPublishedState;
+     $searchByUser=$data->searchByUser;
+     $sortField=$data->sortField;
+     $order=$data->order;
+     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('video.archives.administrator.index',$filterResult);
+
+     
+  }
+
+  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+          $searchByUser,$sortField,$order) {
+      $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name']);
+    if($searchByTitle){
+      $videos =$videos->ofTitle($searchByTitle);
+    }
+      if($searchByCategory){
+      $videos =$videos->ofCategory($searchByCategory);
+    }
+    
+    if(!is_null($searchByFeaturedState)){
+      $videos =$videos->ofFeaturedState($searchByFeaturedState);   
+    }
+    if(!is_null($searchByPublishedState)){
+      $videos =$videos->ofPublishedState($searchByPublishedState);   
+    }
+    if($searchByUser){
+      $videos =$videos->ofUser($searchByUser);   
+    }
+    if($sortField){
+      $videos = $videos->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+    }else{
+      $videos = $videos->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+    }
+    $videos->withPath('videos');
+    $videos->appends([
+        'pageLength' => $pageLength,
+        'searchByTitle' => $searchByTitle,
+        'searchByCategory' => $searchByCategory,
+        'searchByFeaturedState' => $searchByFeaturedState,
+        'searchByPublishedState' => $searchByPublishedState,
+        'searchByUser' => $searchByUser,
+        'sortField' => $sortField,
+        'order' => $order])->links();
+    $numberOfItemSFound=$videos->count();
+    if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$videos->total();
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$videos->total();
+
+    }
+    $entries=[25,50,100];
+    $categories= Category::where('published','<>',2)->get(['id','title']);
+    $users= User::get(['id','name']);
+    
+    return compact('videos','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser');
+
+  }
+
     /**
      * Show the form for creating a new resource.
      *

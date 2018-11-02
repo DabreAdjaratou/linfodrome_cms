@@ -1,59 +1,68 @@
 @extends('layouts.administrator.master')
 @section('title', 'Videos list')
 @section('css')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
 @section ('pageTitle')
+<input type="hidden" name="order" id="order" value="desc">
 @parent
+<div id='tableContainer'>
 <h3>  {{ ('Liste des videos') }}</h3> @endsection 
 <a href="{{ route('videos.create') }}">Nouveau</a> 
-<table cellpadding="3" cellspacing="0" border="0" style="width: 67%; margin: 0 auto 2em auto;">
-        <thead>
-            <tr>
-                <th>Target</th>
-                <th>Search text</th>
-                <th>Treat as regex</th>
-                <th>Use smart search</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr id="filter_global">
-                <td>Global search</td>
-                <td align="center"><input type="text" namem="global_filter" class="global_filter" id="global_filter"></td>
-                <td align="center"><input type="checkbox" class="global_filter" id="global_regex"></td>
-                <td align="center"><input type="checkbox" class="global_filter" id="global_smart" checked="checked"></td>
-            </tr>
-            <tr id="filter_col1" data-column="0">
-                <td>Column - Title</td>
-                <td align="center"><input type="text" class="column_filter" id="col0_filter"></td>
-                <td align="center"><input type="checkbox" class="column_filter" id="col0_regex"></td>
-                <td align="center"><input type="checkbox" class="column_filter" id="col0_smart" checked="checked"></td>
-            </tr>
-            <tr id="filter_col2" data-column="1">
-                <td>Column - Categorie</td>
-                <td align="center"><input type="text" class="column_filter" id="col1_filter"></td>
-                <td align="center"><input type="checkbox" class="column_filter" id="col1_regex"></td>
-                <td align="center"><input type="checkbox" class="column_filter" id="col1_smart" checked="checked"></td>
-            </tr>
-            
-        </tbody>
-    </table>
+ <label> Affiché </label>
+  <select id=entries name="entries" class="searchValue"> 
+  @for($i=0; $i<sizeof($entries);$i++)
+<option value="{{ $entries[$i] }}" @if($entries[$i] == $videos->perPage())  selected @endif>{{ $entries[$i] }}</option>
+  @endfor
+</select> <label> lignes</label>
 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
+
+<div>
+    <input type="text" name="searchByTitle" id="searchByTitle" class="searchValue" @if(isset($searchByTitle)) value="{{$searchByTitle}}" @endif><button  id="searchByTitleButton" name="searchByTitleButton">chercher</button>
+<select name="searchByCategory" id="searchByCategory" class="searchValue">
+        <option value="">-- Categorie --</option>
+    @foreach($categories as $category)
+    <option value="{{$category->id}}" @if(isset($searchByCategory) && $category->id==$searchByCategory) selected @endif>{{$category->title}}</option>
+    @endforeach
+</select>
+<select name="searchByFeaturedState" id="searchByFeaturedState" class="searchValue">
+    <option value="null" >-- Vedette --</option>
+    <option value="0" @if(isset($searchByFeaturedState) && $searchByFeaturedState==0) selected @endif>Pas à la une</option>
+    <option value="1" @if(isset($searchByFeaturedState) && $searchByFeaturedState==1) selected @endif>A la une</option>
+</select>
+
+<select name="searchByPublishedState" id="searchByPublishedState" class="searchValue">
+    <option value="null">-- Etat de publication --</option>
+    <option value="0" @if(isset($searchByPublishedState) && $searchByPublishedState==0) selected @endif>Non publié</option>
+    <option value="1" @if(isset($searchByPublishedState) && $searchByPublishedState==1) selected @endif>Publié</option>
+</select>
+
+<select name="searchByUser" id="searchByUser" class="searchValue">
+    <option value="">-- User --</option>
+@foreach($users as $user)
+<option value="{{$user->id}}" @if(isset($searchByUser) && $user->id==$searchByUser) selected @endif>{{$user->name}}</option>
+    @endforeach
+    </select>
+
+</div>
+<div>
+<table id="dataTable" class="uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
 	<thead>
             <tr>
-            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
-			<th>{{ ('Titre') }}</th>
-			<th>{{ ('Categorie') }}</th>
-			<th>{{ ('A la Une') }}</th>
-			<th>{{ ('Publiée') }}</th>
+			<th id="title" class="tableSort">{{ ('Titre') }}<i class="fas fa-sort"></th>
+			<th id="category_id" class="tableSort">{{ ('Categorie') }}<i class="fas fa-sort"></th>
+			<th id="featured" class="tableSort">{{ ('A la Une') }}<i class="fas fa-sort"></th>
+			<th id="published" class="tableSort">{{ ('Publiée') }}<i class="fas fa-sort"></th>
 			<th>{{ ('Journaliste') }}</th>
 			<th>{{ ('Cameraman') }}</th>
 			<th>{{ ('Monteur') }}</th>
-			<th>{{ ('crée lé') }}</th>
+			<th id="created_at" class="tableSort">{{ ('crée lé') }}<i class="fas fa-sort"></th>
 			<th>{{ ('Debut publication') }}</th>
 			<th>{{ ('fin publication') }}</th>
-			<th>{{ ('Nbre de vue') }}</th>
+			<th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-sort"></th>
                         <th>{{ ('Modifier') }}</th>
                         <th>{{ ('Brouillon') }}</th>
                         <th>{{ ('Corbeille') }}</th>
@@ -61,10 +70,9 @@
                        
 		</tr>
 	</thead>
-{{-- 	<tbody>		
+	<tbody>		
 		@foreach($videos as $video)		
 		<tr>
-			<td><input type="checkbox" name="" class="uk-checkbox"></td>
             <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
 			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
 			<td> {{ $video->featured }}</td>
@@ -90,73 +98,75 @@
 		@endforeach
 	</tbody>
 	<tfoot>
-	</tfoot> --}}
+	</tfoot>
 </table>
+  </div>
+</div>
+{{ $tableInfo}}
+{{ $videos->links() }}
 @section('sidebar')
  @component('layouts.administrator.video-sidebar') @endcomponent 
 @endsection
 @push('js')
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    
-    // $('#dataTable_filter label input').addClass('uk-input');
-    // $('#dataTable_length label select').addClass('uk-select uk-align-left');
 
-var table=$('#dataTable').DataTable({
-	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
-				serverSide: true,
-                processing: true,
-                responsive: true,
-                searching: false,
-                ajax: "{{ route('videos.laratable') }}", 
-                columns: [
-                    { name: 'title' },
-                    { name: 'getcategory.title' },
-                    { name: 'featured' },
-                    { name: 'published' },
-                    { name: 'getauthor.name' },
-                    { name: 'getcameraman.name' },
-                    { name: 'geteditor.name' },
-                    { name: 'created_at' },
-                    { name: 'start_publication_at' },
-                    { name: 'stop_publication_at' },
-                    { name: 'views' },
-                    { name: 'edit', orderable: false, searchable: false },
-                    { name: 'draft', orderable: false, searchable: false },
-                    { name: 'trash', orderable: false, searchable: false },
-                    { name: 'id' },
-                ],
+function searchAndSort(sortField){
+var entries=$('#entries').val();
+var searchByTitle=$('#searchByTitle').val();
+var searchByCategory=$('#searchByCategory').val();
+var searchByFeaturedState=$('#searchByFeaturedState').val();
+var searchByPublishedState=$('#searchByPublishedState').val();
+var searchByUser=$('#searchByUser').val();
+var order=$('#order').val();
 
-        } );
 
-function filterGlobal () {
-    $('#dataTable').DataTable().search(
-        $('#global_filter').val(),
-        $('#global_regex').prop('checked'),
-        $('#global_smart').prop('checked')
-    ).draw();
-}
- 
-function filterColumn ( i ) {
-    $('#dataTable').DataTable().column( i ).search(
-        $('#col'+i+'_filter').val(),
-        $('#col'+i+'_regex').prop('checked'),
-        $('#col'+i+'_smart').prop('checked')
-    ).draw();
-}
- 
-$(document).ready(function() {
-    $('#dataTable').DataTable();
- 
-    $('input.global_filter').on( 'keyup click', function () {
-        filterGlobal();
-    } );
- 
-    $('input.column_filter').on( 'keyup click', function () {
-        filterColumn( $(this).parents('tr').attr('data-column') );
-    } );
-} );
-  }); 
+var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'"}'; 
+               $.ajax({
+          headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          url: '{{route('videos.search-and-sort')}}',
+          dataType : 'html',
+          type: 'POST',
+          data: data,
+          contentType: false, 
+          processData: false,
+          success:function(response) {
+              $('#tableContainer').html(response);
+          }
+     });   
+
+};
+
+$('.searchValue').on('change',function(e){
+e.preventDefault();
+searchAndSort(sortField='id');        
+       
+});
+
+$('#searchByTitleButton').on('click',function(e){
+e.preventDefault();
+searchAndSort(sortField='id');        
+       
+});
+
+$('.tableSort').on('click',function(e){
+  e.preventDefault();
+var sortField=e.target.id;
+var order=$('#order').val();
+searchAndSort(sortField);        
+if(order=='asc'){
+                $('#order').val('desc')
+               }
+               if (order=='desc') {
+                 $('#order').val('asc')
+               }
+});
+$("#searchByUser").select2();
+
+  });
 </script>
 @endpush
 @section('js')

@@ -50,85 +50,69 @@ class Billet extends Model
     }
     
 /**
- * Fetch billets with condition in the datatables.
- *
- * @param \Illuminate\Database\Eloquent\Builder
- * @param \Illuminate\Database\Eloquent\Builder
- */
-public static function laratablesQueryConditions($query)
-{
-    return $query->where('published', '<>',2)->orderBy('id','desc');
-}
-/**
- * Eager load user items of the archive for displaying in the datatables.
- *
- * @return callable
- */
-public static function laratablesGetRevisionRelationQuery()
-{
-    return function ($query) {
-        $query->with('getModifier');
-    };
-}
+     * Scope a query to only include articles that match to  a given title.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfTitle($query, $title)
+    {
+        return $query->where('title','like', '%'.$title.'%');
+    }  
+ /**
+     * Scope a query to only include articles that match to  a given category.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfCategory($query, $category)
+    {
+        return $query->where('category_id', $category);
+    }   
+    
     /**
-     * Returns the edit action column  html for datatables.
+     * Scope a query to only include articles that match to  a given featured state.
      *
-     * @param \App\Models\Billet\Billet
-     * @return string
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-public static function laratablesCustomEdit($billet)
+    public function scopeOfFeaturedState($query, $featuredState)
     {
-        return view('billet.billets.administrator.laratableCustumColumns.edit',compact('billet'))->render();
-    }
-   /* *
-     * Returns the put in trash action column html for datatables.
+        if($featuredState==1){
+        return $query->where('featured', $featuredState);
+        }else{
+        return $query->where('featured','<>',1);
+        }
+    }   
+    
+    /**
+     * Scope a query to only include articles that match to  a given published state.
      *
-     * @param \App\Models\Billet\Billet
-     * @return string
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-public static function laratablesCustomTrash($billet)
+    public function scopeOfPublishedState($query, $publishedState)
     {
-        return view('billet.billets.administrator.laratableCustumColumns.trash',compact('billet'))->render();
-    }
-
-    /* *
-     * Returns the  put in draft action column html for datatables.
+        
+if($publishedState==1){
+        return $query->where('published', $publishedState);
+       }else{
+        return $query->where('published','<>',1);
+        }  
+ }   
+    /**
+     * Scope a query to only include articles that match to  a given author.
      *
-     * @param \App\Models\Billet\Billet
-     * @return string
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-public static function laratablesCustomDraft($billet)
+    public function scopeOfUser($query, $user)
     {
-        return view('billet.billets.administrator.laratableCustumColumns.draft',compact('billet'))->render();
-    }
- /* *
-     * Returns the last updated by column html for datatables.
-     *
-     * @param \App\Models\Billet\Billet
-     * @return string
-     */
-public static function laratablesCustomLastUpdatedBy($billet)
-    {
-        return view('billet.billets.administrator.laratableCustumColumns.lastUpdatedBy',compact('billet'))->render();
-    }
-    /* *
-     * Returns the ast updated at column html for datatables.
-     *
-     * @param \App\Models\Billet\Billet
-     * @return string
-     */
-public static function laratablesCustomLastUpdatedAt($billet)
-    {
-        return view('billet.billets.administrator.laratableCustumColumns.lastUpdatedAt',compact('billet'))->render();
-    }
-
-/* *
-     * Returns clikable title  for datatables.
-     *
-     * * @return string
-     */
-public function laratablesTitle()
-{
-    return "<a href=".route("billets.edit",["billet"=>$this->id]).">".$this->title."</a>";
-}
+        return $query->where('created_by', $user);
+    }   
 }

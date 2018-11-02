@@ -14,8 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Freshbitsweb\Laratables\Laratables;
-use Yajra\Datatables\Datatables;
 
 class ArchiveController extends Controller
 {
@@ -32,32 +30,99 @@ class ArchiveController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    // public function index()
-    // {
-    //   // $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-    //   $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(100);
-        
-    //   return view('article.archives.administrator.index',compact('articles','allArticles'));
-    // }
-
-    public function index()
+       public function index(Request $request)
     {
-$articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25);
-           return view('article.archives.administrator.index',compact('articles'));
-    }
+     
+      if(url()->full() ==  action('Article\ArchiveController@index')){
+      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
+      $entries=[25,50,100];
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']);
+      return view('article.archives.administrator.index',compact('articles','tableInfo','entries','categories','users'));
+        } else {
+            $searchByTitle=$request->searchByTitle;
+            $searchByCategory=$request->searchByCategory;
+            $searchByFeaturedState=$request->searchByFeaturedState;
+            $searchByPublishedState=$request->searchByPublishedState;
+            $searchByUser=$request->searchByUser;
+            $sortField=$request->sortField;
+            $order=$request->order;
+            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('article.archives.administrator.index',$filterResult);
 
+        }   
+      }
+
+      public function searchAndSort(Request $request){ 
+     $data=json_decode($request->getContent());
+     $pageLength=$data->entries;
+     $searchByTitle= $data->searchByTitle;
+     $searchByCategory= $data->searchByCategory;
+     $searchByFeaturedState= $data->searchByFeaturedState;
+     $searchByPublishedState= $data->searchByPublishedState;
+     $searchByUser=$data->searchByUser;
+     $sortField=$data->sortField;
+     $order=$data->order;
+     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $sortField,$order);
+     return view('article.archives.administrator.index',$filterResult);
+
+     
+  }
+
+  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+          $searchByUser,$sortField,$order) {
+      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+    if($searchByTitle){
+      $articles =$articles->ofTitle($searchByTitle);
+    }
+      if($searchByCategory){
+      $articles =$articles->ofCategory($searchByCategory);
+    }
     
-    /**
-    *fetch data for laratable
-    *
-    * @return json response
-    */
-     public function laratableData()
-    {
-      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-       return Datatables::of($articles)->make();
+    if(!is_null($searchByFeaturedState)){
+      $articles =$articles->ofFeaturedState($searchByFeaturedState);   
     }
-      /**
+    if(!is_null($searchByPublishedState)){
+      $articles =$articles->ofPublishedState($searchByPublishedState);   
+    }
+    if($searchByUser){
+      $articles =$articles->ofUser($searchByUser);   
+    }
+    if($sortField){
+      $articles = $articles->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+    }else{
+      $articles = $articles->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+    }
+    $articles->withPath('article-archives');
+    $articles->appends([
+        'pageLength' => $pageLength,
+        'searchByTitle' => $searchByTitle,
+        'searchByCategory' => $searchByCategory,
+        'searchByFeaturedState' => $searchByFeaturedState,
+        'searchByPublishedState' => $searchByPublishedState,
+        'searchByUser' => $searchByUser,
+        'sortField' => $sortField,
+        'order' => $order])->links();
+    $numberOfItemSFound=$articles->count();
+    if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+
+    }
+    $entries=[25,50,100];
+    $categories= Category::where('published','<>',2)->get(['id','title']);
+    $users= User::get(['id','name']);
+    
+    return compact('articles','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser');
+
+  }
+
+
+          /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

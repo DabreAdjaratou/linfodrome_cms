@@ -69,69 +69,70 @@ class Archive extends Model
     {
        return $this->hasMany('App\Models\Video\Revision','video_id');
     }
-
-
 /**
- * Fetch videos with condition in the datatables.
- *
- * @param \Illuminate\Database\Eloquent\Builder
- * @param \Illuminate\Database\Eloquent\Builder
- */
-public static function laratablesQueryConditions($query)
-{
-    return $query->where('published', '<>',2)->orderBy('id','desc');
-}
-/**
- * Eager load user items of the archive for displaying in the datatables.
- *
- * @return callable
- */
-public static function laratablesGetRevisionRelationQuery()
-{
-    return function ($query) {
-        $query->with('getModifier');
-    };
-}
-
+     * Scope a query to only include articles that match to  a given title.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfTitle($query, $title)
+    {
+        return $query->where('title','like', '%'.$title.'%');
+    }  
+ /**
+     * Scope a query to only include articles that match to  a given category.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfCategory($query, $category)
+    {
+        return $query->where('category_id', $category);
+    }   
+    
     /**
-     * Returns the edit action column  html for datatables.
+     * Scope a query to only include articles that match to  a given featured state.
      *
-     * @param \App\Models\Video\Video
-     * @return string
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-public static function laratablesCustomEdit($archive)
+    public function scopeOfFeaturedState($query, $featuredState)
     {
-        return view('video.archives.administrator.laratableCustumColumns.edit',compact('archive'))->render();
-    }
-   /* *
-     * Returns the put in trash action column html for datatables.
+        if($featuredState==1){
+        return $query->where('featured', $featuredState);
+        }else{
+        return $query->where('featured','<>',1);
+        }
+    }   
+    
+    /**
+     * Scope a query to only include articles that match to  a given published state.
      *
-     * @param \App\Models\Video\Video
-     * @return string
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-public static function laratablesCustomTrash($archive)
+    public function scopeOfPublishedState($query, $publishedState)
     {
-        return view('video.archives.administrator.laratableCustumColumns.trash',compact('archive'))->render();
-    }
-
-    /* *
-     * Returns the  put in draft action column html for datatables.
+        
+if($publishedState==1){
+        return $query->where('published', $publishedState);
+       }else{
+        return $query->where('published','<>',1);
+        }  
+ }   
+    /**
+     * Scope a query to only include articles that match to  a given author.
      *
-     * @param \App\Models\Video\Video
-     * @return string
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-public static function laratablesCustomDraft($archive)
+    public function scopeOfUser($query, $user)
     {
-        return view('video.archives.administrator.laratableCustumColumns.draft',compact('archive'))->render();
-    }
-
-    /* *
-     * Returns clikable title  for datatables.
-     *
-     * * @return string
-     */
-public function laratablesTitle()
-{
-    return "<a href=".route("video-archives.edit",["archive"=>$this->id]).">".$this->title."</a>";
-}
+        return $query->where('created_by', $user);
+    }   
  }

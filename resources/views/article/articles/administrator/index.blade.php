@@ -6,6 +6,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.loading.min.css') }}">
 @endsection
 @section('content')
 @section ('pageTitle')
@@ -85,11 +86,11 @@
             <td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
             <td> {{ $article->views }}</td>
             <td> {{ $article->image }}</td>
-            <td> <a href="{{ route('article-archives.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
+            <td> <a href="{{ route('articles.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
             </td>
                         <td> <a href="{{ route('articles.put-in-draft',['article'=>$article]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
             </td>
-             <td> <a href="{{ route('article-archives.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+             <td> <a href="{{ route('articles.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
             </td>
             <td>{{ $article->id }}</td>
                 </tr>
@@ -101,14 +102,13 @@
 </table>
     </div>
 </div>
-<p>  {{ $tableInfo}} </p>
+ {{ $tableInfo}}
 {{ $articles->links() }}
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @push('js')
- {{-- <script src="http://malsup.github.com/jquery.form.js"></script>  --}}
  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-
+<script type="text/javascript" src="{{ asset('js/jquery.loading.min.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -165,7 +165,15 @@ if(order=='asc'){
                }
 });
 $("#searchByUser").select2();
+$(document).ajaxStart(function(){
+$("#dataTable").loading({
+  stoppable : true });
+});
 
+$(document).on({
+    ajaxStart: function() { $("#dataTable").loading();  },
+     ajaxStop: function() { $("#dataTable").loading('stop');  }    
+});
   });
 </script>
 @endpush
