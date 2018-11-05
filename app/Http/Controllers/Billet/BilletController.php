@@ -32,13 +32,12 @@ class BilletController extends Controller
   
    public function index(Request $request)
     {   
-        if(url()->full() ==  action('Billet\BilletController@index')){
-      $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      $tableInfo="Affichage de 1 à ".$billets->perPage()." lignes sur ".$billets->total();
-      $entries=[25,50,100];
-      $categories= Category::where('published','<>',2)->get(['id','title']);
-      $users= User::get(['id','name']);
-      return view('billet.billets.administrator.index',compact('billets','tableInfo','entries','categories','users'));
+       if(url()->full() ==  action('Billet\BilletController@index')){
+      $billetListResult=$this->billetList();
+            return view('billet.billets.administrator.index',$billetListResult);
+           }elseif(url()->full() !=  action('Billet\ArchiveController@index') && !($request->pageLength)){
+           $billetListResult=$this->billetList();
+            return view('billet.billets.administrator.index',$billetListResult);
         } else {
             $pageLength=$request->pageLength;
             $searchByTitle=$request->searchByTitle;
@@ -53,7 +52,24 @@ class BilletController extends Controller
      return view('billet.billets.administrator.index',$filterResult);
 
         }
+          
+      }
+
       
+      public function billetList(){
+        
+       $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $numberOfItemSFound=$billets->count();
+      if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$billets->total();
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$billets->total();
+
+    }
+      $entries=[25,50,100];
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']); 
+        return compact('billets','tableInfo','entries','categories','users');
     }
 
 public function searchAndSort(Request $request){ 

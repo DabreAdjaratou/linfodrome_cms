@@ -28,14 +28,13 @@ class VideoController extends Controller
      * @return \Illuminate\Http\Response
      */
      public function index(Request $request)
-    {   
-        if(url()->full() ==  action('Video\VideoController@index')){
-      $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-      $tableInfo="Affichage de 1 à ".$videos->perPage()." lignes sur ".$videos->total();
-      $entries=[25,50,100];
-      $categories= Category::where('published','<>',2)->get(['id','title']);
-      $users= User::get(['id','name']);
-      return view('video.videos.administrator.index',compact('videos','tableInfo','entries','categories','users'));
+     {
+    if(url()->full() ==  action('Video\VideoController@index')){
+      $videoListResult=$this->videoList();
+            return view('video.videos.administrator.index',$videoListResult);
+           }elseif(url()->full() !=  action('Video\ArchiveController@index') && !($request->pageLength)){
+           $videoListResult=$this->videoList();
+            return view('video.videos.administrator.index',$videoListResult);
         } else {
             $pageLength=$request->pageLength;
             $searchByTitle=$request->searchByTitle;
@@ -50,8 +49,26 @@ class VideoController extends Controller
      return view('video.videos.administrator.index',$filterResult);
 
         }
+          
+      }
+
       
+      public function videoList(){
+        
+      $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+          $numberOfItemSFound=$videos->count();
+      if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$videos->total();
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$videos->total();
+
     }
+      $entries=[25,50,100];
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']); 
+        return compact('videos','tableInfo','entries','categories','users');
+    }
+
 
 public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());

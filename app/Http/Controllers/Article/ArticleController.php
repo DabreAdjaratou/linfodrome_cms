@@ -34,12 +34,11 @@ class ArticleController extends Controller
     public function index(Request $request)
     {   
         if(url()->full() ==  action('Article\ArticleController@index')){
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      $tableInfo="Affichage de 1 à ".$articles->perPage()." lignes sur ".$articles->total();
-      $entries=[25,50,100];
-      $categories= Category::where('published','<>',2)->get(['id','title']);
-      $users= User::get(['id','name']);
-      return view('article.articles.administrator.index',compact('articles','tableInfo','entries','categories','users'));
+      $articleListResult=$this->articleList();
+            return view('article.articles.administrator.index',$articleListResult);
+           }elseif(url()->full() !=  action('Article\ArticleController@index') && !($request->pageLength)){
+           $articleListResult=$this->articleList();
+            return view('article.articles.administrator.index',$articleListResult);
         } else {
             $pageLength=$request->pageLength;
             $searchByTitle=$request->searchByTitle;
@@ -55,6 +54,22 @@ class ArticleController extends Controller
 
         }
       
+    }
+    
+    public function articleList(){
+        
+       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+           $numberOfItemSFound=$articles->count();
+      if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+
+    }
+      $entries=[25,50,100];
+      $categories= Category::where('published','<>',2)->get(['id','title']);
+      $users= User::get(['id','name']); 
+        return compact('articles','tableInfo','entries','categories','users');
     }
 
     public function searchAndSort(Request $request){ 
