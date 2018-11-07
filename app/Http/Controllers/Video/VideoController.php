@@ -42,9 +42,11 @@ class VideoController extends Controller
             $searchByFeaturedState=$request->searchByFeaturedState;
             $searchByPublishedState=$request->searchByPublishedState;
             $searchByUser=$request->searchByUser;
+            $fromDate=$request->fromDate;  
+            $toDate=$request->toDate;
             $sortField=$request->sortField;
             $order=$request->order;
-            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate,$toDate,
             $sortField,$order);
      return view('video.videos.administrator.index',$filterResult);
 
@@ -78,17 +80,19 @@ public function searchAndSort(Request $request){
      $searchByFeaturedState= $data->searchByFeaturedState;
      $searchByPublishedState= $data->searchByPublishedState;
      $searchByUser=$data->searchByUser;
+      $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->fromDate).' 00:00:00')) : null;
+     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
      $sortField=$data->sortField;
      $order=$data->order;
-     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate, $toDate,
             $sortField,$order);
-     return view('video.videos.administrator.index',$filterResult);
+     return view('video.videos.administrator.searchAndSort',$filterResult);
 
      
   }
 
   public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-          $searchByUser,$sortField,$order) {
+          $searchByUser,$fromDate,$toDate,$sortField,$order) {
       $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name']);
     if($searchByTitle){
       $videos =$videos->ofTitle($searchByTitle);
@@ -106,6 +110,15 @@ public function searchAndSort(Request $request){
     if($searchByUser){
       $videos =$videos->ofUser($searchByUser);   
     }
+    if($fromDate && !$toDate){ 
+      $videos =$videos->ofFromDate($fromDate);   
+}
+  if(!$fromDate && $toDate){ 
+  $videos =$videos->ofToDate($toDate);
+}
+if($fromDate && $toDate){
+$videos =$videos->ofBetweenTwoDate($fromDate, $toDate);
+}
     if($sortField){
       $videos = $videos->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
     }else{
@@ -119,6 +132,8 @@ public function searchAndSort(Request $request){
         'searchByFeaturedState' => $searchByFeaturedState,
         'searchByPublishedState' => $searchByPublishedState,
         'searchByUser' => $searchByUser,
+         'fromDate' => $fromDate,
+        'toDate' => $toDate,
         'sortField' => $sortField,
         'order' => $order])->links();
     $numberOfItemSFound=$videos->count();
@@ -132,7 +147,7 @@ public function searchAndSort(Request $request){
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
     
-    return compact('videos','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser');
+    return compact('videos','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
 
   }
 

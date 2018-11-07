@@ -4,24 +4,26 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 @endsection
 @section('content')
 @section ('pageTitle')
 <input type="hidden" name="order" id="order" value="desc">
 @parent
-<div id='tableContainer'>
-<h3>  {{ ('Liste des billets') }}</h3> @endsection 
+<h3>  {{ ('Liste des billets') }}</h3>
+@endsection 
 <a href="{{ route('billets.create') }}">Nouveau</a> 
-<label> Affiché </label>
+<div>
+  <label> Affiché </label>
   <select id=entries name="entries" class="searchValue"> 
   @for($i=0; $i<sizeof($entries);$i++)
 <option value="{{ $entries[$i] }}" @if($entries[$i] == $billets->perPage())  selected @endif>{{ $entries[$i] }}</option>
   @endfor
 </select> <label> lignes</label>
-
+</div>
 
 <div>
-    <input type="text" name="searchByTitle" id="searchByTitle" class="searchValue" @if(isset($searchByTitle)) value="{{$searchByTitle}}" @endif><button  id="searchByTitleButton" name="searchByTitleButton">chercher</button>
+    <input type="text" name="searchByTitle" id="searchByTitle" class="searchValue" @if(isset($searchByTitle)) value="{{$searchByTitle}}" @endif><button  id="searchButton" name="searchButton">chercher</button>
 <select name="searchByCategory" id="searchByCategory" class="searchValue">
         <option value="">-- Categorie --</option>
     @foreach($categories as $category)
@@ -47,63 +49,21 @@
     @endforeach
     </select>
 
+<div class="uk-display-inline-block">De: <input type="text" class="datepicker" id="fromDate" @if(isset($fromDate)) value='{{ date("d/m/Y", strtotime($fromDate))}}' @endif autocomplete="off"></div>
+<div class="uk-display-inline-block">A: <input type="text" class="datepicker" id="toDate" @if(isset($toDate)) value='{{ date("d/m/Y", strtotime($toDate))}}' @endif autocomplete="off"></div>
+
 </div>
+<div id='tableContainer'>
 <div>
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >   
-    <thead>
-            <tr>
-            <th id='title' class="tableSort">{{ ('Titre') }} <i class="fas fa-sort"></i></th>
-            <th id="featured" class="tableSort">{{ ('A la une') }}<i class="fas fa-sort"></i></i></th>
-            <th id="published" class="tableSort">{{ ('Publiée') }}<i class="fas fa-sort"></i></i></th>
-            <th>{{ ('Category') }}</th>
-            <th>{{ ('Auteur') }}</th>
-            <th id="created_at" class="tableSort">{{ ('créé le') }}<i class="fas fa-sort"></i></i></th>
-            <th >{{ ('Dernière modification') }}</i></th>
-            <th>{{ ('Modifié le') }}</i></th>
-            <th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-sort"></i></i></th>
-            <th>{{ ('Image') }}</th>
-            <th>{{ ('Modifier') }}</th>
-      <th>{{ ('brouillon') }}</th>
-            <th>{{ ('Corbeille') }}</th>
-            <th>{{ ('id') }}</th>                  
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($billets as $billet)
-        <tr class="uk-text-small">
-            <td class="uk-table-expand"> {{ $billet->title }}</td>
-            <td> {{ $billet->featured }}</td>
-            <td> {{ $billet->published }}</td>
-           <td class="uk-table-expand"> {{ $billet->getCategory->title }}</td>
-            <td class="uk-table-expand"> {{ $billet->getAuthor->name }}</td>
-           <td class="uk-table-expand"> {{ $billet->created_at }}</td>
-            <td class="uk-table-expand">{{$billet->getRevision->last()['getModifier']['name']}} </td>
-            <td class="uk-table-expand">{{$billet->getRevision->last()['revised_at']}}  </td>
-            <td> {{ $billet->views }}</td>
-            <td> {{ $billet->image }}</td>
-            <td> <a href="{{ route('billet-archives.edit',['billet'=>$billet]) }}" ><span class="uk-text-success">Modifier</span></a>
-            </td>
-                        <td> <a href="{{ route('billet-archives.put-in-draft',['billet'=>$billet]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
-            </td>
-             <td> <a href="{{ route('billet-archives.put-in-trash',['billet'=>$billet]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
-            </td>
-            <td>{{ $billet->id }}</td>
-                </tr>
-        @endforeach
-   </tbody>
-    <tfoot>
-    </tfoot>
-</table>
- </div>
+@include('billet.billets.administrator.searchAndSort')
 </div>
- {{ $tableInfo}}
-{{ $billets->links() }}
 
 @section('sidebar')
  @component('layouts.administrator.billet-sidebar') @endcomponent 
 @endsection
 @push('js')
- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -115,9 +75,12 @@ var searchByFeaturedState=$('#searchByFeaturedState').val();
 var searchByPublishedState=$('#searchByPublishedState').val();
 var searchByUser=$('#searchByUser').val();
 var order=$('#order').val();
+var fromDate=$('#fromDate').val();
+var toDate=$('#toDate').val();
 
 
-var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'"}'; 
+
+var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'","fromDate":"'+ fromDate+'","toDate":"'+ toDate+'"}'; 
                $.ajax({
           headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -130,6 +93,7 @@ var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","s
           processData: false,
           success:function(response) {
               $('#tableContainer').html(response);
+              tableSort();
           }
      });   
 
@@ -141,12 +105,13 @@ searchAndSort(sortField='id');
        
 });
 
-$('#searchByTitleButton').on('click',function(e){
+$('#searchButton').on('click',function(e){
 e.preventDefault();
 searchAndSort(sortField='id');        
        
 });
 
+function tableSort (){
 $('.tableSort').on('click',function(e){
   e.preventDefault();
 var sortField=e.target.id;
@@ -159,7 +124,23 @@ if(order=='asc'){
                  $('#order').val('asc')
                }
 });
+}; tableSort();
+
 $("#searchByUser").select2();
+
+$(".datepicker" ).datepicker(
+    {
+      monthNames: [ "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Decembre" ],
+      monthNamesShort: [ "Jan", "Féb", "Mar", "Avr", "Mai", "Jui", "Juil", "Aoû", "Sep", "Oct", "Nov", "Dec" ],
+      dayNames: [ "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi" ],
+      dayNamesMin: [ "Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa" ],
+      dateFormat: "dd/mm/yy",
+      nextText: "suivant",
+      prevText: "précédent",
+      showButtonPanel: true,
+      currentText: "Aujourd'hui",
+      closeText: "Fermer"
+    });
   });
 </script>
 @endpush

@@ -44,9 +44,11 @@ class ArchiveController extends Controller
             $searchByFeaturedState=$request->searchByFeaturedState;
             $searchByPublishedState=$request->searchByPublishedState;
             $searchByUser=$request->searchByUser;
+            $fromDate=$request->fromDate;  
+            $toDate=$request->toDate;
             $sortField=$request->sortField;
             $order=$request->order;
-            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate,$toDate,
             $sortField,$order);
      return view('billet.archives.administrator.index',$filterResult);
 
@@ -78,17 +80,19 @@ class ArchiveController extends Controller
      $searchByFeaturedState= $data->searchByFeaturedState;
      $searchByPublishedState= $data->searchByPublishedState;
      $searchByUser=$data->searchByUser;
+     $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->fromDate).' 00:00:00')) : null;
+     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
      $sortField=$data->sortField;
      $order=$data->order;
-     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate,$toDate,
             $sortField,$order);
-     return view('billet.archives.administrator.index',$filterResult);
+     return view('billet.archives.administrator.searchAndSort',$filterResult);
 
      
   }
 
   public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-          $searchByUser,$sortField,$order) {
+          $searchByUser,$fromDate,$toDate,$sortField,$order) {
       $billets = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
     if($searchByTitle){
       $billets =$billets->ofTitle($searchByTitle);
@@ -106,6 +110,18 @@ class ArchiveController extends Controller
     if($searchByUser){
       $billets =$billets->ofUser($searchByUser);   
     }
+
+if($fromDate && !$toDate){ 
+      $billets =$billets->ofFromDate($fromDate);   
+}
+  if(!$fromDate && $toDate){ 
+  $billets =$billets->ofToDate($toDate);
+}
+if($fromDate && $toDate){
+$billets =$billets->ofBetweenTwoDate($fromDate, $toDate);
+}
+
+
     if($sortField){
       $billets = $billets->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }else{
@@ -119,6 +135,8 @@ class ArchiveController extends Controller
         'searchByFeaturedState' => $searchByFeaturedState,
         'searchByPublishedState' => $searchByPublishedState,
         'searchByUser' => $searchByUser,
+        'fromDate' => $fromDate,
+        'toDate' => $toDate,
         'sortField' => $sortField,
         'order' => $order])->links();
     $numberOfItemSFound=$billets->count();
@@ -132,7 +150,7 @@ class ArchiveController extends Controller
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
     
-    return compact('billets','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser');
+    return compact('billets','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
 
   }
     

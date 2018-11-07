@@ -111,4 +111,41 @@ if($publishedState==1){
     {
         return $query->where('created_by', $user);
     }   
+
+    /**
+     * Scope a query to only include articles whose creation date is more than a given date
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfFromDate($query, $fromDate)
+    {
+        return $query->where('created_at', '>=',$fromDate);
+    }   
+
+
+     /**
+     * Scope a query to only include articles whose creation date is less than a given date
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfToDate($query, $toDate)
+    {
+        return $query->where('created_at', '<=',$toDate);
+    } 
+
+     /**
+     * Scope a query to only include articles whose creation date is between two  given date
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfBetweenTwoDate($query,$fromDate, $toDate)
+    {
+        return $query->whereBetween('created_at',[$fromDate,$toDate]);
+    }   
 }

@@ -4,24 +4,25 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 @endsection
 @section('content')
 @section ('pageTitle')
 <input type="hidden" name="order" id="order" value="desc">
 @parent
-<div id='tableContainer'>
 <h3>  {{ ('Liste des videos') }}</h3> @endsection 
 <a href="{{ route('videos.create') }}">Nouveau</a> 
- <label> Affiché </label>
+ <div>
+  <label> Affiché </label>
   <select id=entries name="entries" class="searchValue"> 
   @for($i=0; $i<sizeof($entries);$i++)
 <option value="{{ $entries[$i] }}" @if($entries[$i] == $videos->perPage())  selected @endif>{{ $entries[$i] }}</option>
   @endfor
 </select> <label> lignes</label>
-
+</div>
 
 <div>
-    <input type="text" name="searchByTitle" id="searchByTitle" class="searchValue" @if(isset($searchByTitle)) value="{{$searchByTitle}}" @endif><button  id="searchByTitleButton" name="searchByTitleButton">chercher</button>
+    <input type="text" name="searchByTitle" id="searchByTitle" class="searchValue" @if(isset($searchByTitle)) value="{{$searchByTitle}}" @endif><button  id="searchButton" name="searchButton">chercher</button>
 <select name="searchByCategory" id="searchByCategory" class="searchValue">
         <option value="">-- Categorie --</option>
     @foreach($categories as $category)
@@ -47,67 +48,19 @@
     @endforeach
     </select>
 
+<div class="uk-display-inline-block">De: <input type="text" class="datepicker" id="fromDate" @if(isset($fromDate)) value='{{ date("d/m/Y", strtotime($fromDate))}}' @endif autocomplete="off"></div>
+<div class="uk-display-inline-block">A: <input type="text" class="datepicker" id="toDate" @if(isset($toDate)) value='{{ date("d/m/Y", strtotime($toDate))}}' @endif autocomplete="off"></div>
 </div>
-<div><table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
-	<thead>
-            <tr>
-			<th id="title" class="tableSort">{{ ('Titre de la video') }}<i class="fas fa-sort"></th>
-			<th id="category_id" class="tableSort">{{ ('Categorie') }}<i class="fas fa-sort"></th>
-			<th id="featured" class="tableSort">{{ ('A la Une') }}<i class="fas fa-sort"></th>
-			<th id="published" class="tableSort">{{ ('Publiée') }}<i class="fas fa-sort"></th>
-			<th>{{ ('Journaliste') }}</th>
-			<th>{{ ('Cameraman') }}</th>
-			<th>{{ ('Monteur') }}</th>
-			<th id="created_at" class="tableSort">{{ ('crée lé') }}<i class="fas fa-sort"></th>
-			<th>{{ ('Debut publication') }}</th>
-			<th>{{ ('fin publication') }}</th>
-			<th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-sort"></th>
-                        <th>{{ ('Modifier') }}</th>
-                        <th>{{ ('Brouillon') }}</th>
-                        <th>{{ ('Corbeille') }}</th>
-			<th>{{ ('id') }}</th>
-                       
-		</tr>
-	</thead>
-	<tbody>
-		@foreach($videos as $video)
-		<tr>
-            <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
-			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
-			<td> {{ $video->featured }}</td>
-			<td> {{ $video->published }}</td>
-			<td class="uk-table-expand"> {{ucwords($video->getAuthor->name)}}</td>
-			<td class="uk-table-expand"> {{ucwords($video->getCameraman->name)}}</td>
-			<td class="uk-table-expand"> {{ucwords($video->getEditor->name)}}  </td>
-			<td class="uk-table-expand">{{$video->created_at}}</td>
-			<td class="uk-table-expand">{{ $video->start_publication_at}} </td>
-			<td class="uk-table-expand"> {{$video->stop_publication_at}}</td>
-			<td> {{$video->views}}</td>
-                         <td> <a href="{{ route('video-archives.edit',['video'=>$video]) }}" ><span class="uk-text-success">Modifier</span></a>
 
-			</td>
-                        <td> <a href="{{ route('video-archives.put-in-draft',['video'=>$video]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
-
-			</td>
-			 <td> <a href="{{ route('video-archives.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
-
-			</td>
-			<td>{{ $video->id }}</td>
-                </tr>
-		@endforeach
-	</tbody>
-	<tfoot>
-	</tfoot>
-</table>
- </div>
+<div id='tableContainer'>
+  @include ('video.archives.administrator.searchAndSort')
 </div>
-{{ $tableInfo}}
-{{ $videos->links() }}
 @section('sidebar')
  @component('layouts.administrator.video-sidebar') @endcomponent 
 @endsection
 @push('js')
  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -119,9 +72,11 @@ var searchByFeaturedState=$('#searchByFeaturedState').val();
 var searchByPublishedState=$('#searchByPublishedState').val();
 var searchByUser=$('#searchByUser').val();
 var order=$('#order').val();
+var fromDate=$('#fromDate').val();
+var toDate=$('#toDate').val();
 
 
-var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'"}'; 
+var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'","fromDate":"'+ fromDate+'","toDate":"'+ toDate+'"}'; 
                $.ajax({
           headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -133,7 +88,8 @@ var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","s
           contentType: false, 
           processData: false,
           success:function(response) {
-              $('#tableContainer').html(response);
+           $('#tableContainer').html(response);
+           tableSort();
           }
      });   
 
@@ -145,13 +101,14 @@ searchAndSort(sortField='id');
        
 });
 
-$('#searchByTitleButton').on('click',function(e){
+$('#searchButton').on('click',function(e){
 e.preventDefault();
 searchAndSort(sortField='id');        
        
 });
 
-$('.tableSort').on('click',function(e){
+function tableSort (){
+ $('.tableSort').on('click',function(e){
   e.preventDefault();
 var sortField=e.target.id;
 var order=$('#order').val();
@@ -163,9 +120,23 @@ if(order=='asc'){
                  $('#order').val('asc')
                }
 });
+};tableSort();
 $("#searchByUser").select2();
-
+$(".datepicker" ).datepicker(
+    {
+      monthNames: [ "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Decembre" ],
+      monthNamesShort: [ "Jan", "Féb", "Mar", "Avr", "Mai", "Jui", "Juil", "Aoû", "Sep", "Oct", "Nov", "Dec" ],
+      dayNames: [ "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi" ],
+      dayNamesMin: [ "Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa" ],
+      dateFormat: "dd/mm/yy",
+      nextText: "suivant",
+      prevText: "précédent",
+      showButtonPanel: true,
+      currentText: "Aujourd'hui",
+      closeText: "Fermer"
+    });
   });
+
 </script>
 @endpush
 @section('js')

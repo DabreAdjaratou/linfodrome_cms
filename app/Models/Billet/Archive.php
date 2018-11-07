@@ -57,6 +57,109 @@ use SoftDeletes;
     {
        return $this->hasMany('App\Models\Billet\Revision','billet_id');
     }
+
+    /**
+     * Scope a query to only include articles that match to  a given title.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfTitle($query, $title)
+    {
+        return $query->where('title','like', '%'.$title.'%');
+    }  
+ /**
+     * Scope a query to only include articles that match to  a given category.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfCategory($query, $category)
+    {
+        return $query->where('category_id', $category);
+    }   
+    
+    /**
+     * Scope a query to only include articles that match to  a given featured state.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfFeaturedState($query, $featuredState)
+    {
+        if($featuredState==1){
+        return $query->where('featured', $featuredState);
+        }else{
+        return $query->where('featured','<>',1);
+        }
+    }   
+    
+    /**
+     * Scope a query to only include articles that match to  a given published state.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfPublishedState($query, $publishedState)
+    {
+        
+if($publishedState==1){
+        return $query->where('published', $publishedState);
+       }else{
+        return $query->where('published','<>',1);
+        }  
+ }   
+    /**
+     * Scope a query to only include articles that match to  a given author.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfUser($query, $user)
+    {
+        return $query->where('created_by', $user);
+    }   
    
+    /**
+     * Scope a query to only include articles whose creation date is more than a given date
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfFromDate($query, $fromDate)
+    {
+        return $query->where('created_at', '>=',$fromDate);
+    }   
+
+
+     /**
+     * Scope a query to only include articles whose creation date is less than a given date
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfToDate($query, $toDate)
+    {
+        return $query->where('created_at', '<=',$toDate);
+    } 
+
+     /**
+     * Scope a query to only include articles whose creation date is between two  given date
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfBetweenTwoDate($query,$fromDate, $toDate)
+    {
+        return $query->whereBetween('created_at',[$fromDate,$toDate]);
+    }   
 
 }
