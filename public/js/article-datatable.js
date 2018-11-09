@@ -25,7 +25,7 @@ $('#dataTable').DataTable({
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'route("article-archives.search-and-sort")',
+        url: route('article-archives.search-and-sort'),
         dataType : 'html',
         type: 'POST',
         data: data,
