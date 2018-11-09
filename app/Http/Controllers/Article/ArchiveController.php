@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 class ArchiveController extends Controller
 {
-  
+
     /**
      * Protecting routes
      */
@@ -30,52 +30,62 @@ class ArchiveController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-       public function index(Request $request)
+    public function index(Request $request)
     {
-      if(url()->full() ==  action('Article\ArchiveController@index')){
-      $articleListResult=$this->articleList();
-            return view('article.archives.administrator.index',$articleListResult);
-           }elseif(url()->full() !=  action('Article\ArchiveController@index') && !($request->pageLength)){
-           $articleListResult=$this->articleList();
-            return view('article.archives.administrator.index',$articleListResult);
-        } else {
-            $pageLength=$request->pageLength;
-            $searchByTitle=$request->searchByTitle;
-            $searchByCategory=$request->searchByCategory;
-            $searchByFeaturedState=$request->searchByFeaturedState;
-            $searchByPublishedState=$request->searchByPublishedState;
-            $searchByUser=$request->searchByUser;
-             $fromDate=$request->fromDate;  
-            $toDate=$request->toDate;
-            $sortField=$request->sortField;
-            $order=$request->order;
-            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order);
-     return view('article.archives.administrator.index',$filterResult);
 
-        }
-          
-                  
-         }
+      $view='article.archives.administrator.index';
+      $queryWithPaginate=$articles=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $controllerMethodUrl=action('Article\ArchiveController@index');
+      $actions=Archive::indexActions();
+      $result=$this->articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+      return view($view,$result,$actions);
 
-      
-      public function articleList(){
-        
-       $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-         $numberOfItemSFound=$articles->count();
-      if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
-    }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
 
     }
+
+    public function articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+    {
+
+      if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
+        $result=$this->articleWithTableParameters($queryWithPaginate);
+        return $result;
+      } else {
+        $pageLength=$request->pageLength;
+        $searchByTitle=$request->searchByTitle;
+        $searchByCategory=$request->searchByCategory;
+        $searchByFeaturedState=$request->searchByFeaturedState;
+        $searchByPublishedState=$request->searchByPublishedState;
+        $searchByUser=$request->searchByUser;
+        $fromDate=$request->fromDate;  
+        $toDate=$request->toDate;
+        $sortField=$request->sortField;
+        $order=$request->order;
+        $page=$request->page;
+        $articles = $queryWithOutPaginate;
+        $filterResult=$this->filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$page);
+        return $filterResult;
+
+      }
+
+    }
+
+    public function articleWithTableParameters($articles){
+      $numberOfItemSFound=$articles->count();
+      if($numberOfItemSFound==0){
+        $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+      }else{
+        $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+
+      }
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
-        return compact('articles','tableInfo','entries','categories','users');
+      return compact('articles','tableInfo','entries','categories','users');
     }
     
     
-   public function searchAndSort(Request $request){ 
+    public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());
      $pageLength=$data->entries;
      $searchByTitle= $data->searchByTitle;
@@ -87,20 +97,36 @@ class ArchiveController extends Controller
      $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
      $sortField=$data->sortField;
      $order=$data->order;
-     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
-     $fromDate,$toDate ,$sortField,$order);
-     return view('article.archives.administrator.searchAndSort',$filterResult);
+     $page=$data->page;
 
-     
+     switch ($page) {
+      case('article-archives'):
+      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $actions=Archive::indexActions();
+      break;
+      case('trash'):
+      $articles=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $actions=Archive::trashActions();
+      break;
+
+      case('draft'):
+      $articles=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+      $actions=Archive::draftActions();
+      break;
+    }
+
+    $filterResult=$this->filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+     $fromDate,$toDate ,$sortField,$order,$page);
+    return view('article.archives.administrator.searchAndSort',$filterResult,$actions);
+
   }
 
-  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-          $searchByUser,$fromDate,$toDate,$sortField,$order) {
-      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+  public function filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+    $searchByUser,$fromDate,$toDate,$sortField,$order,$page) {
     if($searchByTitle){
       $articles =$articles->ofTitle($searchByTitle);
     }
-      if($searchByCategory){
+    if($searchByCategory){
       $articles =$articles->ofCategory($searchByCategory);
     }
     
@@ -113,33 +139,39 @@ class ArchiveController extends Controller
     if($searchByUser){
       $articles =$articles->ofUser($searchByUser);   
     }
-if($fromDate && !$toDate){ 
+    if($fromDate && !$toDate){ 
       $articles =$articles->ofFromDate($fromDate);   
-}
-  if(!$fromDate && $toDate){ 
-  $articles =$articles->ofToDate($toDate);
-}
-if($fromDate && $toDate){
-$articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
-}
+    }
+    if(!$fromDate && $toDate){ 
+      $articles =$articles->ofToDate($toDate);
+    }
+    if($fromDate && $toDate){
+      $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
+    }
 
     if($sortField){
       $articles = $articles->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }else{
       $articles = $articles->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }
-    $articles->withPath('article-archives');
+    if($page){
+
+      $articles->withPath($page);
+
+    }
+
     $articles->appends([
-        'pageLength' => $pageLength,
-        'searchByTitle' => $searchByTitle,
-        'searchByCategory' => $searchByCategory,
-        'searchByFeaturedState' => $searchByFeaturedState,
-        'searchByPublishedState' => $searchByPublishedState,
-        'searchByUser' => $searchByUser,
-        'fromDate' => $fromDate,
-        'toDate' => $toDate,
-        'sortField' => $sortField,
-        'order' => $order])->links();
+      'pageLength' => $pageLength,
+      'searchByTitle' => $searchByTitle,
+      'searchByCategory' => $searchByCategory,
+      'searchByFeaturedState' => $searchByFeaturedState,
+      'searchByPublishedState' => $searchByPublishedState,
+      'searchByUser' => $searchByUser,
+      'fromDate' => $fromDate,
+      'toDate' => $toDate,
+      'sortField' => $sortField,
+      'page'=>$page,
+      'order' => $order])->links();
     $numberOfItemSFound=$articles->count();
     if($numberOfItemSFound==0){
       $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
@@ -150,7 +182,7 @@ $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
     $entries=[25,50,100];
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
-    
+
     return compact('articles','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
 
   }
@@ -161,10 +193,10 @@ $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+          public function create()
+          {
         //
-    }
+          }
 
     /**
      * Store a newly created resource in storage.
@@ -186,7 +218,7 @@ $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
     public function show($id)
     {
      //  
-     }
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -198,29 +230,29 @@ $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
     {
 
      $article=Article::find($id);
-      if ($article) {
-        return redirect()->route('articles.edit',compact('article'));
+     if ($article) {
+      return redirect()->route('articles.edit',compact('article'));
+    }else{
+      $archive=Archive::find($id);
+      if(is_null($archive)){
+        die('impossible d\'acceder à la resource demander');
       }else{
-        $archive=Archive::find($id);
-        if(is_null($archive)){
-          die('impossible d\'acceder à la resource demander');
-        }else{
-          if($archive->checkout==0 || $archive->checkout==Auth::id()){
-            $archive->checkout=Auth::id();
-            $archive->save();
-             $sources=Source::where('published',1)->get(['id','title']);
-            $categories=Category::where('published',1)->get(['id','title']);
-            $users=user::all('id','name');
-            return view('article.archives.administrator.edit',compact('archive','sources','categories','users'));
-          }elseif ($archive->checkout!=0 && $archive->checkout!=Auth::id()) {
-            session()->flash('message.type', 'warning');
-            session()->flash('message.content', 'Article dejà en cour de modification!');
-            return redirect()->route('article-archives.index');
-          }
+        if($archive->checkout==0 || $archive->checkout==Auth::id()){
+          $archive->checkout=Auth::id();
+          $archive->save();
+          $sources=Source::where('published',1)->get(['id','title']);
+          $categories=Category::where('published',1)->get(['id','title']);
+          $users=user::all('id','name');
+          return view('article.archives.administrator.edit',compact('archive','sources','categories','users'));
+        }elseif ($archive->checkout!=0 && $archive->checkout!=Auth::id()) {
+          session()->flash('message.type', 'warning');
+          session()->flash('message.content', 'Article dejà en cour de modification!');
+          return redirect()->route('article-archives.index');
         }
       }
-}
-      
+    }
+  }
+
 
     /**
      * Update the specified resource in storage.
@@ -254,7 +286,7 @@ $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
       $archive->title =$request->title;
       $archive->alias =str_slug($request->title, '-');
       $archive->category_id = $request->category;
-      $archive->published=$request->published ? $request->published : $archive->published ;
+      $archive->published=$request->published ? $request->published : 0 ;
       $archive->featured=$request->featured ? $request->featured : 0 ; 
       $archive->image = $request->image ? $request->image:$archive->image;
       $archive->image_legend =$request->image_legend;
@@ -308,16 +340,16 @@ public function destroy($id)
 {
 
   $revisions= Revision::where('article_id',$id)->get(['id']);
-   foreach ($revisions as $r) {
+  foreach ($revisions as $r) {
     $r->delete();
-   }
-   $article=Article::onlyTrashed()->find($id);
+  }
+  $article=Article::onlyTrashed()->find($id);
   if($article){
     $article=Article::onlyTrashed()->find($id)->forceDelete();
-      $archive=Archive::onlyTrashed()->find($id)->forceDelete();
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Article supprimé avec success!');
-      return redirect()->route('article-archives.trash');
+    $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Article supprimé avec success!');
+    return redirect()->route('article-archives.trash');
   }else{
     $archive=Archive::onlyTrashed()->find($id)->forceDelete();
     session()->flash('message.type', 'success');
@@ -389,7 +421,7 @@ public function putInTrash($id)
 //           echo $exc->getTraceAsString();
 }
 }
-    return redirect()->route('article-archives.index');
+return redirect()->route('article-archives.index');
 }
 
 /**
@@ -431,10 +463,16 @@ return redirect()->route('article-archives.trash');
      * @return \Illuminate\Http\Response
      */
 
-public function inTrash()
+public function inTrash( Request $request)
 {
- $archives=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
- return view('article.archives.administrator.trash',compact('archives'));
+
+  $view='article.archives.administrator.trash';
+  $queryWithPaginate=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+  $queryWithOutPaginate =Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+  $controllerMethodUrl=action('Article\ArchiveController@inTrash');
+  $actions=Archive::trashActions();
+  $result=$this->articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  return view($view,$result,$actions);
 }
 
 /**
@@ -442,11 +480,17 @@ public function inTrash()
      *
      * @return \Illuminate\Http\Response
      */
-public function inDraft()
+public function inDraft(Request $request)
 {
-  $archives=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-  return view('article.archives.administrator.draft',compact('archives'));
+   $view='article.archives.administrator.draft';
+  $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+  $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+  $controllerMethodUrl=action('Article\ArchiveController@inDraft');
+  $actions=Archive::draftActions();
+  $result=$this->articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  return view($view,$result,$actions);
 }
+
 
 
 }

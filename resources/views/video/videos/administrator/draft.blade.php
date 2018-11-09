@@ -6,10 +6,9 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des videos en corbeille') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive">	
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small">	
 	<thead>
             <tr>
-            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
 			<th>{{ ('Titre de la video') }}</th>
 			<th>{{ ('Categorie') }}</th>
 			<th>{{ ('A la Une') }}</th>
@@ -30,17 +29,16 @@
 	<tbody>
 		@foreach($videos as $video)
 		<tr>
-			{{-- <td><input type="checkbox" name="" class="uk-checkbox"></td> --}}
-                        <td class="uk-table-expand"> {{ ucfirst($video->title) }}</td>
-			<td class="uk-table-expand"> {{$video->getCategory->title}}</td>
+                        <td> {{ ucfirst($video->title) }}</td>
+			<td> {{$video->getCategory->title}}</td>
 			<td> {{ $video->featured }}</td>
 			<td> {{ $video->published }}</td>
-			<td class="uk-table-expand"> {{ucwords($video->getAuthor->name)}}</td>
-			<td class="uk-table-expand"> {{ucwords($video->getCameraman->name)}}</td>
-			<td class="uk-table-expand"> {{ucwords($video->getEditor->name)}}  </td>
-			<td class="uk-table-expand">{{$video->created_at}}</td>
-			<td class="uk-table-expand">{{ $video->start_publication_at}} </td>
-			<td class="uk-table-expand"> {{$video->stop_publication_at}}</td>
+			<td> {{ucwords($video->getAuthor->name)}}</td>
+			<td> {{ucwords($video->getCameraman->name)}}</td>
+			<td> {{ucwords($video->getEditor->name)}}  </td>
+			<td>{{$video->created_at}}</td>
+			<td>{{ $video->start_publication_at}} </td>
+			<td> {{$video->stop_publication_at}}</td>
 			<td> {{$video->views}}</td>
                          <td> <a href="{{ route('videos.edit',['video'=>$video]) }}" ><span class="uk-text-success">Modifier</span></a>
 

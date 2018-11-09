@@ -160,5 +160,35 @@ if($publishedState==1){
     public function scopeOfBetweenTwoDate($query,$fromDate, $toDate)
     {
         return $query->whereBetween('created_at',[$fromDate,$toDate]);
-    }         
+    }  
+
+
+    public  static function indexActions()
+    {
+      $actionTitles='<th>Brouillon</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("article-archives.put-in-draft",["article"=>'articleId']) .'"><span class="uk-text-success">Mettre au brouillon</span></<a></td>
+      <td> <a href="'.route('article-archives.put-in-trash',['article'=>'articleId']) .'" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function trashActions()
+    {
+     $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
+      $actions='<td><a href="'.route("article-archives.destroy",["article"=>'articleId']) .'"><span class="uk-text-success">Suprimer</span></<a></td>
+      <td> <a href="'.route('article-archives.restore',['article'=>'articleId']) .'" ><span class="uk-text-danger">Restaurer</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function draftActions()
+    {
+     $articles=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+      $actionTitles='<th>Modifier</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("article-archives.edit",["article"=>'articleId']) .'"><span class="uk-text-success">modifié</span></<a></td>
+      <td> <a href="'.route('article-archives.put-in-trash',['article'=>'articleId']) .'" ><span class="uk-text-danger">Corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
   }

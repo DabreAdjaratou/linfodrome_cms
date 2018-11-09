@@ -10,11 +10,11 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-			<th>{{ ('Titre') }}</th>
+			<th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('publiée') }}<i class="fas fa-sort uk-margin-left"></i></th>
 			<th> {{ ('Restaurer') }}</th>
 			<th> {{ ('Supprimer') }}</th>
-			<th>{{ ('id') }}</th>
+			<th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>
 
                        
 		</tr>
@@ -22,7 +22,6 @@
 	<tbody>
 		@foreach($categories as $category)
 		<tr>
-			<td><input type="checkbox" name="" class="uk-checkbox"></td>
 			<td> {{ ucfirst($category->title) }}</td>
 			<td>{{ $category->published }}</td>
 			<td> <a href="{{ route('billet-categories.restore',['category'=>$category]) }}" ><span class="uk-text-success">Restaurer</span></a>
@@ -46,7 +45,7 @@
 @endsection
 
 @section('js')
-
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 @endsection
 
 @endsection

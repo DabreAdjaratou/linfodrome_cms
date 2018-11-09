@@ -6,10 +6,9 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des billets au brouillon') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-text-small responsive uk-table-justify responsive" >	
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small" >	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre') }}</th>
 			<th>{{ ('A la une') }}</th>
 			<th>{{ ('Publié') }}</th>
@@ -27,16 +26,15 @@
 	</thead>
 	<tbody>
 		@foreach($billets as $billet)
-		<tr class="uk-text-small">
-			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $billet->title }}</td>
+		<tr>
+			<td> {{ $billet->title }}</td>
 			<td> {{ $billet->featured }}</td>
 			<td> {{ $billet->published }}</td>
-			<td class="uk-table-expand"> {{ $billet->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $billet->getAuthor->name }}</td>
-			<td class="uk-table-expand"> {{ $billet->created_at }}</td>
-			<td class="uk-table-expand">{{$billet->getRevision->last()['getModifier']['name']}} </td>
-			<td class="uk-table-expand">{{$billet->getRevision->last()['revised_at']}}  </td>
+			<td> {{ $billet->getCategory->title }}</td>
+			<td> {{ $billet->getAuthor->name }}</td>
+			<td> {{ $billet->created_at }}</td>
+			<td>{{$billet->getRevision->last()['getModifier']['name']}} </td>
+			<td>{{$billet->getRevision->last()['revised_at']}}  </td>
 			<td> {{ $billet->views }}</td>
 			<td> {{ $billet->image }}</td>
                         <td> <a href="{{ route('billets.edit',['billet'=>$billet]) }}" ><span class="uk-text-success">Modifier</span></a>

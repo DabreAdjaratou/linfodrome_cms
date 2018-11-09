@@ -6,10 +6,9 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Liste des articles en corbeille') }}</h3> @endsection
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
+<table id="dataTable" class="uk-table uk-table-responsive uk-table-hover uk-table-striped uk-text-small" >	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre') }}</th>
 			<th>{{ ('A la une') }}</th>
 			<th>{{ ('Publiée') }}</th>
@@ -27,16 +26,15 @@
 	</thead>
 	<tbody>
 		@foreach($articles as $article)
-  	<tr class="uk-text-small">
-			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
-			<td class="uk-table-expand"> {{ $article->title }}</td>
+  	<tr>
+			<td> {{ $article->title }}</td>
 			<td> {{ $article->featured }}</td>
 			<td> {{ $article->published }}</td>
-			<td class="uk-table-expand"> {{ $article->getCategory->title }}</td>
-			<td class="uk-table-expand"> {{ $article->getAuthor->name }}</td>
-			<td class="uk-table-expand"> {{ $article->created_at }}</td>
-			<td class="uk-table-expand">{{$article->getRevision->last()['getModifier']['name']}} </td>
-			<td class="uk-table-expand">{{$article->getRevision->last()['revised_at']}}  </td>
+			<td> {{ $article->getCategory->title }}</td>
+			<td> {{ $article->getAuthor->name }}</td>
+			<td> {{ $article->created_at }}</td>
+			<td>{{$article->getRevision->last()['getModifier']['name']}} </td>
+			<td>{{$article->getRevision->last()['revised_at']}}  </td>
 			<td> {{ $article->views }}</td>
 			<td> {{ $article->image }}</td>
 			<td> <form action="{{ route('articles.destroy',['article'=>$article]) }}" method="POST" id="deleteForm" onsubmit="return confirm('Êtes vous sûre de bien vouloir supprimer cet article?')">

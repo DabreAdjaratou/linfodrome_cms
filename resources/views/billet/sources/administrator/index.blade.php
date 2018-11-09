@@ -12,19 +12,17 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
-            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
-			<th>{{ ('Titre') }}</th>
-			<th> {{ ('Publiée') }}</th>
+			<th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></th>
+			<th>{{ ('Publiée') }}<i class="fas fa-sort uk-margin-left"></th>
 			<th>{{ ('Modifier') }}</th>
 			<th>{{ ('Corbeille') }}</th>
-			<th>{{ ('id') }}</th>
+			<th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></th>
                        
 		</tr>
 	</thead>
 	<tbody>
 		@foreach($sources as $source)
 		<tr>
-			{{-- <td><input type="checkbox" name="" class="uk-checkbox"></td> --}}
 			<td><a href="{{ route('billet-sources.edit',['source'=>$source]) }}" > {{ucfirst($source->title) }}</a></td>
 			<td> {{ $source->published }}</td>
 			<td> <a href="{{ route('billet-sources.edit',['source'=>$source]) }}" ><span class="uk-text-success">Modifier</span></a>
@@ -45,6 +43,7 @@
 @endsection
 
 @section('js')
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 
 @endsection
 

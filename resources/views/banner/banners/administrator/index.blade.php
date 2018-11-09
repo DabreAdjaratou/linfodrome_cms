@@ -12,7 +12,6 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
 			<th>{{ ('Titre') }}</th>
 			<th>{{ ('Publiée') }}</th>
 			<th>{{ ('Category') }}</th>
@@ -30,8 +29,7 @@
 	</thead>
 	<tbody>
 		@foreach($banners as $banner)
-			<tr class="uk-text-small">
-			<td ><input type="checkbox" name="" class="uk-checkbox"></td>
+			<tr>
 			<td><a href="{{ route('banners.edit',['banner'=>$banner]) }}" > {{ $banner->title }}</a></td>
 			<td> {{ $banner->published }}</td>
 			<td> {{ $banner->getCategory->title }}</td>

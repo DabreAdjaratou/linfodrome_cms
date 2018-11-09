@@ -11,10 +11,11 @@
 	<thead>
             <tr>
             <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-			<th>{{ ('Titre') }}</th>
+			<th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Publiée') }}<i class="fas fa-sort uk-margin-left"></i></th>
 			<th> {{ ('Restaurer') }}</th>
 			<th> {{ ('Supprimer') }}</th>
-			<th>{{ ('id') }}</th>
+			<th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>
 
                        
 		</tr>
@@ -42,11 +43,10 @@
 	</tfoot>
 </table>
 @section('sidebar')
-@endsection
-@section('sidebar')
  @component('layouts.administrator.banner-sidebar') @endcomponent 
 @endsection
 @section('js')
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 
 @endsection
 

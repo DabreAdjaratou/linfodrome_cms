@@ -17,20 +17,18 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small">	
 	<thead>
             <tr>
-            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
-			<th>{{ ('Titre') }}</th>
-			<th>{{ ('Pulieé') }}</th>
-			<th> {{ ('Modifier') }}</th>
-			<th> {{ ('Corbeille') }}</th>
-			<th>{{ ('id') }}</th>
-
+             <th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Publiée') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Modifier') }}</th>
+			<th>{{ ('Corbeille') }}</th>
+			<th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>
+                       
                        
 		</tr>
 	</thead>
 	<tbody> 
 @foreach($categories as $category)
 		<tr>
-			{{-- <td><input type="checkbox" name="" class="uk-checkbox"></td> --}}
 		<td><a href="{{ route('article-categories.edit',['category'=>$category]) }}" >{{ ucfirst($category->title) }}</a></td>
 			<td>{{ $category->published }} </td>
 			<td> <a href="{{ route('article-categories.edit',['category'=>$category]) }}" ><span class="uk-text-success">Modifier</span></a>
@@ -49,22 +47,9 @@
 @endsection
 
 @section('js')
- 
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 @endsection
 
-@push('js')
-<script type="text/javascript">
 
-$(document).ready(function() {
-    
-$('#dataTable').DataTable({
-	"lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]]
-				 }); 
-
- }); 
- 
-
-</script>
-@endpush
 
 @endsection

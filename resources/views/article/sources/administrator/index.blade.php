@@ -11,12 +11,12 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small " {{--uk-text-small responsive --}}>	
 	<thead>
             <tr>
-            {{-- <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th> --}}
-			<th>{{ ('Titre') }}</th>
-			<th> {{ ('Publiée') }}</th>
+          <th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Publiée') }}<i class="fas fa-sort uk-margin-left"></i></th>
 			<th>{{ ('Modifier') }}</th>
 			<th>{{ ('Corbeille') }}</th>
-			<th>{{ ('id') }}</th>
+			<th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>
+                       
                        
 		</tr>
 	</thead>
@@ -45,6 +45,7 @@
 @endsection
 
 @section('js')
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 
 @endsection
 
