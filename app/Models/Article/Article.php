@@ -148,4 +148,32 @@ if($publishedState==1){
     {
         return $query->whereBetween('created_at',[$fromDate,$toDate]);
     }   
+    
+    public  static function indexActions()
+    {
+      $actionTitles='<th>Brouillon</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("articles.put-in-draft",["article"=>'articleId']) .'"><span class="uk-text-success">Mettre au brouillon</span></<a></td>
+      <td> <a href="'.route('articles.put-in-trash',['article'=>'articleId']) .'" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function trashActions()
+    {
+     $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
+      $actions='<td><a href="'.route("articles.destroy",["article"=>'articleId']) .'"><span class="uk-text-success">Suprimer</span></<a></td>
+      <td> <a href="'.route('articles.restore',['article'=>'articleId']) .'" ><span class="uk-text-danger">Restaurer</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function draftActions()
+    {
+      $actionTitles='<th>Modifier</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("articles.edit",["article"=>'articleId']) .'"><span class="uk-text-success">modifié</span></<a></td>
+      <td> <a href="'.route('articles.put-in-trash',['article'=>'articleId']) .'" ><span class="uk-text-danger">Corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
 }

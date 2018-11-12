@@ -32,19 +32,18 @@ class ArchiveController extends Controller
      */
     public function index(Request $request)
     {
-
       $view='article.archives.administrator.index';
-      $queryWithPaginate=$articles=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
       $controllerMethodUrl=action('Article\ArchiveController@index');
       $actions=Archive::indexActions();
-      $result=$this->articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+      $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
       return view($view,$result,$actions);
 
 
     }
 
-    public function articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+    public function articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
     {
 
       if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
@@ -61,9 +60,9 @@ class ArchiveController extends Controller
         $toDate=$request->toDate;
         $sortField=$request->sortField;
         $order=$request->order;
-        $page=$request->page;
+        $itemType=$request->itemType;
         $articles = $queryWithOutPaginate;
-        $filterResult=$this->filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$page);
+        $filterResult=$this->filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
         return $filterResult;
 
       }
@@ -97,32 +96,32 @@ class ArchiveController extends Controller
      $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
      $sortField=$data->sortField;
      $order=$data->order;
-     $page=$data->page;
+     $itemType=$data->itemType;
 
-     switch ($page) {
+     switch ($itemType) {
       case('article-archives'):
-      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
       $actions=Archive::indexActions();
       break;
-      case('trash'):
+      case('article-archive-trash'):
       $articles=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
       $actions=Archive::trashActions();
       break;
 
-      case('draft'):
+      case('article-archive-draft'):
       $articles=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
       $actions=Archive::draftActions();
       break;
     }
 
     $filterResult=$this->filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
-     $fromDate,$toDate ,$sortField,$order,$page);
+     $fromDate,$toDate ,$sortField,$order,$itemType);
     return view('article.archives.administrator.searchAndSort',$filterResult,$actions);
 
   }
 
   public function filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-    $searchByUser,$fromDate,$toDate,$sortField,$order,$page) {
+    $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
     if($searchByTitle){
       $articles =$articles->ofTitle($searchByTitle);
     }
@@ -154,9 +153,10 @@ class ArchiveController extends Controller
     }else{
       $articles = $articles->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }
-    if($page){
-
-      $articles->withPath($page);
+    if($itemType){
+if($itemType=='article-archives'){ $articles->withPath('article-archives');};
+if($itemType=='article-archive-trash'){ $articles->withPath('trash');};
+if($itemType=='article-archive-draft'){ $articles->withPath('draft');};
 
     }
 
@@ -170,7 +170,7 @@ class ArchiveController extends Controller
       'fromDate' => $fromDate,
       'toDate' => $toDate,
       'sortField' => $sortField,
-      'page'=>$page,
+      'itemType'=>$itemType,
       'order' => $order])->links();
     $numberOfItemSFound=$articles->count();
     if($numberOfItemSFound==0){
@@ -471,7 +471,7 @@ public function inTrash( Request $request)
   $queryWithOutPaginate =Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
   $controllerMethodUrl=action('Article\ArchiveController@inTrash');
   $actions=Archive::trashActions();
-  $result=$this->articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
   return view($view,$result,$actions);
 }
 
@@ -487,7 +487,7 @@ public function inDraft(Request $request)
   $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
   $controllerMethodUrl=action('Article\ArchiveController@inDraft');
   $actions=Archive::draftActions();
-  $result=$this->articlesList($request,$view,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
   return view($view,$result,$actions);
 }
 

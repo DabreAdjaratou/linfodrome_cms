@@ -33,71 +33,100 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {   
-        if(url()->full() ==  action('Article\ArticleController@index')){
-      $articleListResult=$this->articleList();
-            return view('article.articles.administrator.index',$articleListResult);
-           }elseif(url()->full() !=  action('Article\ArticleController@index') && !($request->pageLength)){
-           $articleListResult=$this->articleList();
-            return view('article.articles.administrator.index',$articleListResult);
-        } else {
-            $pageLength=$request->pageLength;
-            $searchByTitle=$request->searchByTitle;
-            $searchByCategory=$request->searchByCategory;
-            $searchByFeaturedState=$request->searchByFeaturedState;
-            $searchByPublishedState=$request->searchByPublishedState;
-            $searchByUser=$request->searchByUser;
-            $fromDate=$request->fromDate;  
-            $toDate=$request->toDate;
-            $sortField=$request->sortField;
-            $order=$request->order;
-            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate,$toDate,$sortField,$order);
-     return view('article.articles.administrator.index',$filterResult);
+      $view='article.articles.administrator.index';
+      $queryWithPaginate=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $queryWithOutPaginate = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $controllerMethodUrl=action('Article\ArticleController@index');
+      $actions= Article::indexActions();
+      $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+      return view($view,$result,$actions);
 
-        }
+        
       
     }
-    
-    public function articleList(){
-        
-       $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-           $numberOfItemSFound=$articles->count();
-      if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
-    }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+    public function articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+    {
+
+      if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
+        $result=$this->articleWithTableParameters($queryWithPaginate);
+        return $result;
+      } else {
+        $pageLength=$request->pageLength;
+        $searchByTitle=$request->searchByTitle;
+        $searchByCategory=$request->searchByCategory;
+        $searchByFeaturedState=$request->searchByFeaturedState;
+        $searchByPublishedState=$request->searchByPublishedState;
+        $searchByUser=$request->searchByUser;
+        $fromDate=$request->fromDate;  
+        $toDate=$request->toDate;
+        $sortField=$request->sortField;
+        $order=$request->order;
+        $itemType=$request->itemType;
+        $articles = $queryWithOutPaginate;
+        $filterResult=$this->filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
+        return $filterResult;
+
+      }
 
     }
+
+    public function articleWithTableParameters($articles){
+      $numberOfItemSFound=$articles->count();
+      if($numberOfItemSFound==0){
+        $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+      }else{
+        $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+
+      }
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
-        return compact('articles','tableInfo','entries','categories','users');
+      return compact('articles','tableInfo','entries','categories','users');
     }
-
+    
+    
     public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());
+     $pageLength=$data->entries;
      $searchByTitle= $data->searchByTitle;
      $searchByCategory= $data->searchByCategory;
      $searchByFeaturedState= $data->searchByFeaturedState;
      $searchByPublishedState= $data->searchByPublishedState;
      $searchByUser=$data->searchByUser;
-     $sortField=$data->sortField;
-     $order=$data->order;
-     $pageLength=$data->entries;
      $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->fromDate).' 00:00:00')) : null;
      $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
-     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate,$toDate,$sortField,$order);
-         return view('article.articles.administrator.searchAndSort',$filterResult);
+     $sortField=$data->sortField;
+     $order=$data->order;
+     $itemType=$data->itemType;
 
-     
+     switch ($itemType) {
+      case('articles'):
+      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $actions=Article::indexActions();
+      break;
+      case('article-trash'):
+      $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $actions=Article::trashActions();
+      break;
+
+      case('article-draft'):
+      $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+      $actions=Article::draftActions();
+      break;
+    }
+
+    $filterResult=$this->filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+     $fromDate,$toDate ,$sortField,$order,$itemType);
+    return view('article.articles.administrator.searchAndSort',$filterResult,$actions);
+
   }
 
-  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-          $searchByUser, $fromDate,$toDate,$sortField,$order) {
-      $articles = Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+  public function filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+    $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
     if($searchByTitle){
       $articles =$articles->ofTitle($searchByTitle);
     }
-      if($searchByCategory){
+    if($searchByCategory){
       $articles =$articles->ofCategory($searchByCategory);
     }
     
@@ -110,32 +139,42 @@ class ArticleController extends Controller
     if($searchByUser){
       $articles =$articles->ofUser($searchByUser);   
     }
-if($fromDate && !$toDate){ 
+    if($fromDate && !$toDate){ 
       $articles =$articles->ofFromDate($fromDate);   
-}
-  if(!$fromDate && $toDate){ 
-  $articles =$articles->ofToDate($toDate);
-}
-if($fromDate && $toDate){
-$articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
-}
+    }
+    if(!$fromDate && $toDate){ 
+      $articles =$articles->ofToDate($toDate);
+    }
+    if($fromDate && $toDate){
+      $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
+    }
+
     if($sortField){
       $articles = $articles->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }else{
       $articles = $articles->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }
-    $articles->withPath('articles');
+    if($itemType){
+
+      if($itemType=='articles'){ $articles->withPath('article-archives');};
+if($itemType=='article-trash'){ $articles->withPath('trash');};
+if($itemType=='article-draft'){ $articles->withPath('draft');};
+
+
+    }
+
     $articles->appends([
-        'pageLength' => $pageLength,
-        'searchByTitle' => $searchByTitle,
-        'searchByCategory' => $searchByCategory,
-        'searchByFeaturedState' => $searchByFeaturedState,
-        'searchByPublishedState' => $searchByPublishedState,
-        'searchByUser' => $searchByUser,
-        'fromDate' => $fromDate,
-        'toDate' => $toDate,
-        'sortField' => $sortField,
-        'order' => $order])->links();
+      'pageLength' => $pageLength,
+      'searchByTitle' => $searchByTitle,
+      'searchByCategory' => $searchByCategory,
+      'searchByFeaturedState' => $searchByFeaturedState,
+      'searchByPublishedState' => $searchByPublishedState,
+      'searchByUser' => $searchByUser,
+      'fromDate' => $fromDate,
+      'toDate' => $toDate,
+      'sortField' => $sortField,
+      'itemType'=>$itemType,
+      'order' => $order])->links();
     $numberOfItemSFound=$articles->count();
     if($numberOfItemSFound==0){
       $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
@@ -146,11 +185,10 @@ $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
     $entries=[25,50,100];
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
-    
-    return compact('articles','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','fromDate','toDate','searchByUser');
+
+    return compact('articles','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
 
   }
-
          /**
      * Show the form for creating a new resource.
      *
@@ -550,10 +588,16 @@ return redirect()->route('articles.trash');
      * @return \Illuminate\Http\Response
      */
 
-public function inTrash()
+public function inTrash(Request $request)
 {
- $articles=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
- return view('article.articles.administrator.trash',compact('articles'));
+$view='article.articles.administrator.trash';
+$queryWithPaginate=Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+$queryWithOutPaginate =Article::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+$controllerMethodUrl=action('Article\ArticleController@inTrash');
+$actions=Article::trashActions();
+$result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+return view($view,$result,$actions);
+ 
 }
 
 /**
@@ -562,10 +606,16 @@ public function inTrash()
      * @return \Illuminate\Http\Response
      */
 
-public function inDraft()
+public function inDraft(Request $request)
 {
-  $articles=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-  return view('article.articles.administrator.draft',compact('articles'));
+
+   $view='article.articles.administrator.draft';
+  $queryWithPaginate=Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+  $queryWithOutPaginate =Article::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+  $controllerMethodUrl=action('Article\ArticleController@inDraft');
+  $actions=Article::draftActions();
+  $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  return view($view,$result,$actions);
 }
 
 

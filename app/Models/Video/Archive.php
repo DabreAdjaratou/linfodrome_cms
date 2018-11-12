@@ -173,4 +173,32 @@ if($publishedState==1){
     {
         return $query->whereBetween('created_at',[$fromDate,$toDate]);
     }    
+    
+    
+    public  static function indexActions()
+    {
+      $actionTitles='<th>Brouillon</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("video-archives.put-in-draft",["video"=>'videoId']) .'"><span class="uk-text-success">Mettre au brouillon</span></<a></td>
+      <td> <a href="'.route('video-archives.put-in-trash',['video'=>'videoId']) .'" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function trashActions()
+    {
+     $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
+      $actions='<td><a href="'.route("video-archives.destroy",["video"=>'videoId']) .'"><span class="uk-text-success">Suprimer</span></<a></td>
+      <td> <a href="'.route('video-archives.restore',['video'=>'videoId']) .'" ><span class="uk-text-danger">Restaurer</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function draftActions()
+    {
+      $actionTitles='<th>Modifier</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("video-archives.edit",["video"=>'videoId']) .'"><span class="uk-text-success">modifié</span></<a></td>
+      <td> <a href="'.route('video-archives.put-in-trash',['video'=>'videoId']) .'" ><span class="uk-text-danger">Corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
  }

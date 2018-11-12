@@ -13,14 +13,13 @@
 			<th>{{ ('Debut publication') }}</th>
 			<th>{{ ('fin publication') }}</th>
 			<th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-sort uk-margin-left"></i></th>
-                        <th>{{ ('Brouillon') }}</th>
-                        <th>{{ ('Corbeille') }}</th>
+                       {!! $actionTitles !!}
 			<th id="id" class="tableSort">{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>
                        
 		</tr>
 	</thead>
 	<tbody>		
-		@foreach($videos as $video)		
+		@foreach($items as $video)		
 		<tr>
             <td><a href="{{ route('videos.edit',['video'=>$video]) }}" > {{ ucfirst($video->title) }}</a></td>
 			<td> {{$video->getCategory->title}}</td>
@@ -33,9 +32,9 @@
 			<td>{{ $video->start_publication_at}} </td>
 			<td> {{$video->stop_publication_at}}</td>
 			<td> {{$video->views}}</td>
-			</td><td> <a href="{{ route('videos.put-in-draft',['video'=>$video]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a></td>
-      <td> <a href="{{ route('videos.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a></td>
-			<td>{{ $video->id }}</td>
+			                        {!! str_replace('videoId',$video->id, $actions)!!}
+
+                        <td>{{ $video->id }}</td>
                 </tr>
 		@endforeach
 	</tbody>

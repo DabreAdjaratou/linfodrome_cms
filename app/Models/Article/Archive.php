@@ -183,7 +183,6 @@ if($publishedState==1){
 
      public  static function draftActions()
     {
-     $articles=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
       $actionTitles='<th>Modifier</th><th>Corbeille</th>';
       $actions='<td><a href="'.route("article-archives.edit",["article"=>'articleId']) .'"><span class="uk-text-success">modifié</span></<a></td>
       <td> <a href="'.route('article-archives.put-in-trash',['article'=>'articleId']) .'" ><span class="uk-text-danger">Corbeille</span></a>

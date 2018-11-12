@@ -1,4 +1,5 @@
-<table id="dataTable" class=" uk-table uk-table-hover uk-table-striped uk-text-small" >   
+<div>
+    <table id="dataTable" class=" uk-table uk-table-hover uk-table-striped uk-text-small" >   
     <thead>
             <tr>
             <th id='title' class="tableSort">{{ ('Titre') }} <i class="fas fa-sort uk-margin-left"></i></th>
@@ -11,13 +12,12 @@
             <th>{{ ('Modifié le') }}</i></th>
             <th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-sort uk-margin-left"></i></th>
             <th>{{ ('Image') }}</th>
-            <th>{{ ('brouillon') }}</th>
-            <th>{{ ('Corbeille') }}</th>
+            {!! $actionTitles!!}
             <th id="id" class="tableSort">{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>                  
         </tr>
     </thead>
     <tbody>
-        @foreach($billets as $billet)
+        @foreach($items as $billet)
         <tr>
             <td> <a href="{{ route('billet-archives.edit',['billet'=>$billet]) }}" >{{ $billet->title }}</a></td>
             <td> {{ $billet->featured }}</td>
@@ -29,10 +29,7 @@
             <td>{{$billet->getRevision->last()['revised_at']}}  </td>
             <td> {{ $billet->views }}</td>
             <td> {{ $billet->image }}</td>
-            <td> <a href="{{ route('billet-archives.put-in-draft',['billet'=>$billet]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
-            </td>
-             <td> <a href="{{ route('billet-archives.put-in-trash',['billet'=>$billet]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
-            </td>
+            {!! str_replace('billetId',$billet->id, $actions)!!}
             <td>{{ $billet->id }}</td>
                 </tr>
         @endforeach
@@ -42,4 +39,4 @@
 </table>
  </div>
  {{ $tableInfo}}
-{{ $billets->links() }}
+{{ $items->links() }}

@@ -1,65 +1,30 @@
 @extends('layouts.administrator.master')
-@section('title', 'Videos trash')
+@section('title', 'Videos draft')
 @section('css')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 @endsection
 @section('content')
 @section ('pageTitle')
+<input type="hidden" name="order" id="order" value="desc">
+<input type="hidden" name="itemType" id="itemType" value="video-archive-draft">
 @parent
-<h3>  {{ ('Liste des videos en corbeille') }}</h3> @endsection 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-text-small">	
-	<thead>
-            <tr>
-			<th>{{ ('Titre de la video') }}</th>
-			<th>{{ ('Categorie') }}</th>
-			<th>{{ ('A la Une') }}</th>
-			<th>{{ ('Publiée') }}</th>
-			<th>{{ ('Journaliste') }}</th>
-			<th>{{ ('Cameraman') }}</th>
-			<th>{{ ('Monteur') }}</th>
-			<th>{{ ('crée lé') }}</th>
-			<th>{{ ('Debut publication') }}</th>
-			<th>{{ ('fin publication') }}</th>
-			<th>{{ ('Nbre de vue') }}</th>
-                        <th>{{ ('Modifier') }}</th>
-                        <th>{{ ('Corbeille') }}</th>
-			<th>{{ ('id') }}</th>
-                       
-		</tr>
-	</thead>
-	<tbody>
-		@foreach($archives as $video)
-		<tr>
-            <td> {{ ucfirst($video->title) }}</td>
-			<td> {{$video->getCategory->title}}</td>
-			<td> {{ $video->featured }}</td>
-			<td> {{ $video->published }}</td>
-			<td> {{ucwords($video->getAuthor->name)}}</td>
-			<td> {{ucwords($video->getCameraman->name)}}</td>
-			<td> {{ucwords($video->getEditor->name)}}  </td>
-			<td>{{$video->created_at}}</td>
-			<td>{{ $video->start_publication_at}} </td>
-			<td> {{$video->stop_publication_at}}</td>
-			<td> {{$video->views}}</td>
-                         <td> <a href="{{ route('video-archives.edit',['video'=>$video]) }}" ><span class="uk-text-success">Modifier</span></a>
-
-			</td>
-             <td> <a href="{{ route('video-archives.put-in-trash',['video'=>$video]) }}" ><span class="uk-text-success">Mettre en Corbeille</span></a>
-
-			</td>
-			
-			<td>{{ $video->id }}</td>
-                </tr>
-		@endforeach
-	</tbody>
-	<tfoot>
-	</tfoot>
-</table>
+  <h3>  {{ ('Liste des videos au brouillon') }}</h3> @endsection 
+  <a href="{{ route('videos.create') }}">Nouveau</a> 
+  @include('video.archives.administrator.filterFields')
+  <div id='tableContainer'>
+   @include('video.archives.administrator.searchAndSort',['actions'=>$actions]) 
+</div>
 @section('sidebar')
- @component('layouts.administrator.video-sidebar') @endcomponent 
+@component('layouts.administrator.video-sidebar') @endcomponent 
 @endsection
-
-@section('js')
-<script type="text/javascript" src="{{asset('js/custom-datatable.js')}}" ></script>
-@endsection
+@routes
+@push('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="{{ asset('js/own-datatable.js') }}"></script>
+@endpush
 
 @endsection

@@ -151,7 +151,7 @@ if($publishedState==1){
     } 
 
      /**
-     * Scope a query to only include articles whose creation date is between two  given date
+     * Scope a query to only include billets whose creation date is between two  given date
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $type
@@ -161,5 +161,32 @@ if($publishedState==1){
     {
         return $query->whereBetween('created_at',[$fromDate,$toDate]);
     }   
+
+    public  static function indexActions()
+    {
+      $actionTitles='<th>Brouillon</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("billet-archives.put-in-draft",["billet"=>'billetId']) .'"><span class="uk-text-success">Mettre au brouillon</span></<a></td>
+      <td> <a href="'.route('billet-archives.put-in-trash',['billet'=>'billetId']) .'" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function trashActions()
+    {
+     $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
+      $actions='<td><a href="'.route("billet-archives.destroy",["billet"=>'billetId']) .'"><span class="uk-text-success">Suprimer</span></<a></td>
+      <td> <a href="'.route('billet-archives.restore',['billet'=>'billetId']) .'" ><span class="uk-text-danger">Restaurer</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function draftActions()
+    {
+      $actionTitles='<th>Modifier</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("billet-archives.edit",["billet"=>'billetId']) .'"><span class="uk-text-success">modifié</span></<a></td>
+      <td> <a href="'.route('billet-archives.put-in-trash',['billet'=>'billetId']) .'" ><span class="uk-text-danger">Corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
 
 }

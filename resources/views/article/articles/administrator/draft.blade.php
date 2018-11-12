@@ -1,57 +1,32 @@
 @extends('layouts.administrator.master')
 @section('title', 'Articles draft')
 @section('css')
+@section('css')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 @endsection
 @section('content')
 @section ('pageTitle')
+<input type="hidden" name="order" id="order" value="desc">
+<input type="hidden" name="itemType" id="itemType" value="article-draft">
+
 @parent
-<h3>  {{ ('Liste des articles en corbeille') }}</h3> @endsection
-<table id="dataTable" class="uk-table uk-table-responsive uk-table-hover uk-table-striped uk-text-small" >	
-	<thead>
-            <tr>
-			<th>{{ ('Titre') }}</th>
-			<th>{{ ('Category') }}</th>
-			<th>{{ ('Auteur') }}</th>
-			<th>{{ ('créé le') }}</th>
-			<th>{{ ('Dernière modification') }}</th>
-			<th>{{ ('Modifié le') }}</th>
-			<th>{{ ('Nbre de vue') }}</th>
-			<th>{{ ('Image') }}</th>
-                       <th>{{ ('Modifier') }}</th>
-                         <th>{{ ('Corbeille') }}</th>
-			<th>{{ ('id') }}</th>                       
-		</tr>
-	</thead>
-	<tbody>
-		@foreach($articles as $article)
-  	<tr>
-			<td> {{ $article->title }}</td>
-			<td> {{ $article->getCategory->title }}</td>
-			<td> {{ $article->getAuthor->name }}</td>
-			<td> {{ $article->created_at }}</td>
-			<td>{{$article->getRevision->last()['getModifier']['name']}} </td>
-			<td>{{$article->getRevision->last()['revised_at']}}  </td>
-			<td> {{ $article->views }}</td>
-			<td> {{ $article->image }}</td>
-                         <td> <a href="{{ route('articles.edit',['article'=>$article]) }}" ><span class="uk-text-success">Modifier</span></a>
-
-			</td>
-			 <td> <a href="{{ route('articles.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre au brouillon</span></a>
-
-			</td>
-			<td>{{ $article->id }}</td>
-                </tr>
-		@endforeach
-		
-	</tbody>
-	<tfoot>
-	</tfoot>
-</table>
+<h3>  {{ ('Liste des articles au brouillon') }}</h3> @endsection
+@include('article.articles.administrator.filterFields')
+<div id="tableContainer">	
+@include('article.articles.administrator.searchAndSort',['actions'=>$actions]) 
+</div>
 @section('sidebar')
  @component('layouts.administrator.article-sidebar') @endcomponent 
 @endsection
+@routes
+@push('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="{{ asset('js/own-datatable.js') }}"></script>
+@endpush
+@endsection
 
-@section('js')
-<script type="text/javascript" src="{{asset('js/custom-datatable.js')}}" ></script>
-@endsection
-@endsection
+

@@ -30,52 +30,62 @@ class BilletController extends Controller
      * @return \Illuminate\Http\Response
      */
   
-   public function index(Request $request)
-    {   
-       if(url()->full() ==  action('Billet\BilletController@index')){
-      $billetListResult=$this->billetList();
-            return view('billet.billets.administrator.index',$billetListResult);
-           }elseif(url()->full() !=  action('Billet\ArchiveController@index') && !($request->pageLength)){
-           $billetListResult=$this->billetList();
-            return view('billet.billets.administrator.index',$billetListResult);
-        } else {
-            $pageLength=$request->pageLength;
-            $searchByTitle=$request->searchByTitle;
-            $searchByCategory=$request->searchByCategory;
-            $searchByFeaturedState=$request->searchByFeaturedState;
-            $searchByPublishedState=$request->searchByPublishedState;
-            $searchByUser=$request->searchByUser;
-            $fromDate=$request->fromDate;  
-            $toDate=$request->toDate;
-            $sortField=$request->sortField;
-            $order=$request->order;
-            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,
-              $toDate,
-            $sortField,$order);
-     return view('billet.billets.administrator.index',$filterResult);
+  
+ public function index(Request $request)
+    {
+      $view='billet.billets.administrator.index';
+      $queryWithPaginate=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $queryWithOutPaginate =Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $controllerMethodUrl=action('Billet\BilletController@index');
+      $actions=Billet::indexActions();
+      $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+      return view($view,$result,$actions);
 
-        }
-          
-      }
-
-      
-      public function billetList(){
-        
-       $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        $numberOfItemSFound=$billets->count();
-      if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$billets->total();
-    }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$billets->total();
 
     }
+
+    public function itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+    {
+
+      if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
+        $result=$this->itemsWithTableParameters($queryWithPaginate);
+        return $result;
+      } else {
+        $pageLength=$request->pageLength;
+        $searchByTitle=$request->searchByTitle;
+        $searchByCategory=$request->searchByCategory;
+        $searchByFeaturedState=$request->searchByFeaturedState;
+        $searchByPublishedState=$request->searchByPublishedState;
+        $searchByUser=$request->searchByUser;
+        $fromDate=$request->fromDate;  
+        $toDate=$request->toDate;
+        $sortField=$request->sortField;
+        $order=$request->order;
+        $itemType=$request->itemType;
+        $items = $queryWithOutPaginate;
+        $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
+        return $filterResult;
+
+      }
+
+    }
+
+    public function itemsWithTableParameters($items){
+      $numberOfItemSFound=$items->count();
+      if($numberOfItemSFound==0){
+        $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
+      }else{
+        $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
+
+      }
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
-        return compact('billets','tableInfo','entries','categories','users');
+      return compact('items','tableInfo','entries','categories','users');
     }
-
-public function searchAndSort(Request $request){ 
+    
+    
+    public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());
      $pageLength=$data->entries;
      $searchByTitle= $data->searchByTitle;
@@ -87,72 +97,94 @@ public function searchAndSort(Request $request){
      $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
      $sortField=$data->sortField;
      $order=$data->order;
-     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate,$toDate,
-            $sortField,$order);
-     return view('billet.billets.administrator.searchAndSort',$filterResult);
+     $itemType=$data->itemType;
 
-     
+     switch ($itemType) {
+      case('billets'):
+      $items = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $actions=Billet::indexActions();
+      break;
+      case('billet-trash'):
+      $items=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $actions=Billet::trashActions();
+      break;
+
+      case('billet-draft'):
+      $items=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+      $actions=Billet::draftActions();
+      break;
+    }
+
+    $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+     $fromDate,$toDate ,$sortField,$order,$itemType);
+    return view('billet.billets.administrator.searchAndSort',$filterResult,$actions);
+
   }
 
-  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-          $searchByUser,$fromDate,$toDate,$sortField,$order) {
-      $billets = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+  public function filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+    $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
     if($searchByTitle){
-      $billets =$billets->ofTitle($searchByTitle);
+      $items =$items->ofTitle($searchByTitle);
     }
-      if($searchByCategory){
-      $billets =$billets->ofCategory($searchByCategory);
+    if($searchByCategory){
+      $items =$items->ofCategory($searchByCategory);
     }
     
     if(!is_null($searchByFeaturedState)){
-      $billets =$billets->ofFeaturedState($searchByFeaturedState);   
+      $items =$items->ofFeaturedState($searchByFeaturedState);   
     }
     if(!is_null($searchByPublishedState)){
-      $billets =$billets->ofPublishedState($searchByPublishedState);   
+      $items =$items->ofPublishedState($searchByPublishedState);   
     }
     if($searchByUser){
-      $billets =$billets->ofUser($searchByUser);   
+      $items =$items->ofUser($searchByUser);   
     }
-    
-if($fromDate && !$toDate){ 
-      $billets =$billets->ofFromDate($fromDate);   
-}
-  if(!$fromDate && $toDate){ 
-  $billets =$billets->ofToDate($toDate);
-}
-if($fromDate && $toDate){
-$billets =$billets->ofBetweenTwoDate($fromDate, $toDate);
-}
+    if($fromDate && !$toDate){ 
+      $items =$items->ofFromDate($fromDate);   
+    }
+    if(!$fromDate && $toDate){ 
+      $items =$items->ofToDate($toDate);
+    }
+    if($fromDate && $toDate){
+      $items =$items->ofBetweenTwoDate($fromDate, $toDate);
+    }
 
     if($sortField){
-      $billets = $billets->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $items = $items->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }else{
-      $billets = $billets->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $items = $items->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
     }
-    $billets->withPath('billets');
-    $billets->appends([
-        'pageLength' => $pageLength,
-        'searchByTitle' => $searchByTitle,
-        'searchByCategory' => $searchByCategory,
-        'searchByFeaturedState' => $searchByFeaturedState,
-        'searchByPublishedState' => $searchByPublishedState,
-        'searchByUser' => $searchByUser,
-        'fromDate' => $fromDate,
-        'toDate' => $toDate,
-        'sortField' => $sortField,
-        'order' => $order])->links();
-    $numberOfItemSFound=$billets->count();
+    if($itemType){
+if($itemType=='billets'){ $items->withPath('billets');};
+if($itemType=='billet-trash'){ $items->withPath('trash');};
+if($itemType=='billet-draft'){ $items->withPath('draft');};
+
+    }
+
+    $items->appends([
+      'pageLength' => $pageLength,
+      'searchByTitle' => $searchByTitle,
+      'searchByCategory' => $searchByCategory,
+      'searchByFeaturedState' => $searchByFeaturedState,
+      'searchByPublishedState' => $searchByPublishedState,
+      'searchByUser' => $searchByUser,
+      'fromDate' => $fromDate,
+      'toDate' => $toDate,
+      'sortField' => $sortField,
+      'itemType'=>$itemType,
+      'order' => $order])->links();
+    $numberOfItemSFound=$items->count();
     if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$billets->total();
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
     }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$billets->total();
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
     }
     $entries=[25,50,100];
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
-    
-    return compact('billets','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
+
+    return compact('items','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
 
   }
 
@@ -527,20 +559,30 @@ return redirect()->route('billets.trash');
      *
      * @return \Illuminate\Http\Response
      */
-public function inTrash()
+public function inTrash(Request $request)
 {
- $billets=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
- return view('billet.billets.administrator.trash',compact('billets'));
+$view='billet.billets.administrator.trash';
+  $queryWithPaginate=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+        $queryWithOutPaginate =Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+       $controllerMethodUrl=action('Billet\BilletController@inTrash');
+  $actions=Billet::trashActions();
+  $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  return view($view,$result,$actions);
 }
 /**
      * Display a listing of the resource in the draft.
      *
      * @return \Illuminate\Http\Response
      */
-public function inDraft()
+public function inDraft( Request $request)
 {
-  $billets=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-  return view('billet.billets.administrator.draft',compact('billets'));
+  $view='billet.billets.administrator.draft';
+  $queryWithPaginate=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+  $queryWithOutPaginate =Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+  $controllerMethodUrl=action('Billet\BilletController@inDraft');
+  $actions=Billet::draftActions();
+  $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  return view($view,$result,$actions);
 }
 
 }

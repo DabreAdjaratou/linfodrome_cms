@@ -10,7 +10,7 @@
 @section('content')
 @section ('pageTitle')
 <input type="hidden" name="order" id="order" value="desc">
-<input type="hidden" name="page" id="page" value="trash">
+<input type="hidden" name="itemType" id="itemType" value="article-archive-trash">
 
 @parent
 <h3>  {{ ('Liste des articles en corbeille') }}</h3> @endsection
@@ -25,6 +25,6 @@
 @push('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script type="text/javascript" src="{{ asset('js/article-datatable.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/own-datatable.js') }}"></script>
 @endpush
 @endsection

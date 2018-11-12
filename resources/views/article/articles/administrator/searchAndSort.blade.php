@@ -1,5 +1,5 @@
   <div>
-    <table id="dataTable" class="uk-table uk-table-responsive uk-table-hover uk-table-striped uk-text-small" > 
+    <table id="dataTable" class="uk-table tuk-table-responsive uk-table-hover uk-table-striped uk-text-small" > 
      <thead>
       <tr>
        <th id='title' class="tableSort">{{ ('Titre') }} <i class="fas fa-sort uk-margin-left"></i></th>
@@ -12,9 +12,8 @@
        <th>{{ ('Modifié le') }}</i></th>
        <th id="views" class="tableSort">{{ ('Nbre de vue') }}<i class="fas fa-sort uk-margin-left"></i></th>
        <th>{{ ('Image') }}</th>
-       <th>{{ ('brouillon') }}</th>
-       <th>{{ ('Corbeille') }}</th>
-       <th id="id" class="tableSort">{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>                       
+       {!! $actionTitles !!}
+       <th  id='id' class="tableSort">{{ ('id') }}<i class="fas fa-sort uk-margin-left"></i></th>                       
      </tr>
    </thead>
    <tbody>
@@ -30,18 +29,16 @@
       <td>@if($article->getRevision->last()['revised_at']){{ date("d/m/Y H:i:s", strtotime($article->getRevision->last()['revised_at']))}} @endif  </td>
       <td> {{ $article->views }}</td>
       <td> {{ $article->image }}</td>
-          <td> <a href="{{ route('articles.put-in-draft',['article'=>$article]) }}" ><span class="uk-text-success">Mettre au brouillon</span></a>
-          </td>
-          <td> <a href="{{ route('articles.put-in-trash',['article'=>$article]) }}" ><span class="uk-text-danger">Mettre en corbeille</span></a>
-          </td>
-          <td>{{ $article->id }}</td>
-        </tr>
-        @endforeach
-      </tbody>
-      <tfoot>
-      </tfoot>
 
-    </table>
-  </div>
+      {!! str_replace('articleId',$article->id, $actions)!!}
+      <td>{{ $article->id }}</td>
+    </tr>
+    @endforeach
+  </tbody>
+  <tfoot>
+  </tfoot>
+
+</table>
+</div>
 {{ $tableInfo}}
 {{ $articles->links() }}

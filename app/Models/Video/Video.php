@@ -147,7 +147,7 @@ if($publishedState==1){
     } 
 
      /**
-     * Scope a query to only include articles whose creation date is between two  given date
+     * Scope a query to only include videos whose creation date is between two  given date
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $type
@@ -156,5 +156,33 @@ if($publishedState==1){
     public function scopeOfBetweenTwoDate($query,$fromDate, $toDate)
     {
         return $query->whereBetween('created_at',[$fromDate,$toDate]);
-    }         
+    }     
+
+
+    public  static function indexActions()
+    {
+      $actionTitles='<th>Brouillon</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("videos.put-in-draft",["video"=>'videoId']) .'"><span class="uk-text-success">Mettre au brouillon</span></<a></td>
+      <td> <a href="'.route('videos.put-in-trash',['video'=>'videoId']) .'" ><span class="uk-text-danger">Mettre en corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function trashActions()
+    {
+     $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
+      $actions='<td><a href="'.route("videos.destroy",["video"=>'videoId']) .'"><span class="uk-text-success">Suprimer</span></<a></td>
+      <td> <a href="'.route('videos.restore',['video'=>'videoId']) .'" ><span class="uk-text-danger">Restaurer</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }
+
+     public  static function draftActions()
+    {
+      $actionTitles='<th>Modifier</th><th>Corbeille</th>';
+      $actions='<td><a href="'.route("videos.edit",["video"=>'videoId']) .'"><span class="uk-text-success">modifié</span></<a></td>
+      <td> <a href="'.route('videos.put-in-trash',['video'=>'videoId']) .'" ><span class="uk-text-danger">Corbeille</span></a>
+      </td>';
+        return compact('actionTitles','actions');
+    }    
 }
