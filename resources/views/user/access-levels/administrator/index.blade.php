@@ -12,11 +12,11 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small" {{--uk-text-small responsive --}}/>	
 	<thead>
             <tr>
-			<th>{{ ('Titre') }}</th>
-			<th>{{ ('Groupes utilisateurs') }}</th>
+			<th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></th>
+			<th>{{ ('Groupes utilisateurs') }}<i class="fas fa-sort uk-margin-left"></th>
 			<th>{{ ('Modifier') }}</th>
 			<th>{{ ('Supprimer') }}</th>
-			<th>{{ ('Id') }}</th>
+			<th>{{ ('Id') }}<i class="fas fa-sort uk-margin-left"></th>
                        
 		</tr>
 	</thead>
@@ -46,9 +46,8 @@
 @section('sidebar')
  @component('layouts.administrator.user-sidebar') @endcomponent 
 @endsection
-
 @section('js')
-
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 @endsection
 
 @endsection

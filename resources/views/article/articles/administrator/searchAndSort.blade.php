@@ -30,7 +30,7 @@
       <td> {{ $article->views }}</td>
       <td> {{ $article->image }}</td>
 
-      {!! str_replace('articleId',$article->id, $actions)!!}
+      {!!  str_replace('articleId',$article->id, $actions)!!}
       <td>{{ $article->id }}</td>
     </tr>
     @endforeach

@@ -44,9 +44,7 @@ Route::get('articles/trash','Article\ArticleController@inTrash')->name('articles
 
 Route::post('articles/searchAndSort','Article\ArticleController@searchAndSort')->name('articles.search-and-sort');
 
-Route::resource('articles','Article\ArticleController')->only([
-    'index','show','edit','update','create','delete','store','destroy'
-]);
+Route::resource('articles','Article\ArticleController');
 
 Route::get('article-categories/{article_category}/trash','Article\CategoryController@putInTrash')->name('article-categories.put-in-trash');
 Route::get('article-categories/{article_category}/restore','Article\CategoryController@restore')->name('article-categories.restore');

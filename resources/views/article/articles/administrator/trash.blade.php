@@ -26,5 +26,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript" src="{{ asset('js/own-datatable.js') }}"></script>
-@endpush
+<script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
+<script>
+	
+    $("#deleteForm").submit(function(){
+      return confirm("Êtes vous sûre de bien vouloir supprimer cet article?");
+    });
+</script>
+@endpush 
 @endsection

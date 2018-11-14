@@ -41,4 +41,10 @@
             </li>
         @endif
     </ul>
+    @else
+     <ul class="pagination uk-align-right" role="navigation">
+    <li class="page-item uk-display-inline-block uk-padding-small ">Previous</li>
+    <li class="page-item uk-display-inline-block uk-padding-small ">1</li>
+    <li class="page-item uk-display-inline-block uk-padding-small ">Next</li>
+</ul>
 @endif

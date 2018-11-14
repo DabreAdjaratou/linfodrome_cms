@@ -1,11 +1,9 @@
-<a href="{{ route('user-groups.create') }}">Nouveau</a> 
-
 @foreach($children as $child)
 @if($view=='view')
   @if(isset($data))
     @if(in_array($child->title,$data))
         <ul>
-            {{-- <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" checked> --}}
+            <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" checked>
             {{ ucfirst($child->title) }}
               @if(count($child->getChildren))
                @include('user.groups.administrator.groupChild',['children' => $child->getChildren,])
@@ -15,7 +13,7 @@
   
       @if(in_array($child->title,$arrayDiff))
         <ul>
-          {{-- <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" > --}}
+          <input type="checkbox" name="groups[]" value="{{$child->id}}" class="uk-checkbox" >
           {{ ucfirst($child->title) }}
             @if(count($child->getChildren))
              @include('user.groups.administrator.groupChild',['children' => $child->getChildren,])

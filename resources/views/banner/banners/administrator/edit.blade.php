@@ -1,6 +1,9 @@
 @extends('layouts.administrator.master')
 @section('title', 'Edit a banner')
 @section('css')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Modifier une bannière ') }}</h3>@endsection 
@@ -57,11 +60,11 @@
 
 	<div>
 		<label for="start_publication_at">{{('Star publication at:')}}</label>
-		<input type="text" name="start_publication_at" value="{{ $banner->start_publication_at }}" >
+		<input type="text" name="start_publication_at" class="datepicker"  @if(isset($banner->start_publication_at)) value='{{ date("d-m-Y H:i:s", strtotime($banner->start_publication_at))}}' @endif autocomplete="off"  >
 	</div>
 	<div>
 		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
-		<input type="text" name="stop_publication_at"  value="{{ $banner->stop_publication_at}}">
+		<input type="text" name="stop_publication_at"  class="datepicker"  @if(isset($banner->stop_publication_at)) value='{{ date("d-m-Y H:i:s", strtotime($banner->stop_publication_at))}}' @endif autocomplete="off" >
 	</div>
 <div class="uk-grid">
 	<div class="uk-width-1-3">
@@ -127,6 +130,7 @@
  @component('layouts.administrator.banner-sidebar') @endcomponent 
 @endsection
 @section('js')
-
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
 @endsection
 @endsection

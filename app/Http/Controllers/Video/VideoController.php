@@ -27,52 +27,61 @@ class VideoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-     public function index(Request $request)
-     {
-    if(url()->full() ==  action('Video\VideoController@index')){
-      $videoListResult=$this->videoList();
-            return view('video.videos.administrator.index',$videoListResult);
-           }elseif(url()->full() !=  action('Video\ArchiveController@index') && !($request->pageLength)){
-           $videoListResult=$this->videoList();
-            return view('video.videos.administrator.index',$videoListResult);
-        } else {
-            $pageLength=$request->pageLength;
-            $searchByTitle=$request->searchByTitle;
-            $searchByCategory=$request->searchByCategory;
-            $searchByFeaturedState=$request->searchByFeaturedState;
-            $searchByPublishedState=$request->searchByPublishedState;
-            $searchByUser=$request->searchByUser;
-            $fromDate=$request->fromDate;  
-            $toDate=$request->toDate;
-            $sortField=$request->sortField;
-            $order=$request->order;
-            $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate,$toDate,
-            $sortField,$order);
-     return view('video.videos.administrator.index',$filterResult);
+      public function index(Request $request)
+    {
+      $view='video.videos.administrator.index';
+      $queryWithPaginate=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+      $queryWithOutPaginate =Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2);
+      $controllerMethodUrl=action('Video\VideoController@index');
+      $actions=Video::indexActions();
+      $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+      return view($view,$result,$actions);
 
-        }
-          
-      }
-
-      
-      public function videoList(){
-        
-      $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-          $numberOfItemSFound=$videos->count();
-      if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$videos->total();
-    }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$videos->total();
 
     }
+
+    public function itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+    {
+
+      if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
+        $result=$this->itemsWithTableParameters($queryWithPaginate);
+        return $result;
+      } else {
+        $pageLength=$request->pageLength;
+        $searchByTitle=$request->searchByTitle;
+        $searchByCategory=$request->searchByCategory;
+        $searchByFeaturedState=$request->searchByFeaturedState;
+        $searchByPublishedState=$request->searchByPublishedState;
+        $searchByUser=$request->searchByUser;
+        $fromDate=$request->fromDate;  
+        $toDate=$request->toDate;
+        $sortField=$request->sortField;
+        $order=$request->order;
+        $itemType=$request->itemType;
+        $items = $queryWithOutPaginate;
+        $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
+        return $filterResult;
+
+      }
+
+    }
+
+    public function itemsWithTableParameters($items){
+      $numberOfItemSFound=$items->count();
+      if($numberOfItemSFound==0){
+        $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
+      }else{
+        $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
+
+      }
       $entries=[25,50,100];
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
-        return compact('videos','tableInfo','entries','categories','users');
+      return compact('items','tableInfo','entries','categories','users');
     }
-
-
-public function searchAndSort(Request $request){ 
+    
+    
+    public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());
      $pageLength=$data->entries;
      $searchByTitle= $data->searchByTitle;
@@ -80,74 +89,98 @@ public function searchAndSort(Request $request){
      $searchByFeaturedState= $data->searchByFeaturedState;
      $searchByPublishedState= $data->searchByPublishedState;
      $searchByUser=$data->searchByUser;
-      $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->fromDate).' 00:00:00')) : null;
-     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
+    $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime($data->fromDate)) : null;
+     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( $data->toDate)) : null;
      $sortField=$data->sortField;
      $order=$data->order;
-     $filterResult=$this->filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,$fromDate, $toDate,
-            $sortField,$order);
-     return view('video.videos.administrator.searchAndSort',$filterResult);
+     $itemType=$data->itemType;
 
-     
+     switch ($itemType) {
+      case('videos'):
+      $items = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2);
+      $actions=Video::indexActions();
+      break;
+      case('video-trash'):
+      $items=Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name']);
+      $actions=Video::trashActions();
+      break;
+
+      case('video-draft'):
+      $items=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2);
+      $actions=Video::draftActions();
+      break;
+    }
+
+    $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+     $fromDate,$toDate ,$sortField,$order,$itemType);
+    return view('video.videos.administrator.searchAndSort',$filterResult,$actions);
+
   }
 
-  public function filter($pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-          $searchByUser,$fromDate,$toDate,$sortField,$order) {
-      $videos = Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name']);
+  public function filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+    $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
     if($searchByTitle){
-      $videos =$videos->ofTitle($searchByTitle);
+      $items =$items->ofTitle($searchByTitle);
     }
-      if($searchByCategory){
-      $videos =$videos->ofCategory($searchByCategory);
+    if($searchByCategory){
+      $items =$items->ofCategory($searchByCategory);
     }
     
     if(!is_null($searchByFeaturedState)){
-      $videos =$videos->ofFeaturedState($searchByFeaturedState);   
+      $items =$items->ofFeaturedState($searchByFeaturedState);   
     }
     if(!is_null($searchByPublishedState)){
-      $videos =$videos->ofPublishedState($searchByPublishedState);   
+      $items =$items->ofPublishedState($searchByPublishedState);   
     }
     if($searchByUser){
-      $videos =$videos->ofUser($searchByUser);   
+      $items =$items->ofUser($searchByUser);   
     }
     if($fromDate && !$toDate){ 
-      $videos =$videos->ofFromDate($fromDate);   
-}
-  if(!$fromDate && $toDate){ 
-  $videos =$videos->ofToDate($toDate);
-}
-if($fromDate && $toDate){
-$videos =$videos->ofBetweenTwoDate($fromDate, $toDate);
-}
-    if($sortField){
-      $videos = $videos->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-    }else{
-      $videos = $videos->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+      $items =$items->ofFromDate($fromDate);   
     }
-    $videos->withPath('videos');
-    $videos->appends([
-        'pageLength' => $pageLength,
-        'searchByTitle' => $searchByTitle,
-        'searchByCategory' => $searchByCategory,
-        'searchByFeaturedState' => $searchByFeaturedState,
-        'searchByPublishedState' => $searchByPublishedState,
-        'searchByUser' => $searchByUser,
-         'fromDate' => $fromDate,
-        'toDate' => $toDate,
-        'sortField' => $sortField,
-        'order' => $order])->links();
-    $numberOfItemSFound=$videos->count();
-    if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$videos->total();
+    if(!$fromDate && $toDate){ 
+      $items =$items->ofToDate($toDate);
+    }
+    if($fromDate && $toDate){
+      $items =$items->ofBetweenTwoDate($fromDate, $toDate);
+    }
+
+    if($sortField){
+      $items = $items->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
     }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$videos->total();
+      $items = $items->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+    }
+    if($itemType){
+if($itemType=='videos'){ $items->withPath('videos');};
+if($itemType=='video-trash'){ $items->withPath('trash');};
+if($itemType=='video-draft'){ $items->withPath('draft');};
+
+    }
+
+    $items->appends([
+      'pageLength' => $pageLength,
+      'searchByTitle' => $searchByTitle,
+      'searchByCategory' => $searchByCategory,
+      'searchByFeaturedState' => $searchByFeaturedState,
+      'searchByPublishedState' => $searchByPublishedState,
+      'searchByUser' => $searchByUser,
+      'fromDate' => $fromDate,
+      'toDate' => $toDate,
+      'sortField' => $sortField,
+      'itemType'=>$itemType,
+      'order' => $order])->links();
+    $numberOfItemSFound=$items->count();
+    if($numberOfItemSFound==0){
+      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
+    }else{
+      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
     }
     $entries=[25,50,100];
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
-    
-    return compact('videos','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
+
+    return compact('items','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
 
   }
 
@@ -182,8 +215,8 @@ $videos =$videos->ofBetweenTwoDate($fromDate, $toDate);
         'created_by'=>'int',
         'cameraman'=>'required|int',
         'editor'=>'required|int',
-        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+        'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
       ]);
 
       $video= new Video;
@@ -199,9 +232,18 @@ $videos =$videos->ofBetweenTwoDate($fromDate, $toDate);
       $video->cameraman =$request->cameraman;
       $video->editor =$request->editor;
       $video->created_at =now();
-      $video->start_publication_at = $request->start_publication_at;
-      $video->stop_publication_at =$request->stop_publication_at;
-
+       if($request->start_publication_at){
+     $start_at=explode(' ',$request->start_publication_at);
+     $video->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     }else{
+      $video->start_publication_at=$request->start_publication_at;
+    }
+     if($request->start_publication_at){
+     $stop_at=explode(' ',$request->stop_publication_at);
+     $video->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
+     }else{
+      $video->stop_publication_at=$request->stop_publication_at;
+     }
 
 
       try {
@@ -321,8 +363,8 @@ $videos =$videos->ofBetweenTwoDate($fromDate, $toDate);
         'created_by'=>'int',
         'cameraman'=>'required|int',
         'editor'=>'required|int',
-        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+        'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
       ]);
       $video=Video::find($id);
       $video->title =$request->title;
@@ -337,8 +379,18 @@ $videos =$videos->ofBetweenTwoDate($fromDate, $toDate);
       $video->cameraman =$request->cameraman;
       $video->editor =$request->editor;
       $video->created_at =now();
-      $video->start_publication_at = $request->start_publication_at;
-      $video->stop_publication_at =$request->stop_publication_at;
+       if($request->start_publication_at){
+     $start_at=explode(' ',$request->start_publication_at);
+     $video->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     }else{
+      $video->start_publication_at=$request->start_publication_at;
+    }
+     if($request->start_publication_at){
+     $stop_at=explode(' ',$request->stop_publication_at);
+     $video->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
+     }else{
+      $video->stop_publication_at=$request->stop_publication_at;
+     }
       $video->checkout=0;
 
       try {
@@ -499,19 +551,29 @@ return redirect()->route('videos.trash');
      *
      * @return \Illuminate\Http\Response
      */
-public function inTrash()
+public function inTrash( Request $request)
 {
- $videos=Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
- return view('video.videos.administrator.trash',compact('videos'));
+ $view='video.videos.administrator.trash';
+  $queryWithPaginate=Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+        $queryWithOutPaginate =Video::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name']);
+       $controllerMethodUrl=action('Video\VideoController@inTrash');
+  $actions=Video::trashActions();
+  $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  return view($view,$result,$actions);
 }
 /**
      * Display a listing of the resource in the draft.
      *
      * @return \Illuminate\Http\Response
      */
-public function inDraft()
+public function inDraft( Request $request)
 {
-  $videos=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->orderBy('id', 'desc')->get(['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-  return view('video.videos.administrator.draft',compact('videos'));
+   $view='video.videos.administrator.draft';
+  $queryWithPaginate=Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+  $queryWithOutPaginate =Video::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2);
+  $controllerMethodUrl=action('Video\VideoController@inDraft');
+  $actions=Video::draftActions();
+  $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  return view($view,$result,$actions);
 }
 }

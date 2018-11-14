@@ -93,8 +93,8 @@ class ArticleController extends Controller
      $searchByFeaturedState= $data->searchByFeaturedState;
      $searchByPublishedState= $data->searchByPublishedState;
      $searchByUser=$data->searchByUser;
-     $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->fromDate).' 00:00:00')) : null;
-     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
+     $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime($data->fromDate)) : null;
+     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( $data->toDate)) : null;
      $sortField=$data->sortField;
      $order=$data->order;
      $itemType=$data->itemType;
@@ -225,8 +225,8 @@ if($itemType=='article-draft'){ $articles->withPath('draft');};
       'fulltext'=>'required|string',
       'source_id'=>'int',
         // 'created_by'=>'int',
-      'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-      'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+      'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+      'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
 
     ]);
 
@@ -246,8 +246,19 @@ if($itemType=='article-draft'){ $articles->withPath('draft');};
      $article->keywords=$request->tags;
      $article->created_by =$request->created_by ?? $request->auth_userid;
      $article->created_at =now();
-     $article->start_publication_at = $request->start_publication_at;
-     $article->stop_publication_at =$request->stop_publication_at;
+     if($request->start_publication_at){
+     $start_at=explode(' ',$request->start_publication_at);
+     $article->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     }else{
+      $article->start_publication_at=$request->start_publication_at;
+    }
+     if($request->start_publication_at){
+     $stop_at=explode(' ',$request->stop_publication_at);
+     $article->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
+     }else{
+      $article->stop_publication_at=$request->stop_publication_at;
+     }
+    
      $article->checkout=0;
         // Storage::disk('local')->put('Images',$request->image->getClientOriginalName());
      try {
@@ -390,8 +401,8 @@ if($itemType=='article-draft'){ $articles->withPath('draft');};
         'fulltext'=>'required|string',
         'source_id'=>'int',
         // 'created_by'=>'int',
-        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+        'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
 
       ]);
       
@@ -403,7 +414,7 @@ if($itemType=='article-draft'){ $articles->withPath('draft');};
      $article->title =$request->title;
      $article->alias =str_slug($request->title, '-');
      $article->category_id = $request->category;
-     $article->published=$request->published ? $request->published : $article->published ;
+     $article->published=$request->published ? $request->published : 0;
      $article->featured=$request->featured ? $request->featured : 0 ; 
      $article->image = $request->image ? $request->image->storeAs('public/images/articles/thumbs/original', $request->image->getClientOriginalName()):$article->image;
      $article->image_legend =$request->image_legend;
@@ -415,8 +426,19 @@ if($itemType=='article-draft'){ $articles->withPath('draft');};
      $article->keywords = $request->tags;
      $article->created_by =$request->created_by ?? $request->auth_userid;
      $article->created_at =now();
-     $article->start_publication_at = $request->start_publication_at;
-     $article->stop_publication_at =$request->stop_publication_at;
+     if($request->start_publication_at){
+     $start_at=explode(' ',$request->start_publication_at);
+     $article->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     }else{
+      $article->start_publication_at=$request->start_publication_at;
+    }
+     if($request->start_publication_at){
+     $stop_at=explode(' ',$request->stop_publication_at);
+     $article->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
+     }else{
+      $article->stop_publication_at=$request->stop_publication_at;
+     }
+    
      $article->checkout=0;
 
      try {

@@ -43,4 +43,4 @@
 	</table>
 </div>
 {{ $tableInfo}}
-{{ $videos->links() }}
+{{ $items->links() }}

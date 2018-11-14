@@ -7,12 +7,13 @@
 @parent
 @section ('pageTitle')<h3>{{ ('Liste des groupes') }}</h3> @endsection 
 <a href="{{ route('user-groups.create') }}">Nouveau</a> 
-<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-divider uk-table-small" {{--uk-text-small responsive --}} >	
+<table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-divider uk-table-small" >	
     <thead>
        <tr>
-        <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-        <th>{{ ('Titre') }}</th>
-        <th>{{ ('id') }}</th>
+        <th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></th>
+        <th>{{ ('Modifier') }}</th>
+        <th>{{ ('Supprimer') }}</th>
+        <th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></th>
     </tr>
 </thead>
 <tbody>
@@ -21,7 +22,6 @@
     @if($group->parent_id==0)
    <tr data-tt-id="{{ $group->id }}">
 
-    {{-- <td><input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"></td> --}}
     <td>{{ ucfirst($group->title) }}</td>
     <td> <a href="{{ route('user-groups.edit',['group'=>$group]) }}" ><span class="uk-text-success">Modifier</span></a>
             </td>
@@ -41,7 +41,6 @@
     @else
  <tr data-tt-id="{{ $group->id }}" data-tt-parent-id="{{ $group->parent_id }}">
 
-    {{-- <td><input type="checkbox" name="groups[]" value="{{$group->id}}" class="uk-checkbox"></td> --}}
     <td>{{ ucfirst($group->title) }}</td>
     <td> <a href="{{ route('user-groups.edit',['group'=>$group]) }}" ><span class="uk-text-success">Modifier</span></a>
             </td>
@@ -75,7 +74,12 @@
 @section('js')
 <script src="{{ asset('js/jquery.treetable.js')}}""></script>
 <script>
+
+$(document).ready(function() {
 $("#dataTable").treetable();
+    
+     }); 
 </script>
+
 @endsection
 @endsection

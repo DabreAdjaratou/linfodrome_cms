@@ -9,12 +9,11 @@
 <table id="dataTable" class="uk-table uk-table-striped uk-table-hover uk-table-small" {{--uk-text-small responsive --}}>	
 <thead>
 	<tr>
-            <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-		<th>{{ ('Titre') }}</th>
-		<th>{{ (' Nom affiché') }}</th>
+		<th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></th>
+		<th>{{ (' Nom affiché') }}<i class="fas fa-sort uk-margin-left"></th>
 		<th>{{ ('Modifier') }}</th>
 		<th>{{ ('Supprimer') }}</th>
-	<th>id</th>
+	<th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></th>
 
 	</tr>
 	
@@ -26,7 +25,6 @@
 
 
 	<tr>
-            <td><input type="checkbox" name="" class="uk-checkbox"></td>
 		<td>{{ ucfirst($action->title) }}</td>
 		<td>{{ ucfirst($action->display_name )}}</td>
 		<td> <a href="{{ route('actions.edit',['action'=>$action]) }}" ><span class="uk-text-success">Modifier</span></a>
@@ -46,8 +44,6 @@
 
 <tfoot>
 	
-
-
 </tfoot>
 
 </table>
@@ -55,8 +51,7 @@
  @component('layouts.administrator.user-sidebar') @endcomponent 
 @endsection
 @section('js')
-
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 @endsection
-
 
 @endsection

@@ -2,6 +2,7 @@
 @section('title', 'Create a new billet')
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Ajouter une billet ') }}</h3>@endsection 
@@ -79,11 +80,11 @@
 
 <div>
 <label for="start_publication_at">{{('Star publication at:')}}</label>
-<input type="text" name="start_publication_at" value="{{ old('start_publication_at') }}">
+<input type="text" name="start_publication_at" class="datepicker" value="{{ old('start_publication_at') }}">
 </div>
 <div>
 <label for="stop_publication_at">{{('Stop publication at:')}}</label>
-<input type="text" name="stop_publication_at" value="{{ old('stop_publication_at') }}">
+<input type="text" name="stop_publication_at" class="datepicker" value="{{ old('stop_publication_at') }}">
 </div>
 
 </form>
@@ -91,7 +92,9 @@
  @component('layouts.administrator.billet-sidebar') @endcomponent 
 @endsection
 @section('js')
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
 <script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
+<script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
 @endsection
 @endsection

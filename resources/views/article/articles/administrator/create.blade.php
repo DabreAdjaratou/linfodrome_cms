@@ -2,6 +2,7 @@
 @section('title', 'Create a new article')
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Ajouter une article ') }}</h3>@endsection
@@ -12,7 +13,7 @@
 	<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
 	{{-- @endcan --}}
 	<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
-		<button type="reset" name="cancel" value="cancel" onclick="window.location.href='{{ session()->get('link') }}'">{{('Annuler')}}</button>
+		<button type="reset" name="cancel" value="cancel" onclick="window.location.href='{{ route('articles.index')}}'">{{('Annuler')}}</button>
 		<div>	
 		<label for="ontitle">{{('Sur Titre:')}}</label>
 		<input type="text" name="ontitle" placeholder="Sur titre" value="{{ old('ontitle') }}">
@@ -91,16 +92,20 @@
 
 	<div>
 		<label for="start_publication_at">{{('Star publication at:')}}</label>
-		<input type="text" name="start_publication_at" value="{{ old('start_publication_at') }}" >
+		<input type="text" name="start_publication_at" value="{{ old('start_publication_at') }}" class="datepicker">
 	</div>
 	<div>
 		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
-		<input type="text" name="stop_publication_at"  value="{{ old('stop_publication_at') }}">
+		<input type="text" name="stop_publication_at"  value="{{ old('stop_publication_at') }}" class="datepicker">
 	</div>
 </form>
+@section('sidebar')
+ @component('layouts.administrator.article-sidebar') @endcomponent 
+@endsection
 @section('js')
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
 <script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
- </script>
+<script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
 @endsection
 @endsection

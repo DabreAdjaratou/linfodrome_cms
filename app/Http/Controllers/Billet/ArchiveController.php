@@ -93,8 +93,8 @@ class ArchiveController extends Controller
      $searchByFeaturedState= $data->searchByFeaturedState;
      $searchByPublishedState= $data->searchByPublishedState;
      $searchByUser=$data->searchByUser;
-     $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->fromDate).' 00:00:00')) : null;
-     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( str_replace('/', '-',$data->toDate).' 23:59:59')) : null;
+     $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime($data->fromDate)) : null;
+     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( $data->toDate)) : null;
      $sortField=$data->sortField;
      $order=$data->order;
      $itemType=$data->itemType;
@@ -273,8 +273,8 @@ if($itemType=='billet-archive-draft'){ $items->withPath('draft');};
         'fulltext'=>'required|string',
         'source_id'=>'int',
         // 'created_by'=>'int',
-        'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-        'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+        'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+        'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
 
     ]);
            
@@ -293,8 +293,18 @@ if($itemType=='billet-archive-draft'){ $items->withPath('draft');};
        $archive->keywords = $request->tags;
        $archive->created_by =$request->created_by ?? $request->auth_userid;
        $archive->created_at =now();
-       $archive->start_publication_at = $request->start_publication_at;
-       $archive->stop_publication_at =$request->stop_publication_at;
+       if($request->start_publication_at){
+     $start_at=explode(' ',$request->start_publication_at);
+     $archive->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     }else{
+      $archive->start_publication_at=$request->start_publication_at;
+    }
+     if($request->start_publication_at){
+     $stop_at=explode(' ',$request->stop_publication_at);
+     $archive->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
+     }else{
+      $archive->stop_publication_at=$request->stop_publication_at;
+     }
        $archive->checkout=0;
 
         if ($request->update) {

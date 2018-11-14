@@ -165,7 +165,11 @@ if($publishedState==1){
      public  static function trashActions()
     {
      $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
-      $actions='<td><a href="'.route("billets.destroy",["billet"=>'billetId']) .'"><span class="uk-text-success">Suprimer</span></<a></td>
+      $actions='<td><form action="'. route("billets.destroy",["billet"=>"billetId"]) . '" method="POST" id="deleteForm" >
+                 <input type="hidden" name="_token" value="'.csrf_token().'">
+                 <input type="hidden" name="_method" value="delete">
+                <button class="uk-button uk-button-link"><span class="uk-text-success">Supprimer</span></button>
+            </form></td>
       <td> <a href="'.route('billets.restore',['billet'=>'billetId']) .'" ><span class="uk-text-danger">Restaurer</span></a>
       </td>';
         return compact('actionTitles','actions');

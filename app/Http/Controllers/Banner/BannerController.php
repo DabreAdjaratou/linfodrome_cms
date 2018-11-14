@@ -64,8 +64,8 @@ class BannerController extends Controller
       'codeForTablet'=>'string',
       'codeForMobile'=>'string',
             // 'created_by'=>'int',
-      'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-      'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+      'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+      'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
 
     ]);
 
@@ -80,8 +80,18 @@ class BannerController extends Controller
         $banner->url=$request->url;
         $banner->code='{"computer":"'.$request->codeForComputer.'","tablet":"'.$request->codeForTablet.'","mobile":"'.$request->codeForMobile.'"}';
         $banner->created_by=$request->created_by ?? $request->auth_userid;
-        $banner->start_publication_at=$request->start_publication_at;
-        $banner->stop_publication_at=$request->stop_publication_at;
+         if($request->start_publication_at){
+     $start_at=explode(' ',$request->start_publication_at);
+     $banner->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     }else{
+      $banner->start_publication_at=$request->start_publication_at;
+    }
+     if($request->start_publication_at){
+     $stop_at=explode(' ',$request->stop_publication_at);
+     $banner->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
+     }else{
+      $banner->stop_publication_at=$request->stop_publication_at;
+     }
         
   if ($banner->save()) {
         session()->flash('message.type', 'success');
@@ -148,8 +158,8 @@ class BannerController extends Controller
       'codeForTablet'=>'string',
       'codeForMobile'=>'string',
             // 'created_by'=>'int',
-      'start_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
-      'stop_publication_at'=>'nullable|date_format:Y-m-d H:i:s',
+      'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+      'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
     ]);
 
         $banner=Banner::find($id);
@@ -168,8 +178,18 @@ class BannerController extends Controller
         $banner->url=$request->url;
         $banner->code='{"computer":"'.$request->codeForComputer.'","tablet":"'.$request->codeForTablet.'","mobile":"'.$request->codeForMobile.'"}';
         $banner->created_by=$request->created_by ?? $request->auth_userid;
-        $banner->start_publication_at=$request->start_publication_at;
-        $banner->stop_publication_at=$request->stop_publication_at;
+         if($request->start_publication_at){
+     $start_at=explode(' ',$request->start_publication_at);
+     $banner->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     }else{
+      $banner->start_publication_at=$request->start_publication_at;
+    }
+     if($request->start_publication_at){
+     $stop_at=explode(' ',$request->stop_publication_at);
+     $banner->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
+     }else{
+      $banner->stop_publication_at=$request->stop_publication_at;
+     }
         
   if ($request->update) {
         if ($banner->save()) {

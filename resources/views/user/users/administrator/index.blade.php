@@ -1,24 +1,24 @@
 @extends('layouts.administrator.master')
 @section('title', 'Users list')
 @section('css')
+
 @endsection
+  
 @section('content')
 @parent
 @section ('pageTitle')<h3>{{ ('Liste des utilisateurs') }}</h3> @endsection 
 <a href="{{ route('register') }}">Nouveau</a> 
-<table id="dataTable" class="uk-table uk-table-striped uk-table-small uk-text-small responsive">	
+<table id="dataTable" class="uk-table uk-table-striped uk-table-small uk-text-small">	
     <thead>
        <tr>
-        <th><input type="checkbox" name="checkedAll" class="uk-checkbox"></th>
-        <th>{{ ('Nom') }}</th>
+        <th>{{ ('Nom') }}<i class="fas fa-sort uk-margin-left"></th>
         <th>{{ ('Email') }}</th>
-        <th>{{ ('titre') }} </th>
+        <th>{{ ('titre') }} <i class="fas fa-sort uk-margin-left"></th>
         <th>{{ ('Facebook') }}</th>
         <th>{{ ('Google') }}</th>
         <th>{{ ('twitter') }}</th>
-        <th>{{ ('Actif') }}</th>
-        <th>{{ ('Modifier') }}</th>
-        <th>{{ ('id') }}</th>
+        <th>{{ ('Actif') }}<i class="fas fa-sort uk-margin-left"></th>
+        <th>{{ ('id') }}<i class="fas fa-sort uk-margin-left"></th>
 
     </tr>
     
@@ -28,8 +28,7 @@
 
     @foreach($users as $user)
     <tr>
-        <td><input type="checkbox" name="" class="uk-checkbox"></td>
-        <td class="uk-table-expand">{{ $user->name}}
+        <td class="uk-table-expand"><a href="{{ route('users.edit',['user'=>$user]) }}">{{ $user->name}}</a>
             
             @if($user->require_reset==0)
             <div class="uk-text-small uk-alert-danger">{{ ('reinitialisation du mot de passe requis') }}</div>
@@ -41,7 +40,6 @@
         <td class="uk-table-expand uk-text-truncate">{{ $user->data->google}}</td>
         <td class="uk-table-expand uk-text-truncate">{{ $user->data->twitter}}</td>
         <td>{!!$user->is_active!!}</td>
-        <td> <a href="{{ route('users.edit',['user'=>$user]) }}">Modifier</a></td>
         <td>{{ $user->id}}</td>
     </tr>
     @endforeach
@@ -55,24 +53,37 @@
 
 </table>
 
-
 @section('sidebar')
 @component('layouts.administrator.user-sidebar') @endcomponent 
 @endsection
 @push('js')
 <script type="text/javascript">
 $(document).ready(function() {
-    
-    // $('#dataTable_filter label input').addClass('uk-input');
-    // $('#dataTable_length label select').addClass('uk-select uk-align-left');
-
+  
 $('#dataTable').DataTable({
-     
     "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
-                
-                        });
-               
+    "language": {
+            "lengthMenu": "Affiché _MENU_ lignes",
+            "zeroRecords": "Aucun donnée correspondant - desolé",
+           "info": "Affichage de _START_ à _END_ sur _TOTAL_ entries",
+           "infoEmpty": "Affichage de 0 à  0 sur 0 entries",
+            "infoEmpty": "Aucun resultat disponible",
+            "infoFiltered": "",
+            "search":         "Recherche:",
+
+        },
+        "columnDefs": [
+        { "orderable": false, "targets": [1,3,4,5] },
+         { "searchable": false, "targets" : [1,3,4,5] 
+                },
+
+  ]
+                 }); 
+
  }); 
 </script>
 @endpush
+
+
+
 @endsection
