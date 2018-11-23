@@ -13,12 +13,12 @@ $('#dataTable').DataTable({
             "search":         "Recherche:",
 
         },
-        "columnDefs": [
-        { "orderable": false, "targets": [2,3] },
-         { "searchable": false, "targets" : [2,3] 
-                },
+        // "columnDefs": [
+        // { "orderable": false, "targets": [2,3] },
+        //  { "searchable": false, "targets" : [2,3] 
+  //               },
 
-  ]
+  // ]
 				 }); 
 
  }); 

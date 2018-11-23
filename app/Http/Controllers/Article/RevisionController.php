@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Article;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Article\Revision;
-use App\Models\Article\Article;
+use App\Models\Article\Archive;
 
 class RevisionController extends Controller
 {
@@ -23,7 +23,7 @@ class RevisionController extends Controller
      */
     public function index()
     {
-         $revisions=Revision::with(['getModifier:id,name','getArticle:id,title,category_id,created_by,created_at','getArticle.getCategory:id,title',
+     $revisions=Revision::with(['getModifier:id,name','getArticle:id,title,category_id,created_by,created_at','getArticle.getCategory:id,title',
       'getArticle.getAuthor:id,name'])->get()->groupBy('article_id');
    return view('article.revisions.administrator.index',compact('revisions'));
     }
@@ -52,13 +52,13 @@ class RevisionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $articleId
      * @return \Illuminate\Http\Response
      */
     public function show($articleId)
     {
-       $article=Article::with(['getRevision.getModifier:id,name','getCategory:id,title',
-      'getAuthor:id,name'])->where('id',$articleId)->get();
+       $article=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
+      'getAuthor:id,name'])->withTrashed()->where('id',$articleId)->get();
         return view('article.revisions.administrator.show',compact('article'));
     }
 

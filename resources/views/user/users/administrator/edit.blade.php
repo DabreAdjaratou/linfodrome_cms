@@ -19,15 +19,17 @@
 
     <div id="tabs">
       <ul>
-        <li><a href="#fragment-1"><span>utilisateur</span></a></li>
-        <li><a href="#fragment-2"><span>Groupes</span></a></li>
+        <li><a href="#userInfo"><span>utilisateur</span></a></li>
+        <li><a href="#userGroups"><span>Groupes</span></a></li>
         
     </ul>
-    <div id="fragment-1">
-     <div>
+    <div>
         <button type="submit" name="update" value="update">{{ ('Modifier') }}</button>
         <button type="submit" name="cancel" value="cancel"> {{ ('Annuler') }}</button>
-    </div>  <div>
+    </div>
+    <div id="userInfo">
+       
+    <div>
         <label for="name">{{ ('Nom') }}</label>
         <input id="name" type="text" name="name" value="{{$user->name }}" required autofocus>            
     </div>
@@ -84,7 +86,7 @@
         </select>
     </div>
 </div>
-<div id="fragment-2">
+<div id="userGroups">
    <div>
      
     @foreach($allGroups as $group)

@@ -78,7 +78,7 @@ class Archive extends Model
      */
     public function scopeOfTitle($query, $title)
     {
-        return $query->where('title','like', '%'.$title.'%');
+        return $query->where('video_archives.title','like', '%'.$title.'%');
     }  
  /**
      * Scope a query to only include articles that match to  a given category.
@@ -89,7 +89,7 @@ class Archive extends Model
      */
     public function scopeOfCategory($query, $category)
     {
-        return $query->where('category_id', $category);
+        return $query->where('video_archives.category_id', $category);
     }   
     
     /**
@@ -102,9 +102,9 @@ class Archive extends Model
     public function scopeOfFeaturedState($query, $featuredState)
     {
         if($featuredState==1){
-        return $query->where('featured', $featuredState);
+        return $query->where('video_archives.featured', $featuredState);
         }else{
-        return $query->where('featured','<>',1);
+        return $query->where('video_archives.featured','<>',1);
         }
     }   
     
@@ -119,9 +119,9 @@ class Archive extends Model
     {
         
 if($publishedState==1){
-        return $query->where('published', $publishedState);
+        return $query->where('video_archives.published', $publishedState);
        }else{
-        return $query->where('published','<>',1);
+        return $query->where('video_archives.published','<>',1);
         }  
  }   
     /**
@@ -133,7 +133,7 @@ if($publishedState==1){
      */
     public function scopeOfUser($query, $user)
     {
-        return $query->where('created_by', $user);
+        return $query->where('video_archives.created_by', $user);
     }   
 
     
@@ -146,7 +146,7 @@ if($publishedState==1){
      */
     public function scopeOfFromDate($query, $fromDate)
     {
-        return $query->where('created_at', '>=',$fromDate);
+        return $query->where('video_archives.created_at', '>=',$fromDate);
     }   
 
 
@@ -159,7 +159,7 @@ if($publishedState==1){
      */
     public function scopeOfToDate($query, $toDate)
     {
-        return $query->where('created_at', '<=',$toDate);
+        return $query->where('video_archives.created_at', '<=',$toDate);
     } 
 
      /**
@@ -171,7 +171,7 @@ if($publishedState==1){
      */
     public function scopeOfBetweenTwoDate($query,$fromDate, $toDate)
     {
-        return $query->whereBetween('created_at',[$fromDate,$toDate]);
+        return $query->whereBetween('video_archives.created_at',[$fromDate,$toDate]);
     }    
     
     

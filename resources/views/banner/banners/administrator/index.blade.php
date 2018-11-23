@@ -12,19 +12,19 @@
 <table id="dataTable" class="uk-table uk-table-hover uk-table-striped uk-table-small uk-table-justify uk-text-small responsive" >	
 	<thead>
             <tr>
-			<th>{{ ('Titre') }}</th>
-			<th>{{ ('Publiée') }}</th>
-			<th>{{ ('Category') }}</th>
-			<th>{{ ('Type') }}</th>
-			<th>{{ ('url') }}</th>
-			<th>{{ ('Debut de la publication') }}</th>
-			<th>{{ ('fin de la publication') }}</th>
-			<th>{{ ('Auteur') }}</th>                       
-			<th>{{ ('Crée le') }}</th>
-			<th>{{ ('Modifié le') }}</th> 
+			<th>{{ ('Titre') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Publiée') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Category') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Type') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('url') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Debut de la publication') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('fin de la publication') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Auteur') }}<i class="fas fa-sort uk-margin-left"></i></th>                       
+			<th>{{ ('Crée le') }}<i class="fas fa-sort uk-margin-left"></i></th>
+			<th>{{ ('Modifié le') }}<i class="fas fa-sort uk-margin-left"></i></th> 
 			<th> {{ ('Modifier') }}</th>
 			<th> {{ ('Corbeille') }}</th>  
-			<th>id</th>
+			<th>{{ ('id') }}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -59,7 +59,7 @@
 @endsection
 
 @section('js')
-
+ <script type="text/javascript" src="{{ asset('js/custom-datatable.js') }}"></script>
 @endsection
 
 @endsection

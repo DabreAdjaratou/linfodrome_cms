@@ -16,6 +16,18 @@ use Illuminate\Support\Facades\Route;
 
 class ArchiveController extends Controller
 {
+  /**
+     * The default page length for the datatable
+     *
+     * @var int
+     */
+    public $defaultPageLength =25;
+     /**
+     * The entries for the datatable
+     *
+     * @var array
+     */
+    public $entries=[25,50,100];
      /**
      * Protecting routes
      */
@@ -34,8 +46,11 @@ class ArchiveController extends Controller
  public function index(Request $request)
     {
       $view='billet.archives.administrator.index';
-      $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('published', 'asc')->paginate($this->defaultPageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id')
+      ->where('billet_archives.published','<>',2);
       $controllerMethodUrl=action('Billet\ArchiveController@index');
       $actions=Archive::indexActions();
       $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
@@ -78,7 +93,7 @@ class ArchiveController extends Controller
         $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
       }
-      $entries=[25,50,100];
+      $entries=$this->entries;
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
       return compact('items','tableInfo','entries','categories','users');
@@ -101,16 +116,24 @@ class ArchiveController extends Controller
 
      switch ($itemType) {
       case('billet-archives'):
-      $items = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $items = Archive::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id')
+      ->where('billet_archives.published','<>',2);
       $actions=Archive::indexActions();
       break;
       case('billet-archive-trash'):
-      $items=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $items=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id');
       $actions=Archive::trashActions();
       break;
 
       case('billet-archive-draft'):
-      $items=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+      $items=Archive::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id')
+      ->where('billet_archives.published',2);
       $actions=Archive::draftActions();
       break;
     }
@@ -150,9 +173,9 @@ class ArchiveController extends Controller
     }
 
     if($sortField){
-      $items = $items->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $items = $items->orderBy($sortField, $order)->select('billet_archives.id','billet_archives.title','billet_archives.category_id','billet_archives.published','billet_archives.featured','billet_archives.source_id','billet_archives.created_by','billet_archives.created_at','billet_archives.image','billet_archives.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
     }else{
-      $items = $items->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $items = $items->orderBy('published', 'asc')->select('billet_archives.id','billet_archives.title','billet_archives.category_id','billet_archives.published','billet_archives.featured','billet_archives.source_id','billet_archives.created_by','billet_archives.created_at','billet_archives.image','billet_archives.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
     }
     if($itemType){
 if($itemType=='billet-archives'){ $items->withPath('billet-archives');};
@@ -180,7 +203,7 @@ if($itemType=='billet-archive-draft'){ $items->withPath('draft');};
       $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
     }
-    $entries=[25,50,100];
+    $entries=$this->entries;
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
 
@@ -283,7 +306,7 @@ if($itemType=='billet-archive-draft'){ $items->withPath('draft');};
        $archive->title =$request->title;
        $archive->alias =str_slug($request->title, '-');
        $archive->category_id = $request->category;
-       $archive->published=$request->published ? $request->published : $archive->published;
+       $archive->published=$request->published ? $request->published : 0;
        $archive->featured=$request->featured ? $request->featured : 0 ; 
        $archive->image = $request->image;
        $archive->image_legend =$request->image_legend;
@@ -462,8 +485,15 @@ session()->flash('message.type', 'success');
     public function inTrash(Request $request)
     {
  $view='billet.archives.administrator.trash';
-  $queryWithPaginate=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        $queryWithOutPaginate =Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+  $queryWithPaginate=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id')
+      ->select('billet_archives.id','billet_archives.title','billet_archives.category_id','billet_archives.published','billet_archives.featured','billet_archives.source_id','billet_archives.created_by','billet_archives.created_at','billet_archives.image','billet_archives.views', 'billet_categories.title as category','users.name as author')
+            ->orderBy('billet_archives.id', 'desc')->paginate($this->defaultPageLength);
+        $queryWithOutPaginate =Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id')
+      ->select('billet_archives.id','billet_archives.title','billet_archives.category_id','billet_archives.published','billet_archives.featured','billet_archives.source_id','billet_archives.created_by','billet_archives.created_at','billet_archives.image','billet_archives.views', 'billet_categories.title as category','users.name as author');
        $controllerMethodUrl=action('Billet\ArchiveController@inTrash');
   $actions=Archive::trashActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
@@ -477,8 +507,16 @@ session()->flash('message.type', 'success');
 public function inDraft(Request $request)
     {
   $view='billet.archives.administrator.draft';
-  $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-  $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+  $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory'])
+->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id')
+      ->select('billet_archives.id','billet_archives.title','billet_archives.category_id','billet_archives.published','billet_archives.featured','billet_archives.source_id','billet_archives.created_by','billet_archives.created_at','billet_archives.image','billet_archives.views', 'billet_categories.title as category','users.name as author')
+  ->where('billet_archives.published',2)
+  ->orderBy('billet_archives.id', 'desc')->paginate($this->defaultPageLength);
+  $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory'])
+  ->join('users', 'billet_archives.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billet_archives.category_id', '=', 'billet_categories.id')
+      ->select('billet_archives.id','billet_archives.title','billet_archives.category_id','billet_archives.published','billet_archives.featured','billet_archives.source_id','billet_archives.created_by','billet_archives.created_at','billet_archives.image','billet_archives.views', 'billet_categories.title as category','users.name as author')->where('billet_archives.published',2);
   $controllerMethodUrl=action('Billet\ArchiveController@inDraft');
   $actions=Archive::draftActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);

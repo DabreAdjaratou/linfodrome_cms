@@ -3,31 +3,44 @@
 @section('css')
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
  <link rel="stylesheet"  type="text/css" href="{{asset('css/context-menu.min.css')}}">
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
  @endsection
 @section('content')
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Medias') }}</h3> @endsection 
+<div>
+  <button class="uk-button uk-button-small uk-button-secondary "><i class="fa fa-plus-circle uk-text-lowercase"> {{ ('Transferer') }}</i></button>
+  <button class="uk-button uk-button-small"><i class="fa fa-folder uk-text-lowercase"> {{ ('Nouveau dossier') }}</i></button>
+  
+</div>
+<div>
+<div> {{ (' Affichage') }}</div>
+<div class="uk-button-group uk-margin-bottom">
+<button class="uk-button uk-button-small displayButton" id="grille"><i class="fa fa-th"> Grille</i></button>
+<button class="uk-button uk-button-small displayButton" id="liste"><i class="fa fa-list"> Liste</i></button>
+</div>
+</div>
 
-<div id="txtHint">
-
+<div id="mediaContainer" class="mediaContainer uk-grid" >
 @foreach($directories as $d)
-<li class="uk-display-inline-block folder" id="{{str_replace('/', '@',$d) }}"> <img src="{{asset('storage/images/icons/folder-icon.png') }}">
+<div class="folder media" id="{{str_replace('/', '@',$d) }}"> <img src="{{asset('storage/images/icons/folder-icon.png') }}">
 <div> {{str_limit(basename($d),8) }}</div>
-</li>
+</div>
 
 @endforeach
 @foreach($files as $f)
 
-<li class="uk-display-inline-block" {{str_replace('/', '@',$f) }}> <img src="{{asset('storage/'.substr($f, 7)) }}" width="45px">
+<div class="media" {{str_replace('/', '@',$f) }}> <img src="{{asset('storage/'.substr($f, 7)) }}" width="45px">
 <div>{{ str_limit(basename($f),8) }} </div>
-</li>
+</div>
 @endforeach
 </div>
 @section('sidebar')
  @component('layouts.administrator.media-sidebar') @endcomponent 
 @endsection
+@routes
 @section('js')
   {{-- include the jQuery library --}}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
@@ -35,103 +48,31 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 <script src="{{asset('js/context-menu.min.js')}}" ></script>
 
+<script src="{{ asset('js/custom-jstree.js') }}"></script>
+<script src="{{ asset('js/media-to-load.js') }}"></script>
+<script src="{{ asset('js/custom-menu-context.js') }}"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 <script>
-  $(function () {
-    // create an instance when the DOM is ready
-    $('#jstree').jstree();
-    // bind to events triggered on the tree
-    $('#jstree').on("changed.jstree", function (e, data) {
-      var media=$.parseHTML(data.node.text);
-      var mediaId=media[0].id;
-      var urlToLoad="{{route('media-to-load',['media'=>'folder'])}}".replace('folder',mediaId);
-      // console.log(urlToLoad);
-      $.get(urlToLoad, function(data, status){
-            $('#txtHint').html(data);
-        });
-      // console.log(data.selected);
+  $('.displayButton').on('click',function(){
+var id=$(this).attr('id');
+if (id == 'liste'){
+$('#mediaContainer').attr('class','mediaContainer');
+$('.media > div').attr('class','uk-display-inline');
+$('#mediaContainer > div > img').attr('width','15px');
 
-    });
+}else{
+$('#mediaContainer').attr('class','mediaContainer uk-grid');
+$('.media > div').attr('class','');
+$('#mediaContainer > div > img').attr('width','45px');
 
-    $(".folder").click(function(){
-      var mediaId=$.trim($(this).attr('id')); 
-        $.get("{{route('media-to-load',['media'=>'folder'])}}".replace('folder',mediaId), function(data, status){
-            $('#txtHint').html(data);
-        });
-    });
-        
-});
+};
+  });
 
-var myMenu = [{
-
-    // Menu Icon. 
-    // This example uses Font Awesome Iconic Font.
-    icon: 'fa fa-home',   
-
-    // Menu Label
-    label: 'Homepage', 
-
-    // Callback
-    action: function(option, contextMenuIndex, optionIndex) {}, 
-
-    // An array of submenu objects
-    submenu: null,
-
-    // is disabled?
-    disabled: false   //Disabled status of the option
-},
-  {
-    icon: 'fa fa-cut', 
-    label: 'Couper',  
-    action: function(option, contextMenuIndex, optionIndex) {}, 
-    submenu: null, 
-    disabled: false 
-  },
-  {
-    icon: 'fa fa-envelope', 
-    label: 'Contact', 
-    action: function(option, contextMenuIndex, optionIndex) {},
-    submenu: null,  
-    disabled: false  
-  },
-  {
-    //Menu separator
-    separator: true   
-  },
-  {
-    icon: 'fa fa-share', 
-    label: 'Social Share', 
-    action: function(option, contextMenuIndex, optionIndex) {},
-    submenu: [{ // sub menus
-      icon: 'fa fa-facebook',  
-      label: '<a href="https://www.jqueryscript.net/tags.php?/Facebook/">Facebook</a>',  
-      action: function(option, contextMenuIndex, optionIndex) {}, 
-      submenu: null,  
-      disabled: false  
-    },
-    {
-      icon: 'fa fa-<a href="https://www.jqueryscript.net/tags.php?/twitter/">twitter</a>',  
-      label: 'Twitter', 
-      action: function(option, contextMenuIndex, optionIndex) {}, 
-      submenu: null,  
-      disabled: false  
-    },
-    {
-      icon: 'fa fa-google-plus',
-      label: 'Google Plus',  
-      action: function(option, contextMenuIndex, optionIndex) {}, 
-      submenu: null,  
-      disabled: false  
-    }], 
-    disabled: false
-  },
-];
-
-$('.folder').on('contextmenu', function(e) {
-  e.preventDefault();
-  superCm.createMenu(myMenu, e);
-});
+  $( function() {
+    $( ".uk-button-group" ).selectable();
+  } );
 </script>
-
 
 @endsection
 

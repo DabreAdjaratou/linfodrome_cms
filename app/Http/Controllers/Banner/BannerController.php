@@ -23,7 +23,7 @@ class BannerController extends Controller
      */
     public function index()
     {
-        $banners=Banner::with(['getCategory:id,title','getAuthor:id,name'])->orderBy('id', 'desc')->get();
+        $banners=Banner::with(['getCategory:id,title','getAuthor:id,name'])->orderBy('published', 'asc')->get();
         return view('banner.banners.administrator.index',compact('banners'));
     }
 
@@ -258,7 +258,7 @@ class BannerController extends Controller
 
     public function inTrash()
     {
-    $banners=Banner::onlyTrashed()->with(['getCategory:id,title','getAuthor:id,name'])->orderBy('id', 'desc')->get();
+    $banners=Banner::onlyTrashed()->with(['getCategory:id,title','getAuthor:id,name'])->orderBy('published', 'asc')->get();
        return view('banner.banners.administrator.trash',compact('banners'));      
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Video;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Video\Revision;
+use App\Models\Video\Archive;
 
 class RevisionController extends Controller
 {
@@ -50,12 +51,15 @@ class RevisionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $videoId
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($videoId)
     {
-        //
+     
+       $video=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
+      'getAuthor:id,name'])->withTrashed()->where('id',$videoId)->get();
+        return view('video.revisions.administrator.show',compact('video'));
     }
 
     /**

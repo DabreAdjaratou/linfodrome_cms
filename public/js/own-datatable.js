@@ -80,14 +80,31 @@ function tableSort (){
       e.preventDefault();
       var sortField=e.target.id;
       var order=$('#order').val();
-      searchAndSort(sortField);        
-      if(order=='asc'){
-        $('#order').val('desc')
-      }
-      if (order=='desc') {
-       $('#order').val('asc')
-     }
+      searchAndSort(sortField);  
+      var url=window.location.href;
+         
+//       if(order=='asc'){
+// $('.tableSort > i').attr('class','fas fa-sort uk-margin-left');
+// $("#"+sortField+' > i').attr('class','fas fa-sort-up uk-margin-left');
+//         $('#order').val('desc')
+//       }
+//       if (order=='desc') {
+// $('.tableSort > i').attr('class','fas fa-sort uk-margin-left');
+// $("#"+sortField+' > i').attr('class','fas fa-sort-down uk-margin-left');
+//        $('#order').val('asc')
+//      }
+changeUrl(url)
    });
   };tableSort();
+  
+
+function changeUrl(url)
+{
+  var newUrl=url.split('?');
+ window.history.pushState("data","Title",newUrl[0]);
+ document.title=newUrl[0];
+}
+
     $("#searchByUser").select2();
   });
+

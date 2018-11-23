@@ -15,6 +15,18 @@ use Illuminate\Support\Facades\Route;
 
 class ArchiveController extends Controller
 {
+  /**
+     * The default page length for the datatable
+     *
+     * @var int
+     */
+    public $defaultPageLength =25;
+     /**
+     * The entries for the datatable
+     *
+     * @var array
+     */
+    public $entries=[25,50,100];
      /**
      * Protecting routes
      */
@@ -30,9 +42,14 @@ class ArchiveController extends Controller
  public function index(Request $request)
     {
       $view='video.archives.administrator.index';
-      $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-      $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2);
-      $controllerMethodUrl=action('Video\ArchiveController@index');
+      $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->orderBy('published', 'asc')->paginate($this->defaultPageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+      $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+      ->join('users', 'video_archives.created_by', '=', 'users.id')
+      ->join('users', 'video_archives.cameraman', '=', 'users.id')
+      ->join('users', 'video_archives.editor', '=', 'users.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+      ->where('video_archives.published','<>',2);
+           $controllerMethodUrl=action('Video\ArchiveController@index');
       $actions=Archive::indexActions();
       $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
       return view($view,$result,$actions);
@@ -74,7 +91,7 @@ class ArchiveController extends Controller
         $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
       }
-      $entries=[25,50,100];
+      $entries=$this->entries;
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
       return compact('items','tableInfo','entries','categories','users');
@@ -97,16 +114,29 @@ class ArchiveController extends Controller
 
      switch ($itemType) {
       case('video-archives'):
-      $items = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2);
+      $items = Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+      ->where('video_archives.published','<>',2);
       $actions=Archive::indexActions();
       break;
       case('video-archive-trash'):
-      $items=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name']);
+      $items=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id');
       $actions=Archive::trashActions();
       break;
 
       case('video-archive-draft'):
-      $items=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2);
+      $items=Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+     ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')->where('video_archives.published',2);
       $actions=Archive::draftActions();
       break;
     }
@@ -146,9 +176,9 @@ class ArchiveController extends Controller
     }
 
     if($sortField){
-      $items = $items->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+      $items = $items->orderBy($sortField, $order)->select('video_archives.id','video_archives.title','video_archives.category_id','video_archives.published','video_archives.featured','video_archives.created_by','video_archives.cameraman','video_archives.editor','video_archives.created_at','video_archives.start_publication_at','video_archives.stop_publication_at','video_archives.views','video_categories.title','journaliste.name as journaliste','cameraman.name as camera_operator','editor.name as video_editor')->paginate($pageLength);
     }else{
-      $items = $items->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
+      $items = $items->orderBy('published', 'asc')->select('video_archives.id','video_archives.title','video_archives.category_id','video_archives.published','video_archives.featured','video_archives.created_by','video_archives.cameraman','video_archives.editor','video_archives.created_at','video_archives.start_publication_at','video_archives.stop_publication_at','video_archives.views','video_categories.title','journaliste.name as journaliste','cameraman.name as camera_operator','editor.name as video_editor')->paginate($pageLength);
     }
     if($itemType){
 if($itemType=='video-archives'){ $items->withPath('video-archives');};
@@ -176,7 +206,7 @@ if($itemType=='video-archive-draft'){ $items->withPath('draft');};
       $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
     }
-    $entries=[25,50,100];
+    $entries=$this->entries;
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
 
@@ -277,7 +307,7 @@ if($itemType=='video-archive-draft'){ $items->withPath('draft');};
       $video->title =$request->title;
       $video->alias =str_slug($request->title, '-');
       $video->category_id = $request->category;
-      $video->published=$request->published ? $request->published : $video->published;
+      $video->published=$request->published ? $request->published : 0;
       $video->featured=$request->featured ? $request->featured : 0 ; 
       $video->image = $request->image ? $request->image:$video->image;
       $video->code = $request->video;
@@ -451,8 +481,18 @@ return redirect()->route('video-archives.trash');
 public function inTrash( Request $request)
 {
  $view='video.archives.administrator.trash';
-  $queryWithPaginate=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-        $queryWithOutPaginate =Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name']);
+  $queryWithPaginate=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+      ->orderBy('video_archives.id', 'desc')
+      ->paginate($this->defaultPageLength);
+        $queryWithOutPaginate =Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id');
        $controllerMethodUrl=action('Video\ArchiveController@inTrash');
   $actions=Archive::trashActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
@@ -466,8 +506,20 @@ public function inTrash( Request $request)
 public function inDraft( Request $request)
 {
    $view='video.archives.administrator.draft';
-  $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
-  $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published',2);
+  $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+      ->where('video_archives.published',2)
+      ->orderBy('video_archives.id', 'desc')
+      ->paginate($this->defaultPageLength);
+  $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+      ->where('video_archives.published',2);
   $controllerMethodUrl=action('Video\ArchiveController@inDraft');
   $actions=Archive::draftActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);

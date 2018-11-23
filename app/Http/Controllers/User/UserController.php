@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\ResetsPasswords;
 
 class UserController extends Controller
 {
+
+   use ResetsPasswords;
      /**
      * Protecting routes
      */
@@ -135,6 +138,7 @@ $user->email=$request->email;
 if ($request->password) {
 $user->password=Hash::make($request->password);
 }
+
 $user->is_active=$request->is_active;
 $user->image=$request->image?? NULL;
 $user->require_reset=$request->require_reset;
@@ -184,6 +188,12 @@ public function destroy($id)
 {
 }
 
+/**
+ * force user to reset paswword
+ *
+ * @param  int  $id
+ * @return \Illuminate\Http\Response
+ */
 public function requireResetPassword($id)
 {
   $user=User::find($id);
@@ -191,6 +201,12 @@ public function requireResetPassword($id)
 
 }
 
+/**
+ * reset user paswword if required
+ *
+ * @param  int  $id, Request $request
+ * @return \Illuminate\Http\Response
+ */
 public function resetPassword(Request $request,$id)
 {
    $validatedData=$request->validate([

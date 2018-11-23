@@ -17,6 +17,18 @@ use Illuminate\Support\Facades\Route;
 
 class BilletController extends Controller
 {
+  /**
+     * The default page length for the datatable
+     *
+     * @var int
+     */
+    public $defaultPageLength =25;
+     /**
+     * The entries for the datatable
+     *
+     * @var array
+     */
+    public $entries=[25,50,100];
      /**
      * Protecting routes
      */
@@ -34,8 +46,11 @@ class BilletController extends Controller
  public function index(Request $request)
     {
       $view='billet.billets.administrator.index';
-      $queryWithPaginate=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      $queryWithOutPaginate =Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $queryWithPaginate=Billet::with(['getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('published', 'asc')->paginate($this->defaultPageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $queryWithOutPaginate =Billet::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+      ->where('billets.published','<>',2);
       $controllerMethodUrl=action('Billet\BilletController@index');
       $actions=Billet::indexActions();
       $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
@@ -78,7 +93,7 @@ class BilletController extends Controller
         $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
       }
-      $entries=[25,50,100];
+      $entries=$this->entries;
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
       return compact('items','tableInfo','entries','categories','users');
@@ -101,16 +116,24 @@ class BilletController extends Controller
 
      switch ($itemType) {
       case('billets'):
-      $items = Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $items = Billet::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+      ->where('billets.published','<>',2);
       $actions=Billet::indexActions();
       break;
       case('billet-trash'):
-      $items=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $items=Billet::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id');
       $actions=Billet::trashActions();
       break;
 
       case('billet-draft'):
-      $items=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+      $items=Billet::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+      ->where('billets.published',2);
       $actions=Billet::draftActions();
       break;
     }
@@ -150,9 +173,9 @@ class BilletController extends Controller
     }
 
     if($sortField){
-      $items = $items->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $items = $items->orderBy($sortField, $order)->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
     }else{
-      $items = $items->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $items = $items->orderBy('published', 'asc')->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
     }
     if($itemType){
 if($itemType=='billets'){ $items->withPath('billets');};
@@ -180,7 +203,7 @@ if($itemType=='billet-draft'){ $items->withPath('draft');};
       $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
     }
-    $entries=[25,50,100];
+    $entries=$this->entries;
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
 
@@ -394,7 +417,7 @@ dd('billet not find');
      $billet->title =$request->title;
      $billet->alias =str_slug($request->title, '-');
      $billet->category_id = $request->category;
-     $billet->published=$request->published ? $request->published : $billet->published;
+     $billet->published=$request->published ? $request->published : 0;
      $billet->featured=$request->featured ? $request->featured : 0 ; 
      $billet->image = $request->image;
      $billet->image_legend =$request->image_legend;
@@ -582,8 +605,15 @@ return redirect()->route('billets.trash');
 public function inTrash(Request $request)
 {
 $view='billet.billets.administrator.trash';
-  $queryWithPaginate=Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-        $queryWithOutPaginate =Billet::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+  $queryWithPaginate=Billet::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')
+            ->orderBy('billets.id', 'desc')->paginate($this->defaultPageLength);
+        $queryWithOutPaginate =Billet::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author');
        $controllerMethodUrl=action('Billet\BilletController@inTrash');
   $actions=Billet::trashActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
@@ -597,8 +627,16 @@ $view='billet.billets.administrator.trash';
 public function inDraft( Request $request)
 {
   $view='billet.billets.administrator.draft';
-  $queryWithPaginate=Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-  $queryWithOutPaginate =Billet::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+  $queryWithPaginate=Billet::with(['getAuthor:id,name','getCategory'])
+->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')
+  ->where('billets.published',2)
+  ->orderBy('billets.id', 'desc')->paginate($this->defaultPageLength);
+  $queryWithOutPaginate =Billet::with(['getAuthor:id,name','getCategory'])
+  ->join('users', 'billets.created_by', '=', 'users.id')
+      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->where('billets.published',2);
   $controllerMethodUrl=action('Billet\BilletController@inDraft');
   $actions=Billet::draftActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);

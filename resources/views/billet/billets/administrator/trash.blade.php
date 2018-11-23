@@ -9,7 +9,7 @@
 @section('content')
 @section ('pageTitle')
 <input type="hidden" name="order" id="order" value="desc">
-<input type="hidden" name="itemType" id="itemType" value="billets">
+<input type="hidden" name="itemType" id="itemType" value="billet-trash">
 @parent
   <h3>  {{ ('Liste des billets en corbeille') }}</h3> @endsection 
   @include('billet.billets.administrator.filterFields')

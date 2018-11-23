@@ -17,7 +17,18 @@ use Illuminate\Support\Facades\Route;
 
 class ArchiveController extends Controller
 {
-
+/**
+     * The default page length for the datatable
+     *
+     * @var int
+     */
+    public $defaultPageLength =25;
+     /**
+     * The entries for the datatable
+     *
+     * @var array
+     */
+    public $entries=[25,50,100];
     /**
      * Protecting routes
      */
@@ -34,8 +45,11 @@ class ArchiveController extends Controller
     public function index(Request $request)
     {
       $view='article.archives.administrator.index';
-      $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-      $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('published', 'asc')->paginate($this->defaultPageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'article_archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+      ->where('article_archives.published','<>',2);
       $controllerMethodUrl=action('Article\ArchiveController@index');
       $actions=Archive::indexActions();
       $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
@@ -90,7 +104,7 @@ class ArchiveController extends Controller
         $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
 
       }
-      $entries=[25,50,100];
+      $entries=$this->entries;
       $categories= Category::where('published','<>',2)->get(['id','title']);
       $users= User::get(['id','name']); 
       return compact('articles','tableInfo','entries','categories','users');
@@ -113,16 +127,24 @@ class ArchiveController extends Controller
 
      switch ($itemType) {
       case('article-archives'):
-      $articles = Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published','<>',2);
+      $articles = Archive::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'article_archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+      ->where('article_archives.published','<>',2);
       $actions=Archive::indexActions();
       break;
       case('article-archive-trash'):
-      $articles=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+      $articles=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'article_archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id');
       $actions=Archive::trashActions();
       break;
 
       case('article-archive-draft'):
-      $articles=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+      $articles=Archive::with(['getAuthor:id,name','getCategory'])
+      ->join('users', 'article_archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+      ->where('article_archives.published',2);
       $actions=Archive::draftActions();
       break;
     }
@@ -162,9 +184,9 @@ class ArchiveController extends Controller
     }
 
     if($sortField){
-      $articles = $articles->orderBy($sortField, $order)->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $articles = $articles->orderBy($sortField, $order)->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')->paginate($pageLength);
     }else{
-      $articles = $articles->orderBy('id', 'desc')->paginate($pageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
+      $articles = $articles->orderBy('published', 'asc')->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')->paginate($pageLength);
     }
     if($itemType){
 if($itemType=='article-archives'){ $articles->withPath('article-archives');};
@@ -192,7 +214,7 @@ if($itemType=='article-archive-draft'){ $articles->withPath('draft');};
       $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
 
     }
-    $entries=[25,50,100];
+    $entries=$this->entries;
     $categories= Category::where('published','<>',2)->get(['id','title']);
     $users= User::get(['id','name']);
 
@@ -490,8 +512,15 @@ public function inTrash( Request $request)
 {
 
   $view='article.archives.administrator.trash';
-  $queryWithPaginate=Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-  $queryWithOutPaginate =Archive::onlyTrashed()->with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory']);
+  $queryWithPaginate=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+->join('users', 'article_archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+      ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')
+      ->orderBy('article_archives.id', 'desc')->paginate($this->defaultPageLength);
+  $queryWithOutPaginate =Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+->join('users', 'article_archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+      ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author');
   $controllerMethodUrl=action('Article\ArchiveController@inTrash');
   $actions=Archive::trashActions();
   $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
@@ -506,8 +535,16 @@ public function inTrash( Request $request)
 public function inDraft(Request $request)
 {
    $view='article.archives.administrator.draft';
-  $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2)->orderBy('id', 'desc')->paginate(25,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
-  $queryWithOutPaginate =Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory'])->where('published',2);
+  $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory'])
+->join('users', 'article_archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+      ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')
+  ->where('article_archives.published',2)
+  ->orderBy('article_archives.id', 'desc')->paginate($this->defaultPageLength);
+  $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory'])
+  ->join('users', 'article-archives.created_by', '=', 'users.id')
+      ->join('article_categories', 'article-archives.category_id', '=', 'article_categories.id')
+      ->select('article-archives.id','article-archives.title','article-archives.category_id','article-archives.published','article-archives.featured','article-archives.source_id','article-archives.created_by','article-archives.created_at','article-archives.image','article-archives.views', 'article_categories.title as category','users.name as author')->where('article_archives.published',2);
   $controllerMethodUrl=action('Article\ArchiveController@inDraft');
   $actions=Archive::draftActions();
   $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);

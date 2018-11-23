@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Billet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Billet\Revision;
+use App\Models\Billet\Archive;
 
 class RevisionController extends Controller
 {
@@ -23,7 +24,8 @@ class RevisionController extends Controller
     public function index()
     {
          $revisions=Revision::with(['getModifier:id,name','getBillet:id,title,category_id,created_by,created_at','getBillet.getCategory:id,title','getBillet.getAuthor:id,name'])->get()->groupBy('billet_id');
-           return view('billet.revisions.administrator.index',['revisions'=>$revisions]);
+   return view('billet.revisions.administrator.index',compact('revisions'));
+
     }
 
     /**
@@ -50,13 +52,15 @@ class RevisionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $billetId
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($billetId)
     {
-        //
-    }
+       $billet=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
+      'getAuthor:id,name'])->withTrashed()->where('id',$billetId)->get();
+        return view('billet.revisions.administrator.show',compact('billet'));
+        }
 
     /**
      * Show the form for editing the specified resource.

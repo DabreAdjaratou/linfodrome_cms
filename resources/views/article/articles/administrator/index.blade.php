@@ -12,11 +12,12 @@
 <input type="hidden" name="itemType" id="itemType" value="articles">
 @parent
   <h3>  {{ ('Liste des articles') }}</h3> @endsection 
-  <a href="{{ route('articles.create') }}">Nouveau</a> 
+  <a href="{{ route('articles.create') }}">Nouveau</a>
   @include('article.articles.administrator.filterFields')
   <div id='tableContainer'>
    @include('article.articles.administrator.searchAndSort',['actions'=>$actions]) 
 </div>
+
 @section('sidebar')
 @component('layouts.administrator.article-sidebar') @endcomponent 
 @endsection
@@ -29,3 +30,4 @@
 @endpush
 
 @endsection
+=

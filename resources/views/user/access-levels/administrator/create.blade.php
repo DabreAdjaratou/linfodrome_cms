@@ -11,7 +11,7 @@
 	<div>
 		<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
 		<button type="submit" name="save_next" value="save_next">{{('Enreg & insérer prochain ')}}</button>
-		<button type="reset" name="cancel" value="cancel" onclick="window.location.href='{{ route('access-level.index') }}'">{{('Annuler')}}</button>
+		<button type="reset" name="cancel" value="cancel" onclick="window.location.href='{{ route('access-levels.index') }}'">{{('Annuler')}}</button>
 		
 	</div>
 	<div>	
