@@ -19,7 +19,7 @@ var myMenu = [{
   {
     icon: 'fa fa-cut', 
     label: 'Couper',  
-    action: function(option, contextMenuIndex, optionIndex) {}, 
+    action: function(option, contextMenuIndex, optionIndex) { alert()}, 
     submenu: null, 
     disabled: false 
   },

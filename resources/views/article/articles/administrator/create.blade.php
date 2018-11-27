@@ -7,8 +7,9 @@
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Ajouter une article ') }}</h3>@endsection
-
-<form method="POST" action="{{ route('articles.store') }}"  enctype="multipart/form-data" class="">
+<div class="uk-grid">
+	<div class="uk-width-2-3">
+		<form method="POST" action="{{ route('articles.store') }}"  enctype="multipart/form-data" class="">
 	@csrf
 	{{-- @can('draft', Auth::User())  --}}
 	<button type="submit" name="save_close" value="save_close">{{('Enregistrer & fermer')}}</button>
@@ -21,7 +22,7 @@
 	</div>
 	<div>
 		<label for="title">{{('Titre:')}}</label>
-		<input type="text" name="title" placeholder="Titre"  value="{{ old('title') }}" required autofocus>
+		<input type="text" name="title" id="title" placeholder="Titre"  value="{{ old('title') }}" required autofocus>
 	</div>
 	<label for="category">{{('category:')}}</label>
 	<select  name="category" >
@@ -59,13 +60,9 @@
 
 	<div>
 		<label for="introtext">{{('Intro text:')}}</label>
-		<input type="text" name="introtext" value="{{ old('introtext') }}" >
+		<input type="text" name="introtext" id="introtext" value="{{ old('introtext') }}" >
 	</div>
 
-	<div>
-		<label for="fulltext">{{('Content:')}}</label>
-		<textarea name="fulltext" id="fulltext" >{{ old('fulltext') }}</textarea>
-	</div>
 	<div>
 		<label for="source">{{('Source:')}}</label>
 		<select  name="source" >
@@ -99,10 +96,21 @@
 		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
 		<input type="text" name="stop_publication_at"  value="{{ old('stop_publication_at') }}" class="datepicker">
 	</div>
+	<div>
+		<label for="fulltext">{{('Content:')}}</label>
+		<textarea name="fulltext" id="fulltext" >{{ old('fulltext') }}</textarea>
+	</div>
 </form>
+
+	</div>
+	<div class="uk-width-1-3">
+	 <iframe id="previewIframe" src="" height="600"></iframe> 
+	</div>
+</div>
+
 @section('sidebar')
- @component('layouts.administrator.article-sidebar') @endcomponent 
-@endsection
+ @component('layouts.administrator.article-sidebar') @endcomponent
+ @endsection
 @section('js')
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
@@ -110,6 +118,30 @@
 <script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.js"></script>
 <script>var editor = new Jodit('#fulltext');</script>
+<script type="text/javascript">
+$('.jodit_wysiwyg,#title,#introtext').on('keyup input click',function(e){
+loadIframeContent();
+ });
+
+ 	$('.jodit_toolbar').on('click',function(e){
+ 		loadIframeContent();
+ 	});	
+function loadIframeContent(){
+	var title='<h2>'+ $('#title').val() +'</h2>';
+	var introtext='<div>'+  $('#introtext').val() +'</div>';
+   	var html =title + introtext + $("#fulltext").val();
+    var iframe = document.getElementById("previewIframe");
+    iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(html);
+}; loadIframeContent();
+
+// var $doc = $('#previewIframe');
+// var title='titre';
+// var introtext='introtext';
+// $doc.ready(function() {
+
+//     $doc.contents().find("body").append(doc.(title+' '+introtext);
+// });
+</script>
 
 @endsection
 @endsection
