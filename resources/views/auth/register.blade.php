@@ -1,22 +1,24 @@
 @extends('layouts.administrator.master')
 @section('title', 'Authentification')
 @section('css')
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-<script src="//code.jquery.com/jquery-1.12.4.js"></script>
-<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 @endsection
 
 @section('content')
-
+@section ('pageTitle')
+@parent
+<h3>  {{ ('Ajouter un utilisateur') }}</h3> @endsection 
 <form method="POST" action="{{ route('register') }}" aria-label="{{('Register') }}" enctype="multipart/form-data" class="">
     @csrf
-    <div id="tabs">
-      <ul>
-        <li><a href="#userInfo"><span>utilisateur</span></a></li>
-        <li><a href="#userGroups"><span>Groupes</span></a></li>
+        <ul uk-tab>
+        <li><a href="#">Utilisateur</a></li>
+        <li><a href="#">Groupes</a></li>
         
     </ul>
-    <div id="userInfo">
+
+    <ul class="uk-switcher uk-margin">
+        
+         
+    <li>
         <div>
             <label for="name">{{ ('Nom') }}</label>
             <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus>            
@@ -71,8 +73,14 @@
                 <option value="{{ 1 }}">{{ ('Non') }}</option>
             </select>
         </div>
+      <div>
+        <button type="submit" class="btn btn-primary">
+            {{('Enregistrer') }}
+        </button>
+
     </div>
-    <div id="userGroups">
+    </li>
+    <li>
 
         <div>
             @foreach($groups as $group)
@@ -85,17 +93,9 @@
             </ul>                                     
             @endforeach
         </div>  
-    </div>         <div>
-        <button type="submit" class="btn btn-primary">
-            {{('Enregistrer') }}
-        </button>
-
-    </div>
+    </li>       
+    </ul>
 </form>
-<script>
-    $( "#tabs" ).tabs();
-</script>
-
 @endsection
 @section('sidebar')
 @component('layouts.administrator.user-sidebar') @endcomponent 

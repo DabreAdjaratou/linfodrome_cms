@@ -1,3 +1,4 @@
+$(document).ready(function() {
 $( ".datepicker" ).datepicker(
     {
       monthNames: [ "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Decembre" ],
@@ -11,3 +12,4 @@ $( ".datepicker" ).datepicker(
       currentText: "Aujourd'hui",
       closeText: "Fermer"
     });
+});

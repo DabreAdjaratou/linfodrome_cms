@@ -1,3 +1,10 @@
+/*
+*
+*  https://github.com/pwnedgod/supercontextmenu
+*
+*/
+
+$(document).ready(function() {
 var myMenu = [{
 
     // Menu Icon. 
@@ -8,7 +15,7 @@ var myMenu = [{
     label: 'Ouvrir', 
 
     // Callback
-    action: function(option, contextMenuIndex, optionIndex) {}, 
+    action: function(option, contextMenuIndex, optionIndex) { openMedia(); }, 
 
     // An array of submenu objects
     submenu: null,
@@ -19,7 +26,7 @@ var myMenu = [{
   {
     icon: 'fa fa-cut', 
     label: 'Couper',  
-    action: function(option, contextMenuIndex, optionIndex) { alert()}, 
+    action: function(option, contextMenuIndex, optionIndex) { }, 
     submenu: null, 
     disabled: false 
   },
@@ -33,7 +40,7 @@ var myMenu = [{
   {
     icon: 'fa fa-eye', 
     label: 'Visualiser', 
-    action: function(option, contextMenuIndex, optionIndex) {},
+    action: function(option, contextMenuIndex, optionIndex) {viewMedia();},
     submenu: null,  
     disabled: false  
   },
@@ -54,14 +61,14 @@ var myMenu = [{
   {
     icon: 'fa fa-edit', 
     label: 'Renommer', 
-    action: function(option, contextMenuIndex, optionIndex) {},
+    action: function(option, contextMenuIndex, optionIndex) { renameMedia();},
     submenu: null,  
     disabled: false  
   },
   {
     icon: 'fa fa-trash-alt', 
     label: 'Supprimer', 
-    action: function(option, contextMenuIndex, optionIndex) {},
+    action: function(option, contextMenuIndex, optionIndex) { deleteMedia();},
     submenu: null,  
     disabled: false  
   },
@@ -108,6 +115,64 @@ var myMenu = [{
 
 $('.media').on('contextmenu', function(e) {
   e.preventDefault();
+  var existingClass=$(this).attr('class');
+  $(this).attr('class', existingClass+' '+'context-menu-active');
   superCm.createMenu(myMenu, e);
 
+});
+
+function openMedia(){
+  var contextMenuActive=$('.context-menu-active').attr('id');
+  if($('.context-menu-active').hasClass('folder')){
+   
+    $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: route('media.open',[contextMenuActive]),
+        dataType : 'html',
+        type: 'POST',
+        data:contextMenuActive,
+        contentType: false, 
+        processData: false,
+        success:function(response) {
+          $('#media-container').html(response);
+        }
+      });   
+  }
+       superCm.destroyMenu();
+     };
+
+     function deleteMedia(){
+      // var confirmation = comfirm('Êtes vous bien sûre de vouloir supprimer cet élément ?');
+        var contextMenuActive=$('.context-menu-active').attr('id');
+         $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: route('media.delete',[contextMenuActive]),
+        dataType : 'html',
+        // data: contextMenuActive,
+        contentType: false, 
+        processData: false,
+        success:function(response) {alert('Supprimé')}
+      });   
+          $('.context-menu-active').remove();
+
+              superCm.destroyMenu();
+      }
+
+      function renameMedia(){
+        var contextMenuActive=$('.context-menu-active').attr('id');
+        $('.rename-folder-form > form').attr('class','');
+        $('.oldName').val(contextMenuActive);
+        superCm.destroyMenu();
+      }
+
+      function viewMedia(){
+        var contextMenuActive=$('.context-menu-active').attr('id');
+        var src=$('.context-menu-active > img').attr('src');
+        alert(src);
+        superCm.destroyMenu();
+      }
 });

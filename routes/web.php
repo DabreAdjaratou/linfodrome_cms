@@ -145,6 +145,20 @@ Route::resource('banner-categories','Banner\CategoryController');
 
 //Route to media
 Route::get('media','Media\MediaController@index')->name('media')->middleware('auth','activeUser');
-Route::get('/media-to-load/{media}',function () {
- return view('media/administrator/media-to-load');
-})->name('media-to-load')->middleware('auth','activeUser');
+
+Route::match(['get', 'post'],'/media/open/{media}','Media\MediaController@open')->name('media.open');
+Route::get('/media/delete/{media}','Media\MediaController@delete')->name('media.delete');
+Route::post('/media/create','Media\MediaController@createFolder')->name('media.createFolder');
+Route::post('/media/upload','Media\MediaController@upload')->name('media.upload');
+Route::Post('/media/rename','Media\MediaController@rename')->name('media.rename');
+
+;
+// Route::get('/media/cut/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/copy/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/duplicate/{media}',function () { return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/rename/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/delete/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/properties/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/open/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/download/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
+// Route::get('/media/paste/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');

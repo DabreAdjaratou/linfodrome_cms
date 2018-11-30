@@ -294,7 +294,7 @@ if($itemType=='article-draft'){ $articles->withPath('draft');};
          if($imageExtension=='.jpeg'){
           $imageExtension='.jpg';
         }
-        $filenameWithOutExtension=str_slug(basename($request->image->getClientOriginalName() , $imageExtension),'-');
+        $filenameWithOutExtension=str_slug(basename(strtolower($request->image->getClientOriginalName()) , $imageExtension),'-');
         $filename=$filenameWithOutExtension.'-'.$article->id.$imageExtension;
         $article->image=$filename;
         $request->image->storeAs('public/images/articles/sources', $filename);

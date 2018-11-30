@@ -96,9 +96,24 @@
 		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
 		<input type="text" name="stop_publication_at"  value="{{ old('stop_publication_at') }}" class="datepicker">
 	</div>
-	<div>
-		<label for="fulltext">{{('Content:')}}</label>
+	<div class="uk-margin">
+		
+    <ul  uk-tab>
+        <li><a href="#">Contenu</a></li>
+        <li><a href="#">Galerie</a></li>
+        <li><a href="#">Media</a></li>
+        <li><a href="#">fichier join</a></li>
+    </ul>
+
+    <ul class="uk-switcher uk-margin">
+    	<li>
 		<textarea name="fulltext" id="fulltext" >{{ old('fulltext') }}</textarea>
+	</li>
+        <li>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</li>
+        <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur, sed do eiusmod.</li>
+        <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur, sed do eiusmod.</li>
+        
+    </ul>
 	</div>
 </form>
 
@@ -142,6 +157,7 @@ function loadIframeContent(){
 //     $doc.contents().find("body").append(doc.(title+' '+introtext);
 // });
 </script>
+
 
 @endsection
 @endsection

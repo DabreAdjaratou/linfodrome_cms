@@ -1,9 +1,6 @@
 @extends('layouts.administrator.master')
 @section('title', 'Edit a user')
 @section('css')
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-<script src="//code.jquery.com/jquery-1.12.4.js"></script>
-<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 @endsection
 
 @section('content')
@@ -17,12 +14,16 @@
     @component('layouts.administrator.user-sidebar') @endcomponent 
     @endsection
 
-    <div id="tabs">
-      <ul>
-        <li><a href="#userInfo"><span>utilisateur</span></a></li>
-        <li><a href="#userGroups"><span>Groupes</span></a></li>
+    <ul uk-tab>
+        <li><a href="#">Utilisateur</a></li>
+        <li><a href="#">Groupes</a></li>
         
     </ul>
+
+    <ul class="uk-switcher uk-margin">
+        
+         
+    <li>
     <div>
         <button type="submit" name="update" value="update">{{ ('Modifier') }}</button>
         <button type="submit" name="cancel" value="cancel"> {{ ('Annuler') }}</button>
@@ -85,8 +86,8 @@
             <option value="{{ 1 }}" @if($user->require_reset==1) selected @endif>{{ ('Non') }}</option>
         </select>
     </div>
-</div>
-<div id="userGroups">
+</li>
+<li>
    <div>
      
     @foreach($allGroups as $group)
@@ -110,11 +111,8 @@
 
     @endforeach 
 </div>   
-</div>
+</li>
 
-</div>
+</ul>
 </form>
-<script>
-    $( "#tabs" ).tabs();
-</script>
 @endsection

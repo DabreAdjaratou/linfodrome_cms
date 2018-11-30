@@ -1,27 +1,33 @@
-$('.displayType').on('click',function(){
+$(document).ready(function() {
+
+$('.display-type').on('click',function(){
 var element=$(this).attr('id');
 displayType(element);
   });
 
 function displayType (element){
 if (element == 'liste'){
-$('#mediaContainer').attr('class','mediaContainer');
+$('#media-container').attr('class','media-container');
 $('.media > div').attr('class','uk-display-inline');
-$('.imageIcon').attr('width','15px');
+$('.image-icon').attr('width','25px');
 
 }else{
-$('#mediaContainer').attr('class','mediaContainer uk-grid');
+$('#media-container').attr('class','media-container uk-grid');
 $('.media > div').attr('class','');
-$('.imageIcon').attr('width','45px');
-
+$('.image-icon').attr('width','45px');
 };
+$('.racine').attr('class','racine uk-display-block uk-margin-small-bottom');
+
 }
 
-displayType($('li.displayType.uk-active').attr('id'));
+displayType($('li.display-type.uk-active').attr('id'));
  $(".folder").click(function(){
       var mediaId=$.trim($(this).attr('id')); 
-        $.get(route('media-to-load',['folder']).replace('folder',mediaId), function(data, status){
-            $('#mediaContainer').html(data);
+        $.get(route('media.open',['folder']).replace('folder',mediaId), function(data, status){
+            $('#media-container').html(data);
         });
+            
+
           }); 
         
+});

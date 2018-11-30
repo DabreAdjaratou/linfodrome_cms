@@ -8,16 +8,27 @@ $('#dataTable').DataTable({
         responsive: true
 });
     function searchAndSort(sortField){
-      var entries=$('#entries').val();
-      var searchByTitle=$('#searchByTitle').val();
-      var searchByCategory=$('#searchByCategory').val();
-      var searchByFeaturedState=$('#searchByFeaturedState').val();
-      var searchByPublishedState=$('#searchByPublishedState').val();
-      var searchByUser=$('#searchByUser').val();
+
+      var entries="";
+      var searchByTitle="";
+      var searchByCategory="";
+      var searchByFeaturedState="";
+      var searchByPublishedState="";
+      var searchByUser="";
+      var fromDate="";
+      var toDate="";
       var order=$('#order').val();
-      var fromDate=$('#fromDate').val();
-      var toDate=$('#toDate').val();
       var itemType=$('#itemType').val();
+      
+      if($('#entries')){entries=$('#entries').val();};
+      if($('#searchByTitle')){searchByTitle=$('#searchByTitle').val();};
+      if($('#searchByCategory')){searchByCategory=$('#searchByCategory').val();};
+      if($('#searchByFeaturedState')){searchByFeaturedState=$('#searchByFeaturedState').val();};
+      if($('#searchByPublishedState')){searchByPublishedState=$('#searchByPublishedState').val();};
+      if($('#searchByUser')){searchByUser=$('#searchByUser').val();};
+      if($('#fromDate')){fromDate=$('#fromDate').val();};
+      if($('#toDate')){toDate=$('#toDate').val();};
+      
 if(itemType=='articles' || itemType=='article-trash' || itemType=='article-draft'){
     var routeUrl=route('articles.search-and-sort');
 };
@@ -83,16 +94,16 @@ function tableSort (){
       searchAndSort(sortField);  
       var url=window.location.href;
          
-//       if(order=='asc'){
+      if(order=='asc'){
 // $('.tableSort > i').attr('class','fas fa-sort uk-margin-left');
 // $("#"+sortField+' > i').attr('class','fas fa-sort-up uk-margin-left');
-//         $('#order').val('desc')
-//       }
-//       if (order=='desc') {
+        $('#order').val('desc')
+      }
+      if (order=='desc') {
 // $('.tableSort > i').attr('class','fas fa-sort uk-margin-left');
 // $("#"+sortField+' > i').attr('class','fas fa-sort-down uk-margin-left');
-//        $('#order').val('asc')
-//      }
+       $('#order').val('asc')
+     }
 changeUrl(url)
    });
   };tableSort();

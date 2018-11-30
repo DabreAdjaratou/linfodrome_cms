@@ -6,9 +6,9 @@ $(function () {
     $('#jstree').on("changed.jstree", function (e, data) {
       var media=$.parseHTML(data.node.text);
       var mediaId=media[0].id;
-      var urlToLoad=route('media-to-load',['folder']).replace('folder',mediaId);
+      var urlToLoad=route('media.open',['mediaToOpen']).replace('mediaToOpen',mediaId);
       $.get(urlToLoad, function(data, status){
-            $('#mediaContainer').html(data);
+            $('#media-container').html(data);
         });
     });
 
