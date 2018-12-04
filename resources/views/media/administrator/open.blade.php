@@ -1,6 +1,6 @@
 <script >
-	$('.racine').html('<div class="racine "> <i class="fa fa-folder-open uk-text-muted"> Racine : <?php echo $mediaPath; ?></i></div>');
-	var mediaPath='<?php echo $mediaPath; ?>';
+	$('.racine').html('<div class="racine"> <i class="fa fa-folder-open uk-text-muted"> Racine : <?php echo $mediaPath; ?></i></div>');
+	var mediaPath='<?php echo $path; ?>';
 	$('.path').val(mediaPath);
 </script>
 @foreach($directories as $d)

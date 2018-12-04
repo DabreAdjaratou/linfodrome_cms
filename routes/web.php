@@ -151,8 +151,9 @@ Route::get('/media/delete/{media}','Media\MediaController@delete')->name('media.
 Route::post('/media/create','Media\MediaController@createFolder')->name('media.createFolder');
 Route::post('/media/upload','Media\MediaController@upload')->name('media.upload');
 Route::Post('/media/rename','Media\MediaController@rename')->name('media.rename');
+Route::get('/media/properties/{media}','Media\MediaController@getProperties')->name('media.properties');
+Route::get('/media/download/{media}','Media\MediaController@download')->name('media.download');
 
-;
 // Route::get('/media/cut/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
 // Route::get('/media/copy/{media}',function () {return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');
 // Route::get('/media/duplicate/{media}',function () { return view('media/administrator/media-to-load');})->name('media-to-load')->middleware('auth','activeUser');

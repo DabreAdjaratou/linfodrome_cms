@@ -11,6 +11,7 @@
 @section ('pageTitle')
 @parent
 <h3>  {{ ('Medias') }}</h3> @endsection 
+<div id="alert"> </div>
 <div>
   <button class="uk-button uk-button-small uk-button-secondary " id="uploadBtn">
     <i class="fa fa-plus-circle uk-text-lowercase"> {{ ('Transferer') }}</i>
@@ -51,7 +52,7 @@
      <input type="hidden" name="_token" value="{{csrf_token()}}" > 
       <label>{{('Parcourir')}}</label>  
   <input type="file" name="uploadedFile" required>
-  <input type="hidden" name="path" id="filePath" class="path" value="{{$mediaPath}}">
+  <input type="hidden" name="path" id="filePath" class="path" value="{{$path}}">
   <button class="uk-button uk-button-primary uk-button-small"><i class="fa fa-download uk-margin-small-right"></i>{{('Demarrer l\'envoi')}}</button>
        <button type="reset" name="cancelBtn" id="cancelBtn" class="uk-button uk-button-small cancel-btn" >{{('Annuler')}}</button>
      </form>
@@ -61,7 +62,7 @@
      <input type="hidden" name="_token" value="{{csrf_token()}}" > 
       <label>{{('Nom du dossier :')}}</label>  
       <input type="text" name="folderName" class="" required> 
-       <input type="hidden" name="folderPath" id="path" class="path" value="{{$mediaPath}}"> 
+       <input type="hidden" name="folderPath" id="path" class="path" value="{{$path}}"> 
        <button type="submit" name="submitBtn" class="">{{('Creer')}}</button> 
        <button type="reset" name="cancelBtn" id="cancelBtn" class="cancel-btn" >{{('Annuler')}}</button>
      </form>
@@ -71,16 +72,15 @@
      <input type="hidden" name="_token" value="{{csrf_token()}}" > 
       <label>{{('Renommer en :')}}</label>  
       <input type="text" name="newName" class="" required> 
-       <input type="hidden" name="folderPath" id="path" class="path" value="{{$mediaPath}}"> 
+       <input type="hidden" name="folderPath" id="path" class="path" value="{{$path}}"> 
        <input type="hidden" name="oldName" id="oldName" class="oldName" value="">
        <button type="submit" name="submitBtn" class="">{{('Renommer')}}</button> 
        <button type="reset" name="cancelBtn" id="cancelBtn" class="cancel-btn" >{{('Annuler')}}</button>
      </form>
    </div>
-
-
+   
 <div>
- <div class="racine uk-margin-small-bottom"> <i class="fa fa-folder-open uk-text-muted"> {{ 'Racine : '.$mediaPath}}</i></div>
+ <div class="racine uk-margin-small-bottom"> <i class="fa fa-folder-open uk-text-muted"> {!! 'Racine : '.$mediaPath !!}</i></div>
 
 <div id="media-container" class="media-container uk-grid" >
 @foreach($directories as $d)
@@ -118,7 +118,7 @@
 <script>
 $(document).ready(function() {
 
-$('.path').val('<?php echo $mediaPath;?>');
+$('.path').val('<?php echo $path;?>');
 $('#newFolder').on('click', function(){
   $('.create-folder-form > form').attr('class','')
 });
