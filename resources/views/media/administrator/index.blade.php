@@ -20,16 +20,6 @@
   </button>
 </div>
   
-  <!-- <script type="text/javascript">
-    UIkit.util.on('#new-folder', 'click', function (e) {
-           e.preventDefault();
-           e.target.blur();
-           UIkit.modal.dialog(
-            '<button class="uk-modal-close-default" type="button" uk-close></button><div class="uk-modal-header">            <h2 class="uk-modal-title"> Création de dossier</h2></div><div class="uk-modal-body"> <form method="post" action="<?php echo route("media.createFolder"); ?>" >  <input type="hidden" name="_token" value="<?php echo csrf_token() ?>" >  <h3> Nouveau dossier</h3>  <label>Nom du dossier :</label>  <input type="text" name="folderName" class="uk-input uk-margin-bottom">  <input type="hidden" name="folderPath" id="folderPath" value="<?php echo $mediaPath;?>">  <button type="submit" name="submit-btn" class="uk-button uk-button-primary"> creer</button> <button type="submit" name="cancel-btn" class="uk-button uk-button-default" >Annuler</button></form></div>');
-
-       });
-
-  </script> -->
 <div class="uk-margin-small-top">
 <div class="uk-display-inline-block"> {{ ('Affichage') }}</div>
 <div class="uk-display-inline-block">
@@ -86,14 +76,14 @@
 @foreach($directories as $d)
 <div class="folder media" id="{{str_replace('/', '@',$d) }}"> 
 <img  class="image-icon" src="{{asset('storage/images/icons/folder-icon.png') }}">
-<div class="media-name"> {{str_limit(basename($d),8) }}</div>
+<div class="media-name"> {{ucfirst(str_limit(basename($d),8)) }}</div>
 </div>
 @endforeach
 @foreach($files as $f)
 
 <div class="media files" id="{{str_replace('/', '@',$f) }}">
  <img class="image-icon" src="{{asset('storage/'.substr($f, 7)) }}" width="45px">
-<div class="media-name">{{ str_limit(basename($f),8) }} </div>
+<div class="media-name">{{ ucfirs(str_limit(basename($f),8)) }} </div>
 </div>
 @endforeach
 </div>

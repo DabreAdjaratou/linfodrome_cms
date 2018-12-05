@@ -44,7 +44,7 @@ class MediaController extends Controller
 		$validatedData = $request->validate([
 			'folderName' => 'required|string',
 		]);
-		$folder= str_replace('/', '\\',  storage_path('app/'.$request->folderPath.'/'.ucfirst($request->folderName)));
+		$folder= str_replace('/', '\\',  storage_path('app/'.$request->folderPath.'/'.$request->folderName));
 
 		if(is_dir($folder))
 		{
@@ -53,7 +53,7 @@ class MediaController extends Controller
 
 		}
 		else {
-			Storage::makeDirectory($request->folderPath.'/'.ucfirst($request->folderName));
+			Storage::makeDirectory($request->folderPath.'/'.$request->folderName);
 			session()->flash('message.type', 'success');
 			session()->flash('message.content', 'Le dossier <strong>'.$request->folderName.'</strong> a été crée dans <strong>'.$request->folderPath.'</strong>');
 
@@ -94,14 +94,14 @@ class MediaController extends Controller
 		$newName=$request->newName;
 		$path=$request->folderPath;
 		$folder= str_replace('/', '\\',  storage_path('app/'.$oldName));
-		$exists = Storage::disk('local')->exists(str_replace('/'.class_basename($oldName),'',$oldName).'/'.ucfirst($newName));
+		$exists = Storage::disk('local')->exists(str_replace('/'.class_basename($oldName),'',$oldName).'/'.$newName);
 		if($exists){
 
 			session()->flash('message.type', 'danger');
 			session()->flash('message.content', 'Impossible de renommer, ce fichier existe dejà!');
 
 		}else{
-			Storage::move($oldName, str_replace('/'.class_basename($oldName),'',$oldName).'/'.ucfirst($newName));
+			Storage::move($oldName, str_replace('/'.class_basename($oldName),'',$oldName).'/'.$newName);
 			session()->flash('message.type', 'success');
 			session()->flash('message.content', 'Fichier renommé !');
 		}

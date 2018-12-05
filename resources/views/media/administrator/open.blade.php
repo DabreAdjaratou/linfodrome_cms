@@ -5,7 +5,7 @@
 </script>
 @foreach($directories as $d)
 <div class="folder media" id="{{str_replace('/', '@',$d) }}"> <img class="image-icon" src="{{asset('storage/images/icons/folder-icon.png') }}">
-<div class="media-name"> {{str_limit(basename($d),8) }}</div>
+<div class="media-name"> {{ucfirst(str_limit(basename($d),8))}}</div>
 </div>
 
 @endforeach
@@ -13,7 +13,7 @@
 @foreach($files as $f)
 
 <div class="media files media-container" id="{{str_replace('/', '@',$f) }}"> <img class="image-icon" src="{{asset('storage/'.substr($f, 7)) }}" width="45px">
-<div class="media-name">{{ str_limit(basename($f),8) }} </div>
+<div class="media-name">{{ ucfirst(str_limit(basename($f),8)) }} </div>
 </div>
 
 @endforeach

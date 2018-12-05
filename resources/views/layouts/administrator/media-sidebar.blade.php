@@ -15,7 +15,7 @@
     $files=Storage::files('public/images');
     @endphp
     @foreach( $directories as $directory)
-    <li><span id="{{ str_replace('/', '@',$directory)}}">{{ str_limit(basename($directory),15) }}</span>
+    <li><span id="{{ str_replace('/', '@',$directory)}}">{{ ucfirst(str_limit(basename($directory),15)) }}</span>
       @php 
       $subDirectories=Storage::directories($directory);
       @endphp
@@ -28,13 +28,13 @@
       @endphp
       @foreach ($subfiles as $sf) 
       <ul><li data-jstree='{"icon":"glyphicon glyphicon-leaf"}' class="uk-text-truncate">
-        <span id="{{ str_replace('/', '@',$sf)}}">{{str_limit(basename($sf),15)}}</span></li></ul>
+        <span id="{{ str_replace('/', '@',$sf)}}">{{ucfirst(str_limit(basename($sf),15))}}</span></li></ul>
         @endforeach
       </li>
       @endforeach
       @foreach( $files as $file)
       <li data-jstree='{"icon":"glyphicon glyphicon-leaf"}' class="uk-text-truncate">
-       <span id={{ str_replace('/', '@',$file)}}>{{ str_limit(basename($file),15)}}</span></li>
+       <span id={{ str_replace('/', '@',$file)}}>{{ ucfirst(str_limit(basename($file),15))}}</span></li>
        @endforeach
      </ul>
    </div>

@@ -1,6 +1,6 @@
   <ul>
     	<li>
-		    	<span id="{{ str_replace('/', '@',$directory)}}"> {{ str_limit(basename($directory),15) }}</span>
+		    	<span id="{{ str_replace('/', '@',$directory)}}"> {{ ucfirst(str_limit(basename($directory),15)) }}</span>
     @if(Storage::directories($directory))
 @php 
 $subDirectories=Storage::directories($directory);
@@ -15,7 +15,7 @@ $subDirectories=Storage::directories($directory);
 $subFiles=Storage::files($directory);
 @endphp
 @foreach ($subFiles as $sf)
-<ul><li data-jstree='{"icon":"glyphicon glyphicon-leaf"}'><span id="{{ str_replace('/', '@',$sf)}}">{{ str_limit(basename($sf),15)}}</span></li></ul>
+<ul><li data-jstree='{"icon":"glyphicon glyphicon-leaf"}'><span id="{{ str_replace('/', '@',$sf)}}">{{ ucfirst(str_limit(basename($sf),15))}}</span></li></ul>
 @endforeach
    @endif
     	</li>
