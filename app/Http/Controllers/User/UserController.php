@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User\User;
 use App\Models\User\Group;
+use App\Models\User\GroupChild;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -33,7 +34,7 @@ class UserController extends Controller
 public function index()
 {
   
-  dd(Group::getPermissions(5));
+  // dd(Group::getPermissions(6));
  $users = User::all('id','name','email','is_active','require_reset','data');
  foreach ($users as $u) {
   $u->data=json_decode($u->data);

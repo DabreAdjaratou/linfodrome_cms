@@ -4,6 +4,7 @@ namespace App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User\AccessLevel;
+use App\Models\User\Permission;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Group extends Model {
@@ -78,25 +79,47 @@ class Group extends Model {
      * @return array $permission
      */
     public static function getPermissions($id) {
-        $group = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
-        $permissions = [];
-        $Allpermissions=[];
+        $group = Group::find($id);
+        // $permissions = [];
+        // $Allpermissions=[];
         // get group own permissions via its access levels
-        foreach ($group->getAccessLevels as $accessLevel) {
-            foreach ($accessLevel->getPermissions as $permission) {
-                $permissions[] = $permission;
-            }
-        }
+        // foreach ($group->getAccessLevels as $accessLevel) {
+        //     foreach ($accessLevel->getPermissions as $permission) {
+        //         $permissions[] = $permission;
+        //     }
+        // }
+        $parents = collect([$id]);
 
+       $parent = $group->parent_id;
+      while($parent) {
+        $parents->push($parent);
+        $p = Group::find($parent);
+        $parent=$p->parent_id;
+    }
+    $allAccessLevels=collect([]);
+for($i=0; $i < sizeof($parents); $i++){
+    $accessLevel= AccessLevel::join('usergroup_accesslevel_map', 'access_levels.id', '=', 'usergroup_accesslevel_map.access_level_id')
+     ->where('user_group_id',$parents[$i])->get();
+     foreach ($accessLevel as $a) {
+        $allAccessLevels->push($a->access_level_id);
+     }
+}
+    $permissions=collect([]);
+for($i=0; $i < sizeof($allAccessLevels); $i++){
+    $permission= Permission::where('access_level_id',$allAccessLevels[$i])->get();
+    // join('access_levels', 'access_levels.id', '=', 'Permissions.access_level_id')
+    //  ->where('access_level_id',$allAccessLevels[$i])->get();
+     foreach ($permission as $p) {
+        $permissions->push($p);
+     }
+}
+return $permissions;
 // if the group has a parent, get parent permissions and merge with group permissions and return all permissions
-        $parentPermissions=Group::getParentPermissions($group->parent_id);
-        if($parentPermissions['permissions']){
-            if($parentPermissions['parent_id']){
- $parentPermissions=Group::getParentPermissions($group->parent_id);
-            }
-            return array_merge($permissions,$parentPermissions['permissions']);
-        }
-        return $permissions;
+//       if ($group->parent_id != 0) {
+//         $parent = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
+//         $parentPermissions = Group::getParentPermissions($group->parent_id);
+// }
+              // return Group::allPermissions($permissions,$parentPermissions);
     }
 
 
@@ -135,9 +158,7 @@ class Group extends Model {
 *
 */
     public static function getParentPermissions($id) {
-if ($id != 0) {
-
-$parent = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
+       $parent = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
         $permissions = [];
         $permissionsG2 = [];
         if ($parent) {
@@ -145,27 +166,15 @@ $parent = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id
                  foreach ($accessLevel->getPermissions as $permission) {
                     $permissions[] = $permission;
                 }
-                            }
+       }
 
         }
-dd($parent->parent_id);
-        $p = Group::getParentPermissions($parent->parent_id);
-
-return ['permissions'=>$permissions, 'parent_id'=>$parent->parent_id];
-}else{
-    return [];
-}
-        //     $result= Group::getParentPermissions($group->parent_id);
-        //     if($result["parent_id"]){
-        //     dd(Group::getParentPermissions($result["parent_id"]));
-                
-        //     }
-        //     $Allpermissions = array_merge($permissions, $parentPermissions);
-        // return $Allpermissions;
-        // }
-
-
+return $permissions;
         
+    }
+
+    public  static function allPermissions($permissions, $parentPermissions){
+        return array_merge($permissions, $parentPermissions);
     }
 
 }
