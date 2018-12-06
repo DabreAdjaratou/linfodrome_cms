@@ -21,24 +21,34 @@ class Category extends Model
      */
     protected $table = 'article_categories';
 
-   
+
    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'title','published',
-    ];
-
-     public function getArticles()
-    {
-         return $this->hasMany('App\Models\Article\Article','category_id');
-    }
-
-    public function getArchives()
-    {
-         return $this->hasMany('App\Models\Article\Archive','category_id');
-    }
+   protected $fillable = [
+    'title','published',
+];
+/**
+* get articles list for a category
+*@param
+*@return collection of items
+*
+*/
+public function getArticles()
+{
+   return $this->hasMany('App\Models\Article\Article','category_id');
+}
+/**
+* get archives list for a category
+*@param
+*@return collection of items
+*
+*/
+public function getArchives()
+{
+   return $this->hasMany('App\Models\Article\Archive','category_id');
+}
 
 }

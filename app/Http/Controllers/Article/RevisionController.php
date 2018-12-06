@@ -12,10 +12,10 @@ class RevisionController extends Controller
      /**
      * Protecting routes
      */
-    public function __construct()
-{
-    $this->middleware(['auth','activeUser']);
-}
+     public function __construct()
+     {
+        $this->middleware(['auth','activeUser']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -23,10 +23,10 @@ class RevisionController extends Controller
      */
     public function index()
     {
-     $revisions=Revision::with(['getModifier:id,name','getArticle:id,title,category_id,created_by,created_at','getArticle.getCategory:id,title',
-      'getArticle.getAuthor:id,name'])->get()->groupBy('article_id');
-   return view('article.revisions.administrator.index',compact('revisions'));
-    }
+       $revisions=Revision::with(['getModifier:id,name','getArticle:id,title,category_id,created_by,created_at','getArticle.getCategory:id,title',
+          'getArticle.getAuthor:id,name'])->get()->groupBy('article_id');
+       return view('article.revisions.administrator.index',compact('revisions'));
+   }
 
     /**
      * Show the form for creating a new resource.
@@ -57,10 +57,10 @@ class RevisionController extends Controller
      */
     public function show($articleId)
     {
-       $article=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
+     $article=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
       'getAuthor:id,name'])->withTrashed()->where('id',$articleId)->get();
-        return view('article.revisions.administrator.show',compact('article'));
-    }
+     return view('article.revisions.administrator.show',compact('article'));
+ }
 
     /**
      * Show the form for editing the specified resource.

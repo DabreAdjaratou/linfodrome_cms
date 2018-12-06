@@ -22,12 +22,20 @@ class Banner extends Model
      protected $fillable = [
         'title','published','category_id','type','image','size','url','code','start_publication_at','stop_publication_at','created_by','created_at','updated_at'
     ];
-			
+	/**
+*get item's category
+*@param
+*@return item collection
+*/
      public function getCategory()
     {
          return $this->belongsTo('App\Models\Banner\Category','category_id');
     }
-
+/**
+*get item's author
+*@param
+*@return item collection
+*/
      public function getAuthor()
     {
         return $this->belongsTo('App\Models\User\User','created_by');

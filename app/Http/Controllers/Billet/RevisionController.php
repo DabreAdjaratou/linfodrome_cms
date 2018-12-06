@@ -12,10 +12,10 @@ class RevisionController extends Controller
      /**
      * Protecting routes
      */
-    public function __construct()
-{
-   $this->middleware(['auth','activeUser']);
-}
+     public function __construct()
+     {
+         $this->middleware(['auth','activeUser']);
+     }
     /**
      * Display a listing of the resource.
      *
@@ -23,10 +23,10 @@ class RevisionController extends Controller
      */
     public function index()
     {
-         $revisions=Revision::with(['getModifier:id,name','getBillet:id,title,category_id,created_by,created_at','getBillet.getCategory:id,title','getBillet.getAuthor:id,name'])->get()->groupBy('billet_id');
-   return view('billet.revisions.administrator.index',compact('revisions'));
+       $revisions=Revision::with(['getModifier:id,name','getBillet:id,title,category_id,created_by,created_at','getBillet.getCategory:id,title','getBillet.getAuthor:id,name'])->get()->groupBy('billet_id');
+       return view('billet.revisions.administrator.index',compact('revisions'));
 
-    }
+   }
 
     /**
      * Show the form for creating a new resource.
@@ -57,10 +57,10 @@ class RevisionController extends Controller
      */
     public function show($billetId)
     {
-       $billet=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
+     $billet=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
       'getAuthor:id,name'])->withTrashed()->where('id',$billetId)->get();
-        return view('billet.revisions.administrator.show',compact('billet'));
-        }
+     return view('billet.revisions.administrator.show',compact('billet'));
+ }
 
     /**
      * Show the form for editing the specified resource.

@@ -12,10 +12,10 @@ use Illuminate\Validation\Rule;
 class BannerController extends Controller
 {
 
-     public function __construct()
-{
-     $this->middleware(['auth','activeUser']);
-}
+ public function __construct()
+ {
+   $this->middleware(['auth','activeUser']);
+ }
     /**
      * Display a listing of the resource.
      *
@@ -23,8 +23,8 @@ class BannerController extends Controller
      */
     public function index()
     {
-        $banners=Banner::with(['getCategory:id,title','getAuthor:id,name'])->orderBy('published', 'asc')->get();
-        return view('banner.banners.administrator.index',compact('banners'));
+      $banners=Banner::with(['getCategory:id,title','getAuthor:id,name'])->orderBy('published', 'asc')->get();
+      return view('banner.banners.administrator.index',compact('banners'));
     }
 
     /**
@@ -34,10 +34,10 @@ class BannerController extends Controller
      */
     public function create()
     {
-             $categories=Category::where('published',1)->get(['id','title']);
-        $users=User::all('id','name');
+     $categories=Category::where('published',1)->get(['id','title']);
+     $users=User::all('id','name');
      return view('banner.banners.administrator.create',compact('categories','users'));   
-    }
+   }
 
     /**
      * Store a newly created resource in storage.
@@ -47,65 +47,65 @@ class BannerController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-      
-      'title' => 'required|unique:banners|max:100',
-      'published'=>'nullable',
-      'category'=>'required|int',
-      'type'=>'required|int',
-      'imageForComputer'=>'image',
-      'imageForTablet'=>'image',
-      'imageForMobile'=>'image',
-      'sizeForComputer'=>'string',
-      'sizeForTablet'=>'string',
-      'sizeForMobile'=>'string',
-      'url'=>'required|string',
-      'codeForComputer'=>'string',
-      'codeForTablet'=>'string',
-      'codeForMobile'=>'string',
+      $validatedData = $request->validate([
+        
+        'title' => 'required|unique:banners|max:100',
+        'published'=>'nullable',
+        'category'=>'required|int',
+        'type'=>'required|int',
+        'imageForComputer'=>'image',
+        'imageForTablet'=>'image',
+        'imageForMobile'=>'image',
+        'sizeForComputer'=>'string',
+        'sizeForTablet'=>'string',
+        'sizeForMobile'=>'string',
+        'url'=>'required|string',
+        'codeForComputer'=>'string',
+        'codeForTablet'=>'string',
+        'codeForMobile'=>'string',
             // 'created_by'=>'int',
-      'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
-      'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+        'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+        'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
 
-    ]);
+      ]);
 
-        $banner=new Banner;
-        $banner->title=$request->title;
-        $banner->alias =str_slug($request->title, '-');
-        $banner->published=$request->published ? $request->published : 0 ;
-        $banner->category_id=$request->category;
-        $banner->type=$request->type;
-        $banner->image='{"computer":"'.str_replace('\\', '/',$request->imageForComputer).'","tablet":"'.str_replace('\\', '/',$request->imageForTablet).'","mobile":"'.str_replace('\\', '/',$request->imageForMobile).'"}';
-        $banner->size='{"computer":"'.$request->sizeForComputer.'","tablet":"'.$request->sizeForTablet.'","mobile":"'.$request->sizeForMobile.'"}';
-        $banner->url=$request->url;
-        $banner->code='{"computer":"'.$request->codeForComputer.'","tablet":"'.$request->codeForTablet.'","mobile":"'.$request->codeForMobile.'"}';
-        $banner->created_by=$request->created_by ?? $request->auth_userid;
-         if($request->start_publication_at){
-     $start_at=explode(' ',$request->start_publication_at);
-     $banner->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+      $banner=new Banner;
+      $banner->title=$request->title;
+      $banner->alias =str_slug($request->title, '-');
+      $banner->published=$request->published ? $request->published : 0 ;
+      $banner->category_id=$request->category;
+      $banner->type=$request->type;
+      $banner->image='{"computer":"'.str_replace('\\', '/',$request->imageForComputer).'","tablet":"'.str_replace('\\', '/',$request->imageForTablet).'","mobile":"'.str_replace('\\', '/',$request->imageForMobile).'"}';
+      $banner->size='{"computer":"'.$request->sizeForComputer.'","tablet":"'.$request->sizeForTablet.'","mobile":"'.$request->sizeForMobile.'"}';
+      $banner->url=$request->url;
+      $banner->code='{"computer":"'.$request->codeForComputer.'","tablet":"'.$request->codeForTablet.'","mobile":"'.$request->codeForMobile.'"}';
+      $banner->created_by=$request->created_by ?? $request->auth_userid;
+      if($request->start_publication_at){
+       $start_at=explode(' ',$request->start_publication_at);
+       $banner->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
      }else{
       $banner->start_publication_at=$request->start_publication_at;
     }
-     if($request->start_publication_at){
+    if($request->start_publication_at){
      $stop_at=explode(' ',$request->stop_publication_at);
      $banner->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
-     }else{
-      $banner->stop_publication_at=$request->stop_publication_at;
-     }
-        
+   }else{
+    $banner->stop_publication_at=$request->stop_publication_at;
+  }
+  
   if ($banner->save()) {
-        session()->flash('message.type', 'success');
-        session()->flash('message.content', 'Bannière ajouté avec succès!');
-    } else {
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Erreur lors de l\'ajout!');
-    }
-       if ($request->save_close) {
-           return redirect()->route('banners.index');
-       }else{
-        return redirect()->route('banners.create');
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Bannière ajouté avec succès!');
+  } else {
+    session()->flash('message.type', 'danger');
+    session()->flash('message.content', 'Erreur lors de l\'ajout!');
+  }
+  if ($request->save_close) {
+   return redirect()->route('banners.index');
+ }else{
+  return redirect()->route('banners.create');
 }
-    }
+}
 
     /**
      * Display the specified resource.
@@ -126,10 +126,10 @@ class BannerController extends Controller
      */
     public function edit($id)
     {
-        $banner=Banner::find($id);
+      $banner=Banner::find($id);
       $categories=Category::where('published',1)->get(['id','title']);
-        $users=User::all('id','name');
-        return view('banner.banners.administrator.edit',compact('banner','categories','users'));
+      $users=User::all('id','name');
+      return view('banner.banners.administrator.edit',compact('banner','categories','users'));
     }
 
     /**
@@ -141,72 +141,72 @@ class BannerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
-        $validatedData = $request->validate([
-      'title' => 'required|'.Rule::unique('banners')->ignore($id, 'id'),
-      'published'=>'nullable',
-      'category'=>'required|int',
-      'type'=>'required|int',
-      'imageForComputer'=>'image',
-      'imageForTablet'=>'image',
-      'imageForMobile'=>'image',
-      'sizeForComputer'=>'string',
-      'sizeForTablet'=>'string',
-      'sizeForMobile'=>'string',
-      'url'=>'required|string',
-      'codeForComputer'=>'string',
-      'codeForTablet'=>'string',
-      'codeForMobile'=>'string',
+      
+      $validatedData = $request->validate([
+        'title' => 'required|'.Rule::unique('banners')->ignore($id, 'id'),
+        'published'=>'nullable',
+        'category'=>'required|int',
+        'type'=>'required|int',
+        'imageForComputer'=>'image',
+        'imageForTablet'=>'image',
+        'imageForMobile'=>'image',
+        'sizeForComputer'=>'string',
+        'sizeForTablet'=>'string',
+        'sizeForMobile'=>'string',
+        'url'=>'required|string',
+        'codeForComputer'=>'string',
+        'codeForTablet'=>'string',
+        'codeForMobile'=>'string',
             // 'created_by'=>'int',
-      'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
-      'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
-    ]);
+        'start_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+        'stop_publication_at'=>'nullable|date_format:d-m-Y H:i:s',
+      ]);
 
-        $banner=Banner::find($id);
-        $banner->title=$request->title;
-        $banner->alias =str_slug($request->title, '-');
-        $banner->published=$request->published ? $request->published : 0 ;
-        $banner->category_id=$request->category;
-        $banner->type=$request->type;
-        $exixtingImages=$banner->image;
-                
-        $request->imageForComputer= $request->imageForComputer ? $request->imageForComputer: json_decode($exixtingImages)->computer;
-        $request->imageForTablet= $request->imageForTablet ? $request->imageForTablet:json_decode($exixtingImages)->tablet;
-        $request->imageForMobile= $request->imageForMobile ? $request->imageForMobile:json_decode($exixtingImages)->mobile;
-        $banner->image='{"computer":"'.str_replace('\\', '/',$request->imageForComputer).'","tablet":"'.str_replace('\\', '/',$request->imageForTablet).'","mobile":"'.str_replace('\\', '/',$request->imageForMobile).'"}';
-        $banner->size='{"computer":"'.$request->sizeForComputer.'","tablet":"'.$request->sizeForTablet.'","mobile":"'.$request->sizeForMobile.'"}';
-        $banner->url=$request->url;
-        $banner->code='{"computer":"'.$request->codeForComputer.'","tablet":"'.$request->codeForTablet.'","mobile":"'.$request->codeForMobile.'"}';
-        $banner->created_by=$request->created_by ?? $request->auth_userid;
-         if($request->start_publication_at){
-     $start_at=explode(' ',$request->start_publication_at);
-     $banner->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+      $banner=Banner::find($id);
+      $banner->title=$request->title;
+      $banner->alias =str_slug($request->title, '-');
+      $banner->published=$request->published ? $request->published : 0 ;
+      $banner->category_id=$request->category;
+      $banner->type=$request->type;
+      $exixtingImages=$banner->image;
+      
+      $request->imageForComputer= $request->imageForComputer ? $request->imageForComputer: json_decode($exixtingImages)->computer;
+      $request->imageForTablet= $request->imageForTablet ? $request->imageForTablet:json_decode($exixtingImages)->tablet;
+      $request->imageForMobile= $request->imageForMobile ? $request->imageForMobile:json_decode($exixtingImages)->mobile;
+      $banner->image='{"computer":"'.str_replace('\\', '/',$request->imageForComputer).'","tablet":"'.str_replace('\\', '/',$request->imageForTablet).'","mobile":"'.str_replace('\\', '/',$request->imageForMobile).'"}';
+      $banner->size='{"computer":"'.$request->sizeForComputer.'","tablet":"'.$request->sizeForTablet.'","mobile":"'.$request->sizeForMobile.'"}';
+      $banner->url=$request->url;
+      $banner->code='{"computer":"'.$request->codeForComputer.'","tablet":"'.$request->codeForTablet.'","mobile":"'.$request->codeForMobile.'"}';
+      $banner->created_by=$request->created_by ?? $request->auth_userid;
+      if($request->start_publication_at){
+       $start_at=explode(' ',$request->start_publication_at);
+       $banner->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
      }else{
       $banner->start_publication_at=$request->start_publication_at;
     }
-     if($request->start_publication_at){
+    if($request->start_publication_at){
      $stop_at=explode(' ',$request->stop_publication_at);
      $banner->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
-     }else{
-      $banner->stop_publication_at=$request->stop_publication_at;
-     }
-        
-  if ($request->update) {
-        if ($banner->save()) {
-           
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Bannière modifiée avec succès!');
-        } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la modification!');
-        }
-    }else{
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Modification annulée!');
-    }
-           return redirect()->route('banners.index');
+   }else{
+    $banner->stop_publication_at=$request->stop_publication_at;
+  }
   
-    }
+  if ($request->update) {
+    if ($banner->save()) {
+     
+     session()->flash('message.type', 'success');
+     session()->flash('message.content', 'Bannière modifiée avec succès!');
+   } else {
+     session()->flash('message.type', 'danger');
+     session()->flash('message.content', 'Erreur lors de la modification!');
+   }
+ }else{
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Modification annulée!');
+}
+return redirect()->route('banners.index');
+
+}
 
     /**
      * Remove the specified resource from storage.
@@ -216,11 +216,11 @@ class BannerController extends Controller
      */
     public function destroy($id)
     {
-    $banner=Banner::onlyTrashed()->find($id)->forceDelete();
-    session()->flash('message.type', 'success');
-    session()->flash('message.content', ' bannière supprimée avec success!');
-    return redirect()->route('banners.trash');  
-        
+      $banner=Banner::onlyTrashed()->find($id)->forceDelete();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', ' bannière supprimée avec success!');
+      return redirect()->route('banners.trash');  
+      
     }
     /**
      * put the specified resource in the trash.
@@ -228,12 +228,12 @@ class BannerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-     public function putInTrash($id)
+    public function putInTrash($id)
     {
-    $banner=Banner::find($id)->delete();
-    session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Bannière mis en corbeille!');
-    return redirect()->route('banners.index');
+      $banner=Banner::find($id)->delete();
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Bannière mis en corbeille!');
+      return redirect()->route('banners.index');
     }
 /**
      * restore the specified resource from the trash.
@@ -241,14 +241,14 @@ class BannerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore($id)
-    {
-       $banner=Banner::onlyTrashed()->find($id)->restore();
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Bannière restaurer!');
-      return redirect()->route('banners.trash');
-    
-    }
+public function restore($id)
+{
+ $banner=Banner::onlyTrashed()->find($id)->restore();
+ session()->flash('message.type', 'success');
+ session()->flash('message.content', 'Bannière restaurer!');
+ return redirect()->route('banners.trash');
+ 
+}
 
 /**
      * Display a listing of the resource in the trash.
@@ -256,9 +256,9 @@ class BannerController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function inTrash()
-    {
-    $banners=Banner::onlyTrashed()->with(['getCategory:id,title','getAuthor:id,name'])->orderBy('published', 'asc')->get();
-       return view('banner.banners.administrator.trash',compact('banners'));      
-    }
+public function inTrash()
+{
+  $banners=Banner::onlyTrashed()->with(['getCategory:id,title','getAuthor:id,name'])->orderBy('published', 'asc')->get();
+  return view('banner.banners.administrator.trash',compact('banners'));      
+}
 }

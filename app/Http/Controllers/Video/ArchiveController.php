@@ -20,13 +20,13 @@ class ArchiveController extends Controller
      *
      * @var int
      */
-    public $defaultPageLength =25;
+  public $defaultPageLength =25;
      /**
      * The entries for the datatable
      *
      * @var array
      */
-    public $entries=[25,50,100];
+     public $entries=[25,50,100];
      /**
      * Protecting routes
      */
@@ -34,13 +34,15 @@ class ArchiveController extends Controller
      {
        $this->middleware(['auth','activeUser']);
      }
-    /**
-     * Display a listing of the resource.
+     
+     /* Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\Response with : results of ItemsList action $result, actions for the datatable $actions
      */
- public function index(Request $request)
-    {
+     public function index(Request $request)
+     {
       $view='video.archives.administrator.index';
       $queryWithPaginate=Archive::with(['getRevision.getModifier:id,name','getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])->where('published','<>',2)->orderBy('published', 'asc')->paginate($this->defaultPageLength,['id','title','category_id','published','featured','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','views']);
       $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
@@ -49,172 +51,191 @@ class ArchiveController extends Controller
       ->join('users', 'video_archives.editor', '=', 'users.id')
       ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
       ->where('video_archives.published','<>',2);
-           $controllerMethodUrl=action('Video\ArchiveController@index');
+      $controllerMethodUrl=action('Video\ArchiveController@index');
       $actions=Archive::indexActions();
       $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
       return view($view,$result,$actions);
 
 
     }
+/**
+     * get the list of items.
+     * @param  \Illuminate\Http\Request  $request, a query with pagination $queryWithPaginate, a query without pagination *$queryWithOutPaginate, a controller methode url $controllerMethodUrl
+     *
+     * @return  the result of filter action
+     */
+public function itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+{
 
-    public function itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
-    {
-
-      if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
-        $result=$this->itemsWithTableParameters($queryWithPaginate);
-        return $result;
-      } else {
-        $pageLength=$request->pageLength;
-        $searchByTitle=$request->searchByTitle;
-        $searchByCategory=$request->searchByCategory;
-        $searchByFeaturedState=$request->searchByFeaturedState;
-        $searchByPublishedState=$request->searchByPublishedState;
-        $searchByUser=$request->searchByUser;
-        $fromDate=$request->fromDate;  
-        $toDate=$request->toDate;
-        $sortField=$request->sortField;
-        $order=$request->order;
-        $itemType=$request->itemType;
-        $items = $queryWithOutPaginate;
-        $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
-        return $filterResult;
-
-      }
-
-    }
-
-    public function itemsWithTableParameters($items){
-      $numberOfItemSFound=$items->count();
-      if($numberOfItemSFound==0){
-        $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
-      }else{
-        $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
-
-      }
-      $entries=$this->entries;
-      $categories= Category::where('published','<>',2)->get(['id','title']);
-      $users= User::get(['id','name']); 
-      return compact('items','tableInfo','entries','categories','users');
-    }
-    
-    
-    public function searchAndSort(Request $request){ 
-     $data=json_decode($request->getContent());
-     $pageLength=$data->entries;
-     $searchByTitle= $data->searchByTitle;
-     $searchByCategory= $data->searchByCategory;
-     $searchByFeaturedState= $data->searchByFeaturedState;
-     $searchByPublishedState= $data->searchByPublishedState;
-     $searchByUser=$data->searchByUser;
-     $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime($data->fromDate)) : null;
-     $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( $data->toDate)) : null;
-     $sortField=$data->sortField;
-     $order=$data->order;
-     $itemType=$data->itemType;
-
-     switch ($itemType) {
-      case('video-archives'):
-      $items = Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
-      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
-      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
-      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
-      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
-      ->where('video_archives.published','<>',2);
-      $actions=Archive::indexActions();
-      break;
-      case('video-archive-trash'):
-      $items=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
-      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
-      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
-      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
-      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id');
-      $actions=Archive::trashActions();
-      break;
-
-      case('video-archive-draft'):
-      $items=Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
-     ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
-      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
-      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
-      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')->where('video_archives.published',2);
-      $actions=Archive::draftActions();
-      break;
-    }
-
-    $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
-     $fromDate,$toDate ,$sortField,$order,$itemType);
-    return view('video.archives.administrator.searchAndSort',$filterResult,$actions);
+  if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
+    $result=$this->itemsWithTableParameters($queryWithPaginate);
+    return $result;
+  } else {
+    $pageLength=$request->pageLength;
+    $searchByTitle=$request->searchByTitle;
+    $searchByCategory=$request->searchByCategory;
+    $searchByFeaturedState=$request->searchByFeaturedState;
+    $searchByPublishedState=$request->searchByPublishedState;
+    $searchByUser=$request->searchByUser;
+    $fromDate=$request->fromDate;  
+    $toDate=$request->toDate;
+    $sortField=$request->sortField;
+    $order=$request->order;
+    $itemType=$request->itemType;
+    $items = $queryWithOutPaginate;
+    $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
+    return $filterResult;
 
   }
 
-  public function filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-    $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
-    if($searchByTitle){
-      $items =$items->ofTitle($searchByTitle);
-    }
-    if($searchByCategory){
-      $items =$items->ofCategory($searchByCategory);
-    }
-    
-    if(!is_null($searchByFeaturedState)){
-      $items =$items->ofFeaturedState($searchByFeaturedState);   
-    }
-    if(!is_null($searchByPublishedState)){
-      $items =$items->ofPublishedState($searchByPublishedState);   
-    }
-    if($searchByUser){
-      $items =$items->ofUser($searchByUser);   
-    }
-    if($fromDate && !$toDate){ 
-      $items =$items->ofFromDate($fromDate);   
-    }
-    if(!$fromDate && $toDate){ 
-      $items =$items->ofToDate($toDate);
-    }
-    if($fromDate && $toDate){
-      $items =$items->ofBetweenTwoDate($fromDate, $toDate);
-    }
-
-    if($sortField){
-      $items = $items->orderBy($sortField, $order)->select('video_archives.id','video_archives.title','video_archives.category_id','video_archives.published','video_archives.featured','video_archives.created_by','video_archives.cameraman','video_archives.editor','video_archives.created_at','video_archives.start_publication_at','video_archives.stop_publication_at','video_archives.views','video_categories.title','journaliste.name as journaliste','cameraman.name as camera_operator','editor.name as video_editor')->paginate($pageLength);
-    }else{
-      $items = $items->orderBy('published', 'asc')->select('video_archives.id','video_archives.title','video_archives.category_id','video_archives.published','video_archives.featured','video_archives.created_by','video_archives.cameraman','video_archives.editor','video_archives.created_at','video_archives.start_publication_at','video_archives.stop_publication_at','video_archives.views','video_categories.title','journaliste.name as journaliste','cameraman.name as camera_operator','editor.name as video_editor')->paginate($pageLength);
-    }
-    if($itemType){
-if($itemType=='video-archives'){ $items->withPath('video-archives');};
-if($itemType=='video-archive-trash'){ $items->withPath('trash');};
-if($itemType=='video-archive-draft'){ $items->withPath('draft');};
-
-    }
-
-    $items->appends([
-      'pageLength' => $pageLength,
-      'searchByTitle' => $searchByTitle,
-      'searchByCategory' => $searchByCategory,
-      'searchByFeaturedState' => $searchByFeaturedState,
-      'searchByPublishedState' => $searchByPublishedState,
-      'searchByUser' => $searchByUser,
-      'fromDate' => $fromDate,
-      'toDate' => $toDate,
-      'sortField' => $sortField,
-      'itemType'=>$itemType,
-      'order' => $order])->links();
-    $numberOfItemSFound=$items->count();
-    if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
-    }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
-
-    }
-    $entries=$this->entries;
-    $categories= Category::where('published','<>',2)->get(['id','title']);
-    $users= User::get(['id','name']);
-
-    return compact('items','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
+}
+/**
+     * get parameters for datatable.
+     * @param  items collection $items, 
+     *
+     * @return items collection  $items, datatable information $tableInfo, datatable entries $entries, items categories $categoies, users $users 
+     **/
+public function itemsWithTableParameters($items){
+  $numberOfItemSFound=$items->count();
+  if($numberOfItemSFound==0){
+    $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
+  }else{
+    $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
   }
+  $entries=$this->entries;
+  $categories= Category::where('published','<>',2)->get(['id','title']);
+  $users= User::get(['id','name']); 
+  return compact('items','tableInfo','entries','categories','users');
+}
 
+     /**
+    * search and sort datatable items
+    *@param  \Illuminate\Http\Request $request
+    *@return \Illuminate\Http\Response with : results of filter action, actions for datatable
+    */
+     public function searchAndSort(Request $request){ 
+       $data=json_decode($request->getContent());
+       $pageLength=$data->entries;
+       $searchByTitle= $data->searchByTitle;
+       $searchByCategory= $data->searchByCategory;
+       $searchByFeaturedState= $data->searchByFeaturedState;
+       $searchByPublishedState= $data->searchByPublishedState;
+       $searchByUser=$data->searchByUser;
+       $fromDate=$data->fromDate ? date("Y-m-d H:i:s", strtotime($data->fromDate)) : null;
+       $toDate=$data->toDate ? date("Y-m-d H:i:s", strtotime( $data->toDate)) : null;
+       $sortField=$data->sortField;
+       $order=$data->order;
+       $itemType=$data->itemType;
+
+       switch ($itemType) {
+        case('video-archives'):
+        $items = Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+        ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+        ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+        ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+        ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+        ->where('video_archives.published','<>',2);
+        $actions=Archive::indexActions();
+        break;
+        case('video-archive-trash'):
+        $items=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+        ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+        ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+        ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+        ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id');
+        $actions=Archive::trashActions();
+        break;
+
+        case('video-archive-draft'):
+        $items=Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+        ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+        ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+        ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+        ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')->where('video_archives.published',2);
+        $actions=Archive::draftActions();
+        break;
+      }
+
+      $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser,
+       $fromDate,$toDate ,$sortField,$order,$itemType);
+      return view('video.archives.administrator.searchAndSort',$filterResult,$actions);
+
+    }
+/**
+*filter datatable
+*@param items collection $items, number of items par page $pageLength, value of search fields: $searchByTitle, $searchByCategory, $searchByFeaturedState , $searchByPublishedState, $searchByUser, $fromDate, $toDate, $sortField, $order, itemType
+*
+*@return tems collection $items, number of items par page $pageLength, value of search fields: $searchByTitle, $searchByCategory, $searchByFeaturedState , $searchByPublishedState, $searchByUser, $fromDate, $toDate, $sortField, $order, itemType
+**/
+public function filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+  $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
+  if($searchByTitle){
+    $items =$items->ofTitle($searchByTitle);
+  }
+  if($searchByCategory){
+    $items =$items->ofCategory($searchByCategory);
+  }
   
+  if(!is_null($searchByFeaturedState)){
+    $items =$items->ofFeaturedState($searchByFeaturedState);   
+  }
+  if(!is_null($searchByPublishedState)){
+    $items =$items->ofPublishedState($searchByPublishedState);   
+  }
+  if($searchByUser){
+    $items =$items->ofUser($searchByUser);   
+  }
+  if($fromDate && !$toDate){ 
+    $items =$items->ofFromDate($fromDate);   
+  }
+  if(!$fromDate && $toDate){ 
+    $items =$items->ofToDate($toDate);
+  }
+  if($fromDate && $toDate){
+    $items =$items->ofBetweenTwoDate($fromDate, $toDate);
+  }
+
+  if($sortField){
+    $items = $items->orderBy($sortField, $order)->select('video_archives.id','video_archives.title','video_archives.category_id','video_archives.published','video_archives.featured','video_archives.created_by','video_archives.cameraman','video_archives.editor','video_archives.created_at','video_archives.start_publication_at','video_archives.stop_publication_at','video_archives.views','video_categories.title','journaliste.name as journaliste','cameraman.name as camera_operator','editor.name as video_editor')->paginate($pageLength);
+  }else{
+    $items = $items->orderBy('published', 'asc')->select('video_archives.id','video_archives.title','video_archives.category_id','video_archives.published','video_archives.featured','video_archives.created_by','video_archives.cameraman','video_archives.editor','video_archives.created_at','video_archives.start_publication_at','video_archives.stop_publication_at','video_archives.views','video_categories.title','journaliste.name as journaliste','cameraman.name as camera_operator','editor.name as video_editor')->paginate($pageLength);
+  }
+  if($itemType){
+    if($itemType=='video-archives'){ $items->withPath('video-archives');};
+    if($itemType=='video-archive-trash'){ $items->withPath('trash');};
+    if($itemType=='video-archive-draft'){ $items->withPath('draft');};
+
+  }
+
+  $items->appends([
+    'pageLength' => $pageLength,
+    'searchByTitle' => $searchByTitle,
+    'searchByCategory' => $searchByCategory,
+    'searchByFeaturedState' => $searchByFeaturedState,
+    'searchByPublishedState' => $searchByPublishedState,
+    'searchByUser' => $searchByUser,
+    'fromDate' => $fromDate,
+    'toDate' => $toDate,
+    'sortField' => $sortField,
+    'itemType'=>$itemType,
+    'order' => $order])->links();
+  $numberOfItemSFound=$items->count();
+  if($numberOfItemSFound==0){
+    $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
+  }else{
+    $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
+
+  }
+  $entries=$this->entries;
+  $categories= Category::where('published','<>',2)->get(['id','title']);
+  $users= User::get(['id','name']);
+
+  return compact('items','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
+
+}
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -316,36 +337,36 @@ if($itemType=='video-archive-draft'){ $items->withPath('draft');};
       $video->cameraman =$request->cameraman;
       $video->editor =$request->editor;
       $video->created_at =now();
-       if($request->start_publication_at){
-     $start_at=explode(' ',$request->start_publication_at);
-     $video->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+      if($request->start_publication_at){
+       $start_at=explode(' ',$request->start_publication_at);
+       $video->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
      }else{
       $video->start_publication_at=$request->start_publication_at;
     }
-     if($request->start_publication_at){
+    if($request->start_publication_at){
      $stop_at=explode(' ',$request->stop_publication_at);
      $video->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
-     }else{
-      $video->stop_publication_at=$request->stop_publication_at;
-     }
-      $video->checkout=0;
-      if ($request->update) {
-       $video->save();
-       $revision= new  Revision;
-       $revision->type=explode('@', Route::CurrentRouteAction())[1];
-       $revision->user_id=Auth::id();
-       $revision->video_id=$video->id;
-       $revision->revised_at=now();
-       $revision->save();
-       session()->flash('message.type', 'success');
-       session()->flash('message.content', 'Video modifié avec succès!');
-       
-     }else{
-      session()->flash('message.type', 'danger');
-      session()->flash('message.content', 'Modification annulée!');
-    }
-    return redirect()->route('video-archives.index');
+   }else{
+    $video->stop_publication_at=$request->stop_publication_at;
   }
+  $video->checkout=0;
+  if ($request->update) {
+   $video->save();
+   $revision= new  Revision;
+   $revision->type=explode('@', Route::CurrentRouteAction())[1];
+   $revision->user_id=Auth::id();
+   $revision->video_id=$video->id;
+   $revision->revised_at=now();
+   $revision->save();
+   session()->flash('message.type', 'success');
+   session()->flash('message.content', 'Video modifié avec succès!');
+   
+ }else{
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Modification annulée!');
+}
+return redirect()->route('video-archives.index');
+}
 
     /**
      * Remove the specified resource from storage.
@@ -481,22 +502,22 @@ return redirect()->route('video-archives.trash');
 public function inTrash( Request $request)
 {
  $view='video.archives.administrator.trash';
-  $queryWithPaginate=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
-      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
-      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
-      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
-      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
-      ->orderBy('video_archives.id', 'desc')
-      ->paginate($this->defaultPageLength);
-        $queryWithOutPaginate =Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
-      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
-      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
-      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
-      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id');
-       $controllerMethodUrl=action('Video\ArchiveController@inTrash');
-  $actions=Archive::trashActions();
-  $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
-  return view($view,$result,$actions);
+ $queryWithPaginate=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+ ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+ ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+ ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+ ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+ ->orderBy('video_archives.id', 'desc')
+ ->paginate($this->defaultPageLength);
+ $queryWithOutPaginate =Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+ ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+ ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+ ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+ ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id');
+ $controllerMethodUrl=action('Video\ArchiveController@inTrash');
+ $actions=Archive::trashActions();
+ $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+ return view($view,$result,$actions);
 }
 /**
      * Display a listing of the resource in the draft.
@@ -505,25 +526,25 @@ public function inTrash( Request $request)
      */
 public function inDraft( Request $request)
 {
-   $view='video.archives.administrator.draft';
-  $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
-      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
-      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
-      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
-      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
-      ->where('video_archives.published',2)
-      ->orderBy('video_archives.id', 'desc')
-      ->paginate($this->defaultPageLength);
-  $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
-      ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
-      ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
-      ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
-      ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
-      ->where('video_archives.published',2);
-  $controllerMethodUrl=action('Video\ArchiveController@inDraft');
-  $actions=Archive::draftActions();
-  $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
-  return view($view,$result,$actions);
+ $view='video.archives.administrator.draft';
+ $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+ ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+ ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+ ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+ ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+ ->where('video_archives.published',2)
+ ->orderBy('video_archives.id', 'desc')
+ ->paginate($this->defaultPageLength);
+ $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory','getCameraman:id,name','getEditor:id,name'])
+ ->join('users as journaliste', 'video_archives.created_by', '=', 'journaliste.id')
+ ->join('users as cameraman', 'video_archives.cameraman', '=', 'cameraman.id')
+ ->join('users as editor', 'video_archives.editor', '=', 'editor.id')
+ ->join('video_categories', 'video_archives.category_id', '=', 'video_categories.id')
+ ->where('video_archives.published',2);
+ $controllerMethodUrl=action('Video\ArchiveController@inDraft');
+ $actions=Archive::draftActions();
+ $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+ return view($view,$result,$actions);
 }
 
 }

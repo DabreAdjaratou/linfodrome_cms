@@ -27,12 +27,22 @@ class Revision extends Model
     protected $fillable = [
         'type','user_id','article_id','revised_at',
     ];
-
+/**
+* get the modifier
+*@param
+*@return collection of items
+*
+*/
     public function getModifier()
     {
        return $this->belongsTo('App\Models\User\User','user_id');
     }
-
+/**
+* get the item concerned by the modification
+*@param
+*@return collection of items
+*
+*/
      public function getArticle()
     {
        return $this->belongsTo('App\Models\Article\Archive','article_id')->withTrashed();

@@ -55,22 +55,22 @@ class PermissionController extends Controller
 
         $resources=Resource::all('id','title');
         for ($i=0; $i <$resources->count() ; $i++) { 
-         if ($request->has($resources[$i]['title'])) {
-             foreach ($resources as $r) {
+           if ($request->has($resources[$i]['title'])) {
+               foreach ($resources as $r) {
                 $title=$r->title;
                 $actions=$request->$title;
                 try {
                     DB::transaction(function () use ($actions,$request,$r) {
                       if($actions){
-                       for ($i=0; $i <count($actions) ; $i++) { 
-                         $permission= new Permission;
-                         $permission->access_level_id = $request->accessLevel;
-                         $permission->resource_id=$r->id;
-                         $permission->action_id=$actions[$i];
-                         $permission->save();
-                     }
-                 }
-             });
+                         for ($i=0; $i <count($actions) ; $i++) { 
+                           $permission= new Permission;
+                           $permission->access_level_id = $request->accessLevel;
+                           $permission->resource_id=$r->id;
+                           $permission->action_id=$actions[$i];
+                           $permission->save();
+                       }
+                   }
+               });
 
                 } catch (Exception $e) {
 
@@ -84,8 +84,8 @@ class PermissionController extends Controller
             }
 
             if ($request->save_close) {
-             return redirect()->route('permissions.index');
-         }else{
+               return redirect()->route('permissions.index');
+           }else{
             return redirect()->route('permissions.create');
         }
     }
@@ -141,7 +141,7 @@ if ($validator->fails()) {
 
             $resources=Resource::all('id','title');
             for ($i=0; $i <$resources->count() ; $i++) { 
-             if ($request->has($resources[$i]['title'])) {
+               if ($request->has($resources[$i]['title'])) {
                 $existingPermissions=Permission::where('access_level_id',$id)->get();
                 try {
                     DB::transaction(function () use ($request,$id,$resources,$existingPermissions) {
@@ -152,14 +152,14 @@ if ($validator->fails()) {
                             $title=$r->title;
                             $actions=$request->$title;
                             for ($i=0; $i <count($actions) ; $i++) { 
-                             $permission= new Permission;
-                             $permission->access_level_id = $id;
-                             $permission->resource_id=$r->id;
-                             $permission->action_id=$actions[$i];
-                             $permission->save();
-                         }
-                     }
-                 });
+                               $permission= new Permission;
+                               $permission->access_level_id = $id;
+                               $permission->resource_id=$r->id;
+                               $permission->action_id=$actions[$i];
+                               $permission->save();
+                           }
+                       }
+                   });
 
                 } catch (Exception $e) {
 
@@ -202,8 +202,8 @@ if ($validator->fails()) {
         foreach ($permissions as $p) {
           Permission::destroy($p->id);
       }
-                session()->flash('message.type', 'success');
-                session()->flash('message.content', 'Permissions Supprimées avec succès!');
-                return redirect()->route('permissions.index');
+      session()->flash('message.type', 'success');
+      session()->flash('message.content', 'Permissions Supprimées avec succès!');
+      return redirect()->route('permissions.index');
   }
 }

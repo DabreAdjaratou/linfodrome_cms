@@ -113,8 +113,6 @@ class GroupController extends Controller
         return view ('user.groups.administrator.edit',compact('parents','group'));
     }
 
-
-
     /**
      * Update the specified resource in storage.
      *

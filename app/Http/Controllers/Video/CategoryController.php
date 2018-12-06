@@ -12,10 +12,10 @@ class CategoryController extends Controller
      /**
      * Protecting routes
      */
-    public function __construct()
-{
-    $this->middleware(['auth','activeUser']);
-}
+     public function __construct()
+     {
+        $this->middleware(['auth','activeUser']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +23,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-     $categories=Category::all();
-     return view('video.categories.administrator.index',compact('categories'));   
-    }
+       $categories=Category::all();
+       return view('video.categories.administrator.index',compact('categories'));   
+   }
 
     /**
      * Show the form for creating a new resource.
@@ -46,29 +46,29 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-        'title' => 'required|unique:video_categories|max:100',
-        'published' => 'nullable|int',
+            'title' => 'required|unique:video_categories|max:100',
+            'published' => 'nullable|int',
         ]);
 
-       $category= new Category;
-       $category->title = $request->title;
-       $category->alias=str_slug($request->title);
+        $category= new Category;
+        $category->title = $request->title;
+        $category->alias=str_slug($request->title);
         $category->published=$request->published ? $request->published : 0 ;
-       if ($category->save()) {
-        session()->flash('message.type', 'success');
-        session()->flash('message.content', 'Categorie ajouté avec succès!');
-    } else {
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Erreur lors de l\'ajout!');
-    }
-       
+        if ($category->save()) {
+            session()->flash('message.type', 'success');
+            session()->flash('message.content', 'Categorie ajouté avec succès!');
+        } else {
+            session()->flash('message.type', 'danger');
+            session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        }
+        
         if ($request->save_close) {
-           return redirect()->route('video-categories.index');
-       }else{
+         return redirect()->route('video-categories.index');
+     }else{
         return redirect()->route('video-categories.create');
 
     }
-    }
+}
 
     /**
      * Display the specified resource.
@@ -110,23 +110,23 @@ class CategoryController extends Controller
         $category->title = $request->title;
         $category->alias=str_slug($request->title);
         $category->published=$request->published ? $request->published : 0 ;
-    
-    if ($request->update) {
-        if ($category->save()) {
-           
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Categorie modifiée avec succès!');
-        } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la modification!');
-        }
-    }else{
+        
+        if ($request->update) {
+            if ($category->save()) {
+             
+             session()->flash('message.type', 'success');
+             session()->flash('message.content', 'Categorie modifiée avec succès!');
+         } else {
+             session()->flash('message.type', 'danger');
+             session()->flash('message.content', 'Erreur lors de la modification!');
+         }
+     }else{
         session()->flash('message.type', 'danger');
         session()->flash('message.content', 'Modification annulée!');
     }
-           return redirect()->route('video-categories.index');
-  
-    }
+    return redirect()->route('video-categories.index');
+    
+}
 
     /**
      * Remove the specified resource from storage.
@@ -134,20 +134,20 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-     public function destroy($id)
+    public function destroy($id)
     {
         $category= Category::onlyTrashed()->find($id);
-                if($category->forceDelete()){
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Categorie supprimée avec succès!');
-           } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la suppression!');
-        }
-        
-        return redirect()->route('video-categories.trash');
-    }
-    
+        if($category->forceDelete()){
+         session()->flash('message.type', 'success');
+         session()->flash('message.content', 'Categorie supprimée avec succès!');
+     } else {
+         session()->flash('message.type', 'danger');
+         session()->flash('message.content', 'Erreur lors de la suppression!');
+     }
+     
+     return redirect()->route('video-categories.trash');
+ }
+ 
     /**
      * put the specified resource in the trash.
      *
@@ -158,45 +158,45 @@ class CategoryController extends Controller
     {
         $category= Category::with(['getVideos','getArchives'])->where('id',$id)->first();
         if ($category->getVideos->isEmpty() && $category->getArchives->isEmpty()) {
-        
+            
             if($category->delete()){
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Categorie mis en corbeille!!');
-           } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
-        }
-      } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Cette categorie ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
-        }
-  return redirect()->route('video-categories.index');
-    }
+             session()->flash('message.type', 'success');
+             session()->flash('message.content', 'Categorie mis en corbeille!!');
+         } else {
+             session()->flash('message.type', 'danger');
+             session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+         }
+     } else {
+         session()->flash('message.type', 'danger');
+         session()->flash('message.content', 'Cette categorie ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
+     }
+     return redirect()->route('video-categories.index');
+ }
 /**
      * restore the specified resource from the trash.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore($id)
-    {
-      
-        Category::onlyTrashed()->find($id)->restore();
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Categorie restaurer!');
-      return redirect()->route('video-categories.trash');
-   
-    }
+public function restore($id)
+{
+  
+    Category::onlyTrashed()->find($id)->restore();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Categorie restaurer!');
+    return redirect()->route('video-categories.trash');
+    
+}
 /**
      * Display a listing of the resource in the trash.
      *
      * @return \Illuminate\Http\Response
      */
-    public function inTrash()
-    {
-     $categories= Category::onlyTrashed()->get(['id','title']);
-       return view('video.categories.administrator.trash',compact('categories'));
+public function inTrash()
+{
+   $categories= Category::onlyTrashed()->get(['id','title']);
+   return view('video.categories.administrator.trash',compact('categories'));
    
-        
-    }
+   
+}
 }

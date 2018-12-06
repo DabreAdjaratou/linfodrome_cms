@@ -58,16 +58,16 @@ class CategoryController extends Controller
         $category->published=$request->published ? $request->published : 0 ;
         
         if ($category->save()) {
-         session()->flash('message.type', 'success');
-         session()->flash('message.content', 'Categorie ajouté avec succès!');
-     } else {
-         session()->flash('message.type', 'danger');
-         session()->flash('message.content', 'Erreur lors de l\'ajout!');
-     }
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie ajouté avec succès!');
+       } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de l\'ajout!');
+       }
 
-     if ($request->save_close) {
-         return redirect()->route('article-categories.index');
-     }else{
+       if ($request->save_close) {
+           return redirect()->route('article-categories.index');
+       }else{
         return redirect()->route('article-categories.create');
 
     }
@@ -117,14 +117,14 @@ class CategoryController extends Controller
         $category->published=$request->published ? $request->published : 0 ;
         if ($request->update) {
             if ($category->save()) {
-             
-             session()->flash('message.type', 'success');
-             session()->flash('message.content', 'Categorie modifiée avec succès!');
-         } else {
-             session()->flash('message.type', 'danger');
-             session()->flash('message.content', 'Erreur lors de la modification!');
-         }
-     }else{
+               
+               session()->flash('message.type', 'success');
+               session()->flash('message.content', 'Categorie modifiée avec succès!');
+           } else {
+               session()->flash('message.type', 'danger');
+               session()->flash('message.content', 'Erreur lors de la modification!');
+           }
+       }else{
         session()->flash('message.type', 'danger');
         session()->flash('message.content', 'Modification annulée!');
     }
@@ -141,16 +141,16 @@ class CategoryController extends Controller
     {
         $category= Category::onlyTrashed()->find($id);
         if($category->forceDelete()){
-         session()->flash('message.type', 'success');
-         session()->flash('message.content', 'Categorie supprimée avec succès!');
-     } else {
-         session()->flash('message.type', 'danger');
-         session()->flash('message.content', 'Erreur lors de la suppression!');
-     }
-     
-     return redirect()->route('article-categories.trash');
- }
- 
+           session()->flash('message.type', 'success');
+           session()->flash('message.content', 'Categorie supprimée avec succès!');
+       } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de la suppression!');
+       }
+       
+       return redirect()->route('article-categories.trash');
+   }
+   
     /**
      * put the specified resource in the trash.
      *
@@ -163,18 +163,18 @@ class CategoryController extends Controller
         if (blank($category->getArticles) && blank($category->getArchives)) {
             
             if($category->delete()){
-             session()->flash('message.type', 'success');
-             session()->flash('message.content', 'Categorie mis en corbeille!!');
-         } else {
-             session()->flash('message.type', 'danger');
-             session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
-         }
-     } else {
-         session()->flash('message.type', 'danger');
-         session()->flash('message.content', 'Cette categorie ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
-     }
-     return redirect()->route('article-categories.index');
- }
+               session()->flash('message.type', 'success');
+               session()->flash('message.content', 'Categorie mis en corbeille!!');
+           } else {
+               session()->flash('message.type', 'danger');
+               session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+           }
+       } else {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Cette categorie ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
+       }
+       return redirect()->route('article-categories.index');
+   }
 /**
      * restore the specified resource from the trash.
      *
@@ -200,10 +200,10 @@ public function restore($id)
 
 public function inTrash()
 {
-   $categories= Category::onlyTrashed()->get(['id','title']);
-   return view('article.categories.administrator.trash',compact('categories'));
-   
-   
+ $categories= Category::onlyTrashed()->get(['id','title']);
+ return view('article.categories.administrator.trash',compact('categories'));
+ 
+ 
 }
 
 

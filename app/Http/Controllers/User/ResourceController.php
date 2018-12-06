@@ -29,9 +29,9 @@ class ResourceController extends Controller
         $resources = Resource::with('getActions:title')->get(['id','title','display_name']);  
         foreach ($resources as $d) {
           foreach ($d->getActions as $action) {
-             if ($d->getActions->last()->title==$action->title) {
-               $action->title= $action->title;
-           }else{
+           if ($d->getActions->last()->title==$action->title) {
+             $action->title= $action->title;
+         }else{
             $action->title= $action->title.',';
         }
     }
@@ -72,27 +72,27 @@ return view ('user.resources.administrator.index', compact('resources'));
         $actions =$request->actions;
 
 
-try {
-         DB::transaction(function () use ($resource,$actions) {
-          $resource->save();
-                  for ($i=0; $i <count($actions) ; $i++) { 
-             $resource->getActions()->attach($actions[$i]);
-         }
-     });
-     } catch (Exception $exc) {
-         session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        try {
+           DB::transaction(function () use ($resource,$actions) {
+              $resource->save();
+              for ($i=0; $i <count($actions) ; $i++) { 
+               $resource->getActions()->attach($actions[$i]);
+           }
+       });
+       } catch (Exception $exc) {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
-    }
-session()->flash('message.type', 'success');
-session()->flash('message.content', 'Resource ajouté avec succès!');
-if ($request->save_close) {
-           return redirect()->route('resources.index');
-       }else{
+       }
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Resource ajouté avec succès!');
+       if ($request->save_close) {
+         return redirect()->route('resources.index');
+     }else{
         return redirect()->route('resources.create');
 
     }
-        
+    
 }
 
     /**
@@ -114,9 +114,9 @@ if ($request->save_close) {
      */
     public function edit($id)
     {
-       $resource=Resource::find($id);
-       $allActions=Action::all();
-       foreach ($allActions as $a) {
+     $resource=Resource::find($id);
+     $allActions=Action::all();
+     foreach ($allActions as $a) {
         $actions[]=$a->title;
         $resourceActions=[];
         foreach ($resource->getActions as $resourceAction) {
@@ -137,10 +137,10 @@ if ($request->save_close) {
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-         'title' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
-         'display_name' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
-         'actions'=>'required',
-         ]);
+           'title' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
+           'display_name' => 'required|'.Rule::unique('resources')->ignore($id, 'id').'|max:100',
+           'actions'=>'required',
+       ]);
         $resource=Resource::find($id);
         $resource->title = $request->title;
         $resource->display_name = $request->display_name;
@@ -150,22 +150,22 @@ if ($request->save_close) {
         foreach ($existingInPivot as $e) {
             $existingActions=[];
             foreach ($e->getActions as $existingAction) {
-               $existingActions[]=$existingAction->id;
-           }
-       }
+             $existingActions[]=$existingAction->id;
+         }
+     }
 
-        if ($request->update) {
-            try {
-         DB::transaction(function () use ($resource,$existingActions,$actions) {
-          $resource->save();
-          for ($i=0; $i <count($existingActions) ; $i++) { 
-             $resource->getActions()->detach($existingActions[$i]);
-         }
-         for ($i=0; $i <count($actions) ; $i++) { 
-             $resource->getActions()->attach($actions[$i]);
-         }
-     });
-     } catch (Exception $exc) {
+     if ($request->update) {
+        try {
+           DB::transaction(function () use ($resource,$existingActions,$actions) {
+              $resource->save();
+              for ($i=0; $i <count($existingActions) ; $i++) { 
+               $resource->getActions()->detach($existingActions[$i]);
+           }
+           for ($i=0; $i <count($actions) ; $i++) { 
+               $resource->getActions()->attach($actions[$i]);
+           }
+       });
+       } catch (Exception $exc) {
         
         session()->flash('message.type', 'danger');
         
@@ -177,13 +177,13 @@ if ($request->save_close) {
     
     session()->flash('message.content', 'Resource Modifier avec succès!');
 
-        }else{
- session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Modification annulée!');
-        }
-       
-     
-    return redirect()->route('resources.index');
+}else{
+   session()->flash('message.type', 'danger');
+   session()->flash('message.content', 'Modification annulée!');
+}
+
+
+return redirect()->route('resources.index');
 
 }
 
@@ -202,33 +202,33 @@ if ($request->save_close) {
             $existingActions=[];
             $existingPermissions=[];
             foreach ($e->getActions as $existingAction) {
-               $existingActions[]=$existingAction->id;
-           }
-           foreach ($e->getPermissions as $existingPermission) {
-                  $existingPermissions[]=$existingPermission->id;
-           }
-       }
-       try {
-         DB::transaction(function () use ($resource,$existingActions,$existingPermissions) {
-          $resource->delete();
-          for ($i=0; $i <count($existingActions) ; $i++) { 
-             $resource->getActions()->detach($existingActions[$i]);
+             $existingActions[]=$existingAction->id;
          }
+         foreach ($e->getPermissions as $existingPermission) {
+          $existingPermissions[]=$existingPermission->id;
+      }
+  }
+  try {
+   DB::transaction(function () use ($resource,$existingActions,$existingPermissions) {
+      $resource->delete();
+      for ($i=0; $i <count($existingActions) ; $i++) { 
+       $resource->getActions()->detach($existingActions[$i]);
+   }
 
          // for ($i2=0; $i2 <count($existingPermissions) ; $i2++) { 
-             Permission::destroy($existingPermissions);
+   Permission::destroy($existingPermissions);
          // }
 
-              });
-     } catch (Exception $exc) {
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Erreur lors de la suppression!');
+});
+} catch (Exception $exc) {
+    session()->flash('message.type', 'danger');
+    session()->flash('message.content', 'Erreur lors de la suppression!');
 //           echo $exc->getTraceAsString();
-    }
-    session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Resource supprimer avec succès!');
+}
+session()->flash('message.type', 'success');
+session()->flash('message.content', 'Resource supprimer avec succès!');
 
-   
-       return redirect()->route('resources.index');
-    }
+
+return redirect()->route('resources.index');
+}
 }

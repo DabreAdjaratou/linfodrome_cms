@@ -32,10 +32,13 @@ class UserController extends Controller
  */
 public function index()
 {
+  
+  dd(Group::getPermissions(5));
  $users = User::all('id','name','email','is_active','require_reset','data');
  foreach ($users as $u) {
   $u->data=json_decode($u->data);
   $u->name= ucwords($u->name);
+
 }
 
 $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', 1)->get(['id']);

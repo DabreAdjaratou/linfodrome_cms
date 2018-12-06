@@ -29,12 +29,22 @@ class Category extends Model
     protected $fillable = [
         'title','published',
     ];
-
+/**
+* get billets list for a category
+*@param
+*@return collection of items
+*
+*/
       public function getBillets()
     {
          return $this->hasMany('App\Models\Billet\Billet','category_id');
     }
-
+/**
+* get archives list for a category
+*@param
+*@return collection of items
+*
+*/
     public function getArchives()
     {
          return $this->hasMany('App\Models\Billet\Archive','category_id');

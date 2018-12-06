@@ -11,10 +11,10 @@ class SourceController extends Controller
      /**
      * Protecting routes
      */
-    public function __construct()
-{
-    $this->middleware(['auth','activeUser']);
-}
+     public function __construct()
+     {
+        $this->middleware(['auth','activeUser']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -44,33 +44,29 @@ class SourceController extends Controller
      */
     public function store(Request $request)
     {
-        
-        $validatedData = $request->validate([
-        'title' => 'required|unique:billet_sources|max:100',
-        ]);
 
-       $source= new Source;
-       $source->title = $request->title;
-       $source->published=$request->published ? $request->published : 0 ;
-       if ($source->save()) {
+        $validatedData = $request->validate([
+            'title' => 'required|unique:billet_sources|max:100',
+        ]);
         
-        session()->flash('message.type', 'success');
-        
-        session()->flash('message.content', 'Source ajouté avec succès!');
-    } else {
-        
-        session()->flash('message.type', 'danger');
-        
-        session()->flash('message.content', 'Erreur lors de l\'ajout!');
-    }
-       if ($request->save_close) {
+        $source= new Source;
+        $source->title = $request->title;
+        $source->published=$request->published ? $request->published : 0 ;
+        if ($source->save()) {
+            session()->flash('message.type', 'success');
+            session()->flash('message.content', 'Source ajouté avec succès!');
+        } else {
+            session()->flash('message.type', 'danger');
+            session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        }
+        if ($request->save_close) {
            return redirect()->route('billet-sources.index');
        }else{
         return redirect()->route('billets-sources.create');
 
     }
     
-     }
+}
 
     /**
      * Display the specified resource.
@@ -93,7 +89,7 @@ class SourceController extends Controller
     {
        $source=Source::find($id);
        return view('billet.sources.administrator.edit',compact('source'));
-    }
+   }
 
     /**
      * Update the specified resource in storage.
@@ -104,29 +100,29 @@ class SourceController extends Controller
      */
     public function update(Request $request, $id)
     {
-         $validatedData = $request->validate([
+     $validatedData = $request->validate([
          'title' => 'required|'.Rule::unique('billet_sources')->ignore($id, 'id').'|max:100',
-        ]);
-        $source=Source::find($id);
-        $source->title = $request->title;
-        $source->published=$request->published ? $request->published : 0 ;
-        $source->save();
+     ]);
+     $source=Source::find($id);
+     $source->title = $request->title;
+     $source->published=$request->published ? $request->published : 0 ;
+     $source->save();
 
-if ($request->update) {
+     if ($request->update) {
         if ($source->save()) {
-           
+
            session()->flash('message.type', 'success');
            session()->flash('message.content', 'Categorie modifiée avec succès!');
-        } else {
+       } else {
            session()->flash('message.type', 'danger');
            session()->flash('message.content', 'Erreur lors de la modification!');
-        }
-    }else{
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Modification annulée!');
-    }
-           return redirect()->route('billet-sources.index');
-    }
+       }
+   }else{
+    session()->flash('message.type', 'danger');
+    session()->flash('message.content', 'Modification annulée!');
+}
+return redirect()->route('billet-sources.index');
+}
 
     /**
      * Remove the specified resource from storage.
@@ -134,20 +130,20 @@ if ($request->update) {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-     public function destroy($id)
+    public function destroy($id)
     {
         $source= Source::onlyTrashed()->find($id);
-                if($source->forceDelete()){
+        if($source->forceDelete()){
            session()->flash('message.type', 'success');
            session()->flash('message.content', 'Source supprimée avec succès!');
-           } else {
+       } else {
            session()->flash('message.type', 'danger');
            session()->flash('message.content', 'Erreur lors de la suppression!');
-        }
-        
-        return redirect()->route('billet-sources.trash');
-    }
-    
+       }
+
+       return redirect()->route('billet-sources.trash');
+   }
+
     /**
      * put the specified resource in the trash.
      *
@@ -158,46 +154,46 @@ if ($request->update) {
     {
         $source= Source::with(['getBillets','getArchives'])->where('id',$id)->first();
         if (blank($source->getBillets) && blank($source->getArchives)) {
-        
+
             if($source->delete()){
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Source mis en corbeille!!');
+               session()->flash('message.type', 'success');
+               session()->flash('message.content', 'Source mis en corbeille!!');
            } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
-        }
-      } else {
+               session()->flash('message.type', 'danger');
+               session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+           }
+       } else {
            session()->flash('message.type', 'danger');
            session()->flash('message.content', 'Cette source ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
-        }
-  return redirect()->route('billet-sources.index');
-    }
+       }
+       return redirect()->route('billet-sources.index');
+   }
 /**
      * restore the specified resource from the trash.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore($id)
-    {
-      
-        Source::onlyTrashed()->find($id)->restore();
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'source restaurer!');
-      return redirect()->route('billet-sources.trash');
-   
-    }
+public function restore($id)
+{
+
+    Source::onlyTrashed()->find($id)->restore();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'source restaurer!');
+    return redirect()->route('billet-sources.trash');
+
+}
 
 /**
      * Display a listing of the resource in the trash.
      *
      * @return \Illuminate\Http\Response
      */
-    public function inTrash()
-    {
-     $sources= Source::onlyTrashed()->get(['id','title']);
-       return view('billet.sources.administrator.trash',compact('sources'));
-   
-        
-    }
+public function inTrash()
+{
+ $sources= Source::onlyTrashed()->get(['id','title']);
+ return view('billet.sources.administrator.trash',compact('sources'));
+ 
+
+}
 }

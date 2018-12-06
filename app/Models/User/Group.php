@@ -33,18 +33,40 @@ class Group extends Model {
         'title', 'parent_id',
     ];
 
+/**
+*get group's children
+*@param
+*@return item collection
+*
+**/
     public function getChildren() {
         return $this->hasMany('App\Models\User\Group', 'parent_id');
     }
-
+/**
+*get group's parent 
+*@param
+*@return item collection
+*
+**/
     public function getParent() {
         return $this->belongsTo('App\Models\User\Group', 'parent_id');
     }
-
+/**
+* get users that belongs to a access level 
+*@param
+*@return collection of items
+*
+*/
     Public function getAccessLevels() {
         return $this->belongsToMany('App\Models\User\AccessLevel', 'usergroup_accesslevel_map', 'user_group_id');
     }
 
+/**
+* get users that belong to a groups 
+*@param
+*@return collection of items
+*
+*/
      Public function getUsers() {
         return $this->belongsToMany('App\Models\User\User', 'user_usergroup_map', 'user_group_id');
     }
@@ -52,8 +74,8 @@ class Group extends Model {
 /**
      * get permissions for the specify group. 
      *the group permissions is the set of permissions of all access levels that group and  it parent belong's to
-     *
-     * @return \Illuminate\Http\Response
+     *@param int $id
+     * @return array $permission
      */
     public static function getPermissions($id) {
         $group = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
@@ -65,20 +87,23 @@ class Group extends Model {
                 $permissions[] = $permission;
             }
         }
-// if the group has a prarent, get parent permissions and merge with group permissions and return all permissions
-        if ($group->getParent) {
-            $parentPermissions = Group::getParentPermissions($group->getParent);
-            $Allpermissions = array_merge($permissions, $parentPermissions);
-        return $Allpermissions;
+
+// if the group has a parent, get parent permissions and merge with group permissions and return all permissions
+        $parentPermissions=Group::getParentPermissions($group->parent_id);
+        if($parentPermissions['permissions']){
+            if($parentPermissions['parent_id']){
+ $parentPermissions=Group::getParentPermissions($group->parent_id);
+            }
+            return array_merge($permissions,$parentPermissions['permissions']);
         }
         return $permissions;
-
     }
+
 
 /**
      * get permissions for the specify group if that group doesn't belong to any access level.
      * in this case the group inherit of it parent permissions
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Re
      */
     public static function getPermissionsIfNoAccessLevel($id) {
         $group = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
@@ -104,9 +129,15 @@ class Group extends Model {
 
         return $permissions;
     }
+/**
+*
+*@param parent id
+*
+*/
+    public static function getParentPermissions($id) {
+if ($id != 0) {
 
-    public static function getParentPermissions(Group $group) {
-        $parent = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($group->parent_id);
+$parent = Group::with(['getParent', 'getAccessLevels.getPermissions'])->find($id);
         $permissions = [];
         $permissionsG2 = [];
         if ($parent) {
@@ -116,11 +147,25 @@ class Group extends Model {
                 }
                             }
 
-            if ($parent->getParent) {
-                $permissionsG2 = Group::getPermissions($parent->getParent->id);
-            }
         }
-        return array_merge($permissions, $permissionsG2);
+dd($parent->parent_id);
+        $p = Group::getParentPermissions($parent->parent_id);
+
+return ['permissions'=>$permissions, 'parent_id'=>$parent->parent_id];
+}else{
+    return [];
+}
+        //     $result= Group::getParentPermissions($group->parent_id);
+        //     if($result["parent_id"]){
+        //     dd(Group::getParentPermissions($result["parent_id"]));
+                
+        //     }
+        //     $Allpermissions = array_merge($permissions, $parentPermissions);
+        // return $Allpermissions;
+        // }
+
+
+        
     }
 
 }

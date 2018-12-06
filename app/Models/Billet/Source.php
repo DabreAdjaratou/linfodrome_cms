@@ -29,12 +29,22 @@ class Source extends Model
         'title','published',
     ];
 
-
+/**
+* get billets list for a source
+*@param
+*@return collection of items
+*
+*/
  public function getBillets()
     {
          return $this->hasMany('App\Models\Billet\Billet','source_id');
     }
-
+/**
+* get articles list for a source
+*@param
+*@return collection of items
+*
+*/
     public function getArchives()
     {
          return $this->hasMany('App\Models\Billet\Archive','source_id');

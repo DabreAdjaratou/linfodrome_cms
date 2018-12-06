@@ -19,13 +19,22 @@ class Revision extends Model
      * @var bool
      */
     public $timestamps = false;
-
-
-     public function getModifier()
+/**
+* get the modifier
+*@param
+*@return collection of items
+*
+*/
+ public function getModifier()
     {
        return $this->belongsTo('App\Models\User\User','user_id');
     }
-
+/**
+* get the item concerned by the modification
+*@param
+*@return collection of items
+*
+*/
 public function getBillet()
     {
        return $this->belongsTo('App\Models\Billet\Archive','billet_id')->withTrashed();

@@ -22,13 +22,13 @@ class ArchiveController extends Controller
      *
      * @var int
      */
-    public $defaultPageLength =25;
+public $defaultPageLength =25;
      /**
      * The entries for the datatable
      *
      * @var array
      */
-    public $entries=[25,50,100];
+     public $entries=[25,50,100];
     /**
      * Protecting routes
      */
@@ -38,9 +38,9 @@ class ArchiveController extends Controller
     }
     /**
      * Display a listing of the resource.
-     @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response with : results of ItemsList action $result, actions for the datatable $actions
      */
     public function index(Request $request)
     {
@@ -52,22 +52,22 @@ class ArchiveController extends Controller
       ->where('article_archives.published','<>',2);
       $controllerMethodUrl=action('Article\ArchiveController@index');
       $actions=Archive::indexActions();
-      $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+      $result=$this->ItemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
       return view($view,$result,$actions);
 
 
     }
-/**
-     * get the list of resources.
-     @param  \Illuminate\Http\Request  $request, a query with paginate $queryWithPaginate, a query without paginate $queryWithOutPaginate, a controller methode url $controllerMethodUrl
+    /**
+     * get the list of items.
+     * @param  \Illuminate\Http\Request  $request, a query with pagination $queryWithPaginate, a query without pagination *$queryWithOutPaginate, a controller methode url $controllerMethodUrl
      *
-     * @return \Illuminate\Http\Response 
+     * @return  the result of filter action
      */
-    public function articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+    public function ItemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
     {
 
       if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
-        $result=$this->articleWithTableParameters($queryWithPaginate);
+        $result=$this->itemsWithTableParameters($queryWithPaginate);
         return $result;
       } else {
         $pageLength=$request->pageLength;
@@ -91,12 +91,12 @@ class ArchiveController extends Controller
 
     /**
      * get parameters for datatable.
-     @param  a query $articles, 
+     * @param  items collection $articles, 
      *
-     * @return \Illuminate\Http\Response
+     * @return items collection  $article, datatable information $tableInfo, datatable entries $entries, items categories $categoies, users $users 
      */
 
-    public function articleWithTableParameters($articles){
+    public function itemsWithTableParameters($articles){
       $numberOfItemSFound=$articles->count();
       if($numberOfItemSFound==0){
         $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
@@ -110,7 +110,11 @@ class ArchiveController extends Controller
       return compact('articles','tableInfo','entries','categories','users');
     }
     
-    
+    /**
+    * search and sort datatable items
+    *@param  \Illuminate\Http\Request $request
+    *@return \Illuminate\Http\Response with : results of filter action, actions for datatable
+    */
     public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());
      $pageLength=$data->entries;
@@ -154,84 +158,88 @@ class ArchiveController extends Controller
     return view('article.archives.administrator.searchAndSort',$filterResult,$actions);
 
   }
-
-  public function filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-    $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
-    if($searchByTitle){
-      $articles =$articles->ofTitle($searchByTitle);
-    }
-    if($searchByCategory){
-      $articles =$articles->ofCategory($searchByCategory);
-    }
-    
-    if(!is_null($searchByFeaturedState)){
-      $articles =$articles->ofFeaturedState($searchByFeaturedState);   
-    }
-    if(!is_null($searchByPublishedState)){
-      $articles =$articles->ofPublishedState($searchByPublishedState);   
-    }
-    if($searchByUser){
-      $articles =$articles->ofUser($searchByUser);   
-    }
-    if($fromDate && !$toDate){ 
-      $articles =$articles->ofFromDate($fromDate);   
-    }
-    if(!$fromDate && $toDate){ 
-      $articles =$articles->ofToDate($toDate);
-    }
-    if($fromDate && $toDate){
-      $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
-    }
-
-    if($sortField){
-      $articles = $articles->orderBy($sortField, $order)->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')->paginate($pageLength);
-    }else{
-      $articles = $articles->orderBy('published', 'asc')->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')->paginate($pageLength);
-    }
-    if($itemType){
-if($itemType=='article-archives'){ $articles->withPath('article-archives');};
-if($itemType=='article-archive-trash'){ $articles->withPath('trash');};
-if($itemType=='article-archive-draft'){ $articles->withPath('draft');};
-
-    }
-
-    $articles->appends([
-      'pageLength' => $pageLength,
-      'searchByTitle' => $searchByTitle,
-      'searchByCategory' => $searchByCategory,
-      'searchByFeaturedState' => $searchByFeaturedState,
-      'searchByPublishedState' => $searchByPublishedState,
-      'searchByUser' => $searchByUser,
-      'fromDate' => $fromDate,
-      'toDate' => $toDate,
-      'sortField' => $sortField,
-      'itemType'=>$itemType,
-      'order' => $order])->links();
-    $numberOfItemSFound=$articles->count();
-    if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
-    }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
-
-    }
-    $entries=$this->entries;
-    $categories= Category::where('published','<>',2)->get(['id','title']);
-    $users= User::get(['id','name']);
-
-    return compact('articles','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
-
+/**
+*filter datatable
+*@param items collection $article, number of items par page $pageLength, value of search fields: $searchByTitle, $searchByCategory, $searchByFeaturedState , $searchByPublishedState, $searchByUser, $fromDate, $toDate, $sortField, $order, itemType
+*
+*@return tems collection $article, number of items par page $pageLength, value of search fields: $searchByTitle, $searchByCategory, $searchByFeaturedState , $searchByPublishedState, $searchByUser, $fromDate, $toDate, $sortField, $order, itemType
+**/
+public function filter($articles,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+  $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
+  if($searchByTitle){
+    $articles =$articles->ofTitle($searchByTitle);
+  }
+  if($searchByCategory){
+    $articles =$articles->ofCategory($searchByCategory);
   }
 
+  if(!is_null($searchByFeaturedState)){
+    $articles =$articles->ofFeaturedState($searchByFeaturedState);   
+  }
+  if(!is_null($searchByPublishedState)){
+    $articles =$articles->ofPublishedState($searchByPublishedState);   
+  }
+  if($searchByUser){
+    $articles =$articles->ofUser($searchByUser);   
+  }
+  if($fromDate && !$toDate){ 
+    $articles =$articles->ofFromDate($fromDate);   
+  }
+  if(!$fromDate && $toDate){ 
+    $articles =$articles->ofToDate($toDate);
+  }
+  if($fromDate && $toDate){
+    $articles =$articles->ofBetweenTwoDate($fromDate, $toDate);
+  }
 
-          /**
+  if($sortField){
+    $articles = $articles->orderBy($sortField, $order)->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')->paginate($pageLength);
+  }else{
+    $articles = $articles->orderBy('published', 'asc')->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')->paginate($pageLength);
+  }
+  if($itemType){
+    if($itemType=='article-archives'){ $articles->withPath('article-archives');};
+    if($itemType=='article-archive-trash'){ $articles->withPath('trash');};
+    if($itemType=='article-archive-draft'){ $articles->withPath('draft');};
+  }
+
+  $articles->appends([
+    'pageLength' => $pageLength,
+    'searchByTitle' => $searchByTitle,
+    'searchByCategory' => $searchByCategory,
+    'searchByFeaturedState' => $searchByFeaturedState,
+    'searchByPublishedState' => $searchByPublishedState,
+    'searchByUser' => $searchByUser,
+    'fromDate' => $fromDate,
+    'toDate' => $toDate,
+    'sortField' => $sortField,
+    'itemType'=>$itemType,
+    'order' => $order])->links();
+  $numberOfItemSFound=$articles->count();
+  if($numberOfItemSFound==0){
+    $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+  }else{
+    $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$articles->total();
+
+  }
+  $entries=$this->entries;
+  $categories= Category::where('published','<>',2)->get(['id','title']);
+  $users= User::get(['id','name']);
+
+  return compact('articles','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
+
+}
+
+
+      /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-          public function create()
-          {
+      public function create()
+      {
         //
-          }
+      }
 
     /**
      * Store a newly created resource in storage.
@@ -333,46 +341,46 @@ if($itemType=='article-archive-draft'){ $articles->withPath('draft');};
       $archive->keywords = $request->tags;
       $archive->created_by =$request->created_by ?? $request->auth_userid;
       $archive->created_at =now();
-     if($request->start_publication_at){
-     $start_at=explode(' ',$request->start_publication_at);
-     $archive->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+      if($request->start_publication_at){
+       $start_at=explode(' ',$request->start_publication_at);
+       $archive->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
      }else{
       $archive->start_publication_at=$request->start_publication_at;
     }
-     if($request->start_publication_at){
+    if($request->start_publication_at){
      $stop_at=explode(' ',$request->stop_publication_at);
      $archive->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
-     }else{
-      $archive->stop_publication_at=$request->stop_publication_at;
-     }
-      $archive->checkout=0;
-
-      try {
-       DB::transaction(function () use ($archive,$request) {
-         if ($request->update) {
-           $archive->save();
-           $revision= new  Revision;
-           $revision->type=explode('@', Route::CurrentRouteAction())[1];
-           $revision->user_id=Auth::id();
-           $revision->article_id=$archive->id;
-           $revision->revised_at=now();
-           $revision->save();
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Article modifié avec succès!');
-         }else{
-          session()->flash('message.type', 'danger');
-          session()->flash('message.content', 'Modification annulée!');
-        }
-      });
-
-     } catch (Exception $exc) {
-      session()->flash('message.type', 'danger');
-      session()->flash('message.content', 'Erreur lors de la modification!');
-//           echo $exc->getTraceAsString();
-    }
-
-    return redirect()->route('article-archives.index');
+   }else{
+    $archive->stop_publication_at=$request->stop_publication_at;
   }
+  $archive->checkout=0;
+
+  try {
+   DB::transaction(function () use ($archive,$request) {
+     if ($request->update) {
+       $archive->save();
+       $revision= new  Revision;
+       $revision->type=explode('@', Route::CurrentRouteAction())[1];
+       $revision->user_id=Auth::id();
+       $revision->article_id=$archive->id;
+       $revision->revised_at=now();
+       $revision->save();
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Article modifié avec succès!');
+     }else{
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Modification annulée!');
+    }
+  });
+
+ } catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de la modification!');
+//           echo $exc->getTraceAsString();
+}
+
+return redirect()->route('article-archives.index');
+}
 
 
 /**
@@ -503,7 +511,7 @@ return redirect()->route('article-archives.trash');
 }
 
 /**
-     * Display a listing of the resource in the trash.
+  * Display a listing of the resource in the trash.
      *
      * @return \Illuminate\Http\Response
      */
@@ -513,17 +521,17 @@ public function inTrash( Request $request)
 
   $view='article.archives.administrator.trash';
   $queryWithPaginate=Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
-->join('users', 'article_archives.created_by', '=', 'users.id')
-      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
-      ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')
-      ->orderBy('article_archives.id', 'desc')->paginate($this->defaultPageLength);
+  ->join('users', 'article_archives.created_by', '=', 'users.id')
+  ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+  ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')
+  ->orderBy('article_archives.id', 'desc')->paginate($this->defaultPageLength);
   $queryWithOutPaginate =Archive::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
-->join('users', 'article_archives.created_by', '=', 'users.id')
-      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
-      ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author');
+  ->join('users', 'article_archives.created_by', '=', 'users.id')
+  ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+  ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author');
   $controllerMethodUrl=action('Article\ArchiveController@inTrash');
   $actions=Archive::trashActions();
-  $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+  $result=$this->ItemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
   return view($view,$result,$actions);
 }
 
@@ -534,21 +542,21 @@ public function inTrash( Request $request)
      */
 public function inDraft(Request $request)
 {
-   $view='article.archives.administrator.draft';
-  $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory'])
-->join('users', 'article_archives.created_by', '=', 'users.id')
-      ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
-      ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')
-  ->where('article_archives.published',2)
-  ->orderBy('article_archives.id', 'desc')->paginate($this->defaultPageLength);
-  $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory'])
-  ->join('users', 'article-archives.created_by', '=', 'users.id')
-      ->join('article_categories', 'article-archives.category_id', '=', 'article_categories.id')
-      ->select('article-archives.id','article-archives.title','article-archives.category_id','article-archives.published','article-archives.featured','article-archives.source_id','article-archives.created_by','article-archives.created_at','article-archives.image','article-archives.views', 'article_categories.title as category','users.name as author')->where('article_archives.published',2);
-  $controllerMethodUrl=action('Article\ArchiveController@inDraft');
-  $actions=Archive::draftActions();
-  $result=$this->articlesList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
-  return view($view,$result,$actions);
+ $view='article.archives.administrator.draft';
+ $queryWithPaginate=Archive::with(['getAuthor:id,name','getCategory'])
+ ->join('users', 'article_archives.created_by', '=', 'users.id')
+ ->join('article_categories', 'article_archives.category_id', '=', 'article_categories.id')
+ ->select('article_archives.id','article_archives.title','article_archives.category_id','article_archives.published','article_archives.featured','article_archives.source_id','article_archives.created_by','article_archives.created_at','article_archives.image','article_archives.views', 'article_categories.title as category','users.name as author')
+ ->where('article_archives.published',2)
+ ->orderBy('article_archives.id', 'desc')->paginate($this->defaultPageLength);
+ $queryWithOutPaginate =Archive::with(['getAuthor:id,name','getCategory'])
+ ->join('users', 'article-archives.created_by', '=', 'users.id')
+ ->join('article_categories', 'article-archives.category_id', '=', 'article_categories.id')
+ ->select('article-archives.id','article-archives.title','article-archives.category_id','article-archives.published','article-archives.featured','article-archives.source_id','article-archives.created_by','article-archives.created_at','article-archives.image','article-archives.views', 'article_categories.title as category','users.name as author')->where('article_archives.published',2);
+ $controllerMethodUrl=action('Article\ArchiveController@inDraft');
+ $actions=Archive::draftActions();
+ $result=$this->ItemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
+ return view($view,$result,$actions);
 }
 
 

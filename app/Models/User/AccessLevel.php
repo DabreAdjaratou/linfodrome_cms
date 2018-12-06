@@ -31,11 +31,21 @@ class AccessLevel extends Model
         'title', 
     ];
 
-
+/**
+* get the list groups that belong to a access level and vice versa
+*@param
+*@return collection of items
+*
+*/
 public function getGroups() {
         return $this->belongsToMany('App\Models\User\Group', 'usergroup_accesslevel_map',  'access_level_id','user_group_id');
     }
-
+/**
+* get permissions of a access level
+*@param
+*@return collection of items
+*
+*/
 public function getPermissions() {
         return $this->hasMany('App\Models\User\Permission', 'access_level_id');
     }

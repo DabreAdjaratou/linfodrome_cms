@@ -9,14 +9,14 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
-    
+  
      /**
      * Protecting routes
      */
-    public function __construct()
-{
-    $this->middleware(['auth','activeUser']);
-}
+     public function __construct()
+     {
+      $this->middleware(['auth','activeUser']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -24,8 +24,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories=Category::all();
-        return view('billet.categories.administrator.index',compact('categories'));
+      $categories=Category::all();
+      return view('billet.categories.administrator.index',compact('categories'));
     }
 
     /**
@@ -35,7 +35,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-    return view('billet.categories.administrator.create');
+      return view('billet.categories.administrator.create');
     }
 
     /**
@@ -47,33 +47,33 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
       if ($request->cancel) {
-           return redirect()->route('billet-categories.index');
-      }
-        $validatedData = $request->validate([
-        'title' => 'required|unique:billet_categories|max:100',
-        'published' => 'nullable|int',
-        ]);
+       return redirect()->route('billet-categories.index');
+     }
+     $validatedData = $request->validate([
+      'title' => 'required|unique:billet_categories|max:100',
+      'published' => 'nullable|int',
+    ]);
 
-       $category= new Category;
-       $category->title = $request->title;
-       $category->alias=str_slug($request->title);
-        $category->published=$request->published ? $request->published : 0 ;
+     $category= new Category;
+     $category->title = $request->title;
+     $category->alias=str_slug($request->title);
+     $category->published=$request->published ? $request->published : 0 ;
 
-       if ($category->save()) {
+     if ($category->save()) {
        session()->flash('message.type', 'success');
        session()->flash('message.content', 'Categorie ajouté avec succès!');
-    } else {
+     } else {
        session()->flash('message.type', 'danger');
        session()->flash('message.content', 'Erreur lors de l\'ajout!');
-    }
-       if ($request->save_close) {
-           return redirect()->route('billet-categories.index');
-       }else{
-        return redirect()->route('billet-categories.create');
+     }
+     if ($request->save_close) {
+       return redirect()->route('billet-categories.index');
+     }else{
+      return redirect()->route('billet-categories.create');
 
     }
     
-       }
+  }
 
     /**
      * Display the specified resource.
@@ -94,8 +94,8 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        $category=Category::find($id);
-        return view('billet.categories.administrator.edit',compact('category'));
+      $category=Category::find($id);
+      return view('billet.categories.administrator.edit',compact('category'));
     }
 
     /**
@@ -107,30 +107,30 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-       $validatedData = $request->validate([
-            'title' => 'required|'.Rule::unique('billet_categories')->ignore($id, 'id').'|max:100',
-            'published' => 'nullable|int',
-        ]);
-        $category=Category::find($id);
-        $category->title = $request->title;
-        $category->alias=str_slug($request->title);
-        $category->published=$request->published ? $request->published : 0 ;
+     $validatedData = $request->validate([
+      'title' => 'required|'.Rule::unique('billet_categories')->ignore($id, 'id').'|max:100',
+      'published' => 'nullable|int',
+    ]);
+     $category=Category::find($id);
+     $category->title = $request->title;
+     $category->alias=str_slug($request->title);
+     $category->published=$request->published ? $request->published : 0 ;
      if ($request->update) {
-        if ($category->save()) {
-           
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Categorie modifiée avec succès!');
-        } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la modification!');
-        }
-    }else{
-        session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Modification annulée!');
-    }
-           return redirect()->route('billet-categories.index');
+      if ($category->save()) {
+       
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Categorie modifiée avec succès!');
+     } else {
+       session()->flash('message.type', 'danger');
+       session()->flash('message.content', 'Erreur lors de la modification!');
+     }
+   }else{
+    session()->flash('message.type', 'danger');
+    session()->flash('message.content', 'Modification annulée!');
+  }
+  return redirect()->route('billet-categories.index');
   
-    }
+}
 
     /**
      * Remove the specified resource from storage.
@@ -140,18 +140,18 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $category= Category::onlyTrashed()->find($id);
-                if($category->forceDelete()){
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Categorie supprimée avec succès!');
-           } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la suppression!');
-        }
-        
-        return redirect()->route('billet-categories.trash');
-    }
-    
+      $category= Category::onlyTrashed()->find($id);
+      if($category->forceDelete()){
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Categorie supprimée avec succès!');
+     } else {
+       session()->flash('message.type', 'danger');
+       session()->flash('message.content', 'Erreur lors de la suppression!');
+     }
+     
+     return redirect()->route('billet-categories.trash');
+   }
+   
     /**
      * put the specified resource in the trash.
      *
@@ -160,46 +160,46 @@ class CategoryController extends Controller
      */
     public function putInTrash($id)
     {
-        $category= Category::with(['getBillets','getArchives'])->where('id',$id)->first();
-        if (blank($category->getBillets) && blank($category->getArchives)) {
+      $category= Category::with(['getBillets','getArchives'])->where('id',$id)->first();
+      if (blank($category->getBillets) && blank($category->getArchives)) {
         
-            if($category->delete()){
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Categorie mis en corbeille!!');
-           } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
-        }
-      } else {
-           session()->flash('message.type', 'danger');
-           session()->flash('message.content', 'Cette categorie ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
-        }
-  return redirect()->route('billet-categories.index');
-    }
+        if($category->delete()){
+         session()->flash('message.type', 'success');
+         session()->flash('message.content', 'Categorie mis en corbeille!!');
+       } else {
+         session()->flash('message.type', 'danger');
+         session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+       }
+     } else {
+       session()->flash('message.type', 'danger');
+       session()->flash('message.content', 'Cette categorie ne peut être mise en corbeille car elle est referencée par un ou plusieurs articles!');
+     }
+     return redirect()->route('billet-categories.index');
+   }
 /**
      * restore the specified resource from the trash.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore($id)
-    {
-      
-        Category::onlyTrashed()->find($id)->restore();
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Categorie restaurer!');
-      return redirect()->route('billet-categories.trash');
-   
-    }
+public function restore($id)
+{
+  
+  Category::onlyTrashed()->find($id)->restore();
+  session()->flash('message.type', 'success');
+  session()->flash('message.content', 'Categorie restaurer!');
+  return redirect()->route('billet-categories.trash');
+  
+}
 
 /**
      * Display a listing of the resource in the trash.
      *
      * @return \Illuminate\Http\Response
      */
-    public function inTrash()
-    {
-     $categories= Category::onlyTrashed()->get(['id','title']);
-       return view('billet.categories.administrator.trash',compact('categories'));
-               }
+public function inTrash()
+{
+ $categories= Category::onlyTrashed()->get(['id','title']);
+ return view('billet.categories.administrator.trash',compact('categories'));
+}
 }

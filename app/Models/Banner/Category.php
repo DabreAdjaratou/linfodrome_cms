@@ -30,6 +30,11 @@ class Category extends Model
     protected $fillable = [
         'title','published',
     ];
+    /**
+*get banners list for a category
+*@param
+*@return item collection
+*/
      public function getBanners()
     {
          return $this->hasMany('App\Models\Banner\Banner','category_id');

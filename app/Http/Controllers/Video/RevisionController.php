@@ -12,10 +12,10 @@ class RevisionController extends Controller
      /**
      * Protecting routes
      */
-    public function __construct()
-{
-     $this->middleware(['auth','activeUser']);
-}
+     public function __construct()
+     {
+       $this->middleware(['auth','activeUser']);
+   }
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +23,9 @@ class RevisionController extends Controller
      */
     public function index()
     {
-         $revisions=Revision::with(['getModifier:id,name','getVideo:id,title,category_id,created_by,created_at','getVideo.getCategory:id,title','getVideo.getAuthor:id,name'])->get()->groupBy('video_id');
-           return view('video.revisions.administrator.index',['revisions'=>$revisions]);
-    }
+       $revisions=Revision::with(['getModifier:id,name','getVideo:id,title,category_id,created_by,created_at','getVideo.getCategory:id,title','getVideo.getAuthor:id,name'])->get()->groupBy('video_id');
+       return view('video.revisions.administrator.index',['revisions'=>$revisions]);
+   }
 
     /**
      * Show the form for creating a new resource.
@@ -56,11 +56,11 @@ class RevisionController extends Controller
      */
     public function show($videoId)
     {
-     
-       $video=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
+       
+     $video=Archive::with(['getRevision.getModifier:id,name','getCategory:id,title',
       'getAuthor:id,name'])->withTrashed()->where('id',$videoId)->get();
-        return view('video.revisions.administrator.show',compact('video'));
-    }
+     return view('video.revisions.administrator.show',compact('video'));
+ }
 
     /**
      * Show the form for editing the specified resource.

@@ -42,17 +42,32 @@ use SoftDeletes;
     protected $fillable = [
         'ontitle','title','category_id','published','featured','image','image_legend','video','gallery_photo','introtext','fulltext','source_id','keywords','created_by','created_at','start_publication_at','stop_publication_at',
     ];
-
+/**
+*get item's category
+*@param
+*@return item collection
+*
+**/
     public function getCategory()
     {
         return $this->belongsTo('App\Models\Billet\Category','category_id');
     }
-
+   /**
+*get item's Author
+*@param
+*@return item collection
+*
+**/
    public function getAuthor()
     {
         return $this->belongsTo('App\Models\User\User','created_by');
     }
-
+/**
+*get item's revisions
+*@param
+*@return item collection
+*
+**/
     public function getRevision()
     {
        return $this->hasMany('App\Models\Billet\Revision','billet_id');
@@ -161,7 +176,12 @@ if($publishedState==1){
     {
         return $query->whereBetween('billet_archives.created_at',[$fromDate,$toDate]);
     }   
-
+/**
+* get datatable actions for index view
+*@param
+*@return string actions titles $actionTitles, string actions $action
+*
+*/
     public  static function indexActions()
     {
       $actionTitles='<th>Brouillon</th><th>Corbeille</th>';
@@ -170,7 +190,12 @@ if($publishedState==1){
       </td>';
         return compact('actionTitles','actions');
     }
-
+/**
+* get datatable actions for trash view
+*@param
+*@return string actions titles $actionTitles, string actions $action
+*
+*/
      public  static function trashActions()
     {
      $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
@@ -183,7 +208,12 @@ if($publishedState==1){
       </td>';
         return compact('actionTitles','actions');
     }
-
+/**
+* get datatable actions for draft view
+*@param
+*@return string actions titles $actionTitles, string actions $action
+*
+*/
      public  static function draftActions()
     {
       $actionTitles='<th>Modifier</th><th>Corbeille</th>';

@@ -16,8 +16,8 @@ class AccessLevelController extends Controller
      */
      public function __construct()
      {
-       $this->middleware(['auth','activeUser']);
-    }
+         $this->middleware(['auth','activeUser']);
+     }
     /**
      * Display a listing of the resource.
      *
@@ -30,17 +30,17 @@ class AccessLevelController extends Controller
         foreach ($accessLevels as $a) {
           foreach ($a->getGroups as $group) {
             
-             if ($a->getGroups->last()->title==$group->title) {
-               $group->title= $group->title;
-           }else{
+           if ($a->getGroups->last()->title==$group->title) {
+             $group->title= $group->title;
+         }else{
             $group->title= $group->title.',';
-           }
-          }
-              }
-       
-        return view ('user.access-levels.administrator.index', compact('accessLevels'));
-
+        }
     }
+}
+
+return view ('user.access-levels.administrator.index', compact('accessLevels'));
+
+}
 
     /**
      * Show the form for creating a new resource.
@@ -49,9 +49,9 @@ class AccessLevelController extends Controller
      */
     public function create()
     {
-         $groups = Group::with('getChildren')->where('parent_id',0)->get();
-        return view ('user.access-levels.administrator.create',['groups'=>$groups,'accessLevelView'=>'accessLevelView']);
-    }
+       $groups = Group::with('getChildren')->where('parent_id',0)->get();
+       return view ('user.access-levels.administrator.create',['groups'=>$groups,'accessLevelView'=>'accessLevelView']);
+   }
 
     /**
      * Store a newly created resource in storage.
@@ -71,25 +71,25 @@ class AccessLevelController extends Controller
         $accessLevel->title = $request->title;
         $groups= $request->groups;
 
-try {
-         DB::transaction(function () use ($accessLevel,$groups) {
-          $accessLevel->save();
-                  for ($i=0; $i <count($groups) ; $i++) { 
-             $accessLevel->getGroups()->attach($groups[$i]);
-         }
-     });
-     } catch (Exception $exc) {
-         session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Erreur lors de l\'ajout!');
+        try {
+           DB::transaction(function () use ($accessLevel,$groups) {
+              $accessLevel->save();
+              for ($i=0; $i <count($groups) ; $i++) { 
+               $accessLevel->getGroups()->attach($groups[$i]);
+           }
+       });
+       } catch (Exception $exc) {
+           session()->flash('message.type', 'danger');
+           session()->flash('message.content', 'Erreur lors de l\'ajout!');
 //           echo $exc->getTraceAsString();
-    }
+       }
 
-session()->flash('message.type', 'success');
-session()->flash('message.content', 'Niveau d\' ajouté avec succès!');
-        
-return redirect()->route('access-levels.index');
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Niveau d\' ajouté avec succès!');
+       
+       return redirect()->route('access-levels.index');
 
-}
+   }
 
     /**
      * Display the specified resource.
@@ -110,10 +110,10 @@ return redirect()->route('access-levels.index');
      */
     public function edit($id)
     {
-       $accessLevel=AccessLevel::with('getGroups')->find($id);
-       $allGroups = Group::with('getChildren')->where('parent_id',0)->get();
-       $allGroups2=Group::all();
-       foreach ($allGroups2 as $a) {
+     $accessLevel=AccessLevel::with('getGroups')->find($id);
+     $allGroups = Group::with('getChildren')->where('parent_id',0)->get();
+     $allGroups2=Group::all();
+     foreach ($allGroups2 as $a) {
         $groups[]=$a->title;
         $accessLevelGroups=[];
         // dd($accessLevel);
@@ -121,11 +121,11 @@ return redirect()->route('access-levels.index');
             $accessLevelGroups[]=$accessLevelGroup->title;
         }
     }
-     
+    
     $arrayDiff=array_diff($groups, $accessLevelGroups);
- return view('user.access-levels.administrator.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups]);
-        
-    }
+    return view('user.access-levels.administrator.edit',['arrayDiff'=>$arrayDiff,'accessLevel'=>$accessLevel,'allGroups'=>$allGroups, 'accessLevelGroups'=>$accessLevelGroups]);
+    
+}
 
     /**
      * Update the specified resource in storage.
@@ -143,26 +143,26 @@ return redirect()->route('access-levels.index');
         $accessLevel =AccessLevel::find($id);
         $accessLevel->title = $request->title;
         $groups= $request->groups;
-       $existingInPivot=AccessLevel::with('getGroups')->where('id',$accessLevel->id)->get();
+        $existingInPivot=AccessLevel::with('getGroups')->where('id',$accessLevel->id)->get();
         foreach ($existingInPivot as $e) {
             $existingGroups=[];
             foreach ($e->getGroups as $existingGroup) {
-               $existingGroups[]=$existingGroup->id;
-           }
-       }
+             $existingGroups[]=$existingGroup->id;
+         }
+     }
 
-        if ($request->update) {
-            try {
-         DB::transaction(function () use ($accessLevel,$existingGroups,$groups) {
-          $accessLevel->save();
-          for ($i=0; $i <count($existingGroups) ; $i++) { 
-             $accessLevel->getGroups()->detach($existingGroups[$i]);
-         }
-         for ($i=0; $i <count($groups) ; $i++) { 
-             $accessLevel->getGroups()->attach($groups[$i]);
-         }
-     });
-     } catch (Exception $exc) {
+     if ($request->update) {
+        try {
+           DB::transaction(function () use ($accessLevel,$existingGroups,$groups) {
+              $accessLevel->save();
+              for ($i=0; $i <count($existingGroups) ; $i++) { 
+               $accessLevel->getGroups()->detach($existingGroups[$i]);
+           }
+           for ($i=0; $i <count($groups) ; $i++) { 
+               $accessLevel->getGroups()->attach($groups[$i]);
+           }
+       });
+       } catch (Exception $exc) {
         
         session()->flash('message.type', 'danger');
         
@@ -174,12 +174,12 @@ return redirect()->route('access-levels.index');
     
     session()->flash('message.content', 'Niveau d\'accès Modifier avec succès!');
 
-        }else{
- session()->flash('message.type', 'danger');
-        session()->flash('message.content', 'Modification annulée!');
-        }       
-    return redirect()->route('access-levels.index');
-    }
+}else{
+   session()->flash('message.type', 'danger');
+   session()->flash('message.content', 'Modification annulée!');
+}       
+return redirect()->route('access-levels.index');
+}
 
     /**
      * Remove the specified resource from storage.

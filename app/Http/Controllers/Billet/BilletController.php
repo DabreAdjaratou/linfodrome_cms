@@ -22,13 +22,13 @@ class BilletController extends Controller
      *
      * @var int
      */
-    public $defaultPageLength =25;
+  public $defaultPageLength =25;
      /**
      * The entries for the datatable
      *
      * @var array
      */
-    public $entries=[25,50,100];
+     public $entries=[25,50,100];
      /**
      * Protecting routes
      */
@@ -36,14 +36,15 @@ class BilletController extends Controller
      {
        $this->middleware(['auth','activeUser']);
      }
+     
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
-     */
-  
-  
- public function index(Request $request)
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\Response with : results of ItemsList action $result, actions for the datatable $actions
+     */  
+    public function index(Request $request)
     {
       $view='billet.billets.administrator.index';
       $queryWithPaginate=Billet::with(['getAuthor:id,name','getCategory'])->where('published','<>',2)->orderBy('published', 'asc')->paginate($this->defaultPageLength,['id','title','category_id','published','featured','source_id','created_by','created_at','image','views']);
@@ -58,48 +59,62 @@ class BilletController extends Controller
 
 
     }
+/**
+     * get the list of items.
+     * @param  \Illuminate\Http\Request  $request, a query with pagination $queryWithPaginate, a query without pagination *$queryWithOutPaginate, a controller methode url $controllerMethodUrl
+     *
+     * @return  the result of filter action
+     */
+public function itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
+{
 
-    public function itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl)
-    {
+  if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
+    $result=$this->itemsWithTableParameters($queryWithPaginate);
+    return $result;
+  } else {
+    $pageLength=$request->pageLength;
+    $searchByTitle=$request->searchByTitle;
+    $searchByCategory=$request->searchByCategory;
+    $searchByFeaturedState=$request->searchByFeaturedState;
+    $searchByPublishedState=$request->searchByPublishedState;
+    $searchByUser=$request->searchByUser;
+    $fromDate=$request->fromDate;  
+    $toDate=$request->toDate;
+    $sortField=$request->sortField;
+    $order=$request->order;
+    $itemType=$request->itemType;
+    $items = $queryWithOutPaginate;
+    $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
+    return $filterResult;
 
-      if((url()->full() ==  $controllerMethodUrl || (url()->full() !=  $controllerMethodUrl && !($request->pageLength)))){
-        $result=$this->itemsWithTableParameters($queryWithPaginate);
-        return $result;
-      } else {
-        $pageLength=$request->pageLength;
-        $searchByTitle=$request->searchByTitle;
-        $searchByCategory=$request->searchByCategory;
-        $searchByFeaturedState=$request->searchByFeaturedState;
-        $searchByPublishedState=$request->searchByPublishedState;
-        $searchByUser=$request->searchByUser;
-        $fromDate=$request->fromDate;  
-        $toDate=$request->toDate;
-        $sortField=$request->sortField;
-        $order=$request->order;
-        $itemType=$request->itemType;
-        $items = $queryWithOutPaginate;
-        $filterResult=$this->filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,$searchByUser, $fromDate,$toDate,$sortField,$order,$itemType);
-        return $filterResult;
+  }
 
-      }
+}
+/**
+     * get parameters for datatable.
+     * @param  items collection $items, 
+     *
+     * @return items collection  $items, datatable information $tableInfo, datatable entries $entries, items categories $categoies, users $users 
+     **/
+public function itemsWithTableParameters($items){
+  $numberOfItemSFound=$items->count();
+  if($numberOfItemSFound==0){
+    $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
+  }else{
+    $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
 
-    }
+  }
+  $entries=$this->entries;
+  $categories= Category::where('published','<>',2)->get(['id','title']);
+  $users= User::get(['id','name']); 
+  return compact('items','tableInfo','entries','categories','users');
+}
 
-    public function itemsWithTableParameters($items){
-      $numberOfItemSFound=$items->count();
-      if($numberOfItemSFound==0){
-        $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
-      }else{
-        $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
-
-      }
-      $entries=$this->entries;
-      $categories= Category::where('published','<>',2)->get(['id','title']);
-      $users= User::get(['id','name']); 
-      return compact('items','tableInfo','entries','categories','users');
-    }
-    
-    
+    /**
+    * search and sort datatable items
+    *@param  \Illuminate\Http\Request $request
+    *@return \Illuminate\Http\Response with : results of filter action, actions for datatable
+    */
     public function searchAndSort(Request $request){ 
      $data=json_decode($request->getContent());
      $pageLength=$data->entries;
@@ -143,87 +158,92 @@ class BilletController extends Controller
     return view('billet.billets.administrator.searchAndSort',$filterResult,$actions);
 
   }
+/**
+*filter datatable
+*@param items collection $items, number of items par page $pageLength, value of search fields: $searchByTitle, $searchByCategory, $searchByFeaturedState , $searchByPublishedState, $searchByUser, $fromDate, $toDate, $sortField, $order, itemType
+*
+*@return tems collection $items, number of items par page $pageLength, value of search fields: $searchByTitle, $searchByCategory, $searchByFeaturedState , $searchByPublishedState, $searchByUser, $fromDate, $toDate, $sortField, $order, itemType
+**/
+public function filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
+  $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
+  if($searchByTitle){
+    $items =$items->ofTitle($searchByTitle);
+  }
+  if($searchByCategory){
+    $items =$items->ofCategory($searchByCategory);
+  }
+  
+  if(!is_null($searchByFeaturedState)){
+    $items =$items->ofFeaturedState($searchByFeaturedState);   
+  }
+  if(!is_null($searchByPublishedState)){
+    $items =$items->ofPublishedState($searchByPublishedState);   
+  }
+  if($searchByUser){
+    $items =$items->ofUser($searchByUser);   
+  }
+  if($fromDate && !$toDate){ 
+    $items =$items->ofFromDate($fromDate);   
+  }
+  if(!$fromDate && $toDate){ 
+    $items =$items->ofToDate($toDate);
+  }
+  if($fromDate && $toDate){
+    $items =$items->ofBetweenTwoDate($fromDate, $toDate);
+  }
 
-  public function filter($items,$pageLength,$searchByTitle,$searchByCategory,$searchByFeaturedState,$searchByPublishedState,
-    $searchByUser,$fromDate,$toDate,$sortField,$order,$itemType) {
-    if($searchByTitle){
-      $items =$items->ofTitle($searchByTitle);
-    }
-    if($searchByCategory){
-      $items =$items->ofCategory($searchByCategory);
-    }
-    
-    if(!is_null($searchByFeaturedState)){
-      $items =$items->ofFeaturedState($searchByFeaturedState);   
-    }
-    if(!is_null($searchByPublishedState)){
-      $items =$items->ofPublishedState($searchByPublishedState);   
-    }
-    if($searchByUser){
-      $items =$items->ofUser($searchByUser);   
-    }
-    if($fromDate && !$toDate){ 
-      $items =$items->ofFromDate($fromDate);   
-    }
-    if(!$fromDate && $toDate){ 
-      $items =$items->ofToDate($toDate);
-    }
-    if($fromDate && $toDate){
-      $items =$items->ofBetweenTwoDate($fromDate, $toDate);
-    }
-
-    if($sortField){
-      $items = $items->orderBy($sortField, $order)->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
-    }else{
-      $items = $items->orderBy('published', 'asc')->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
-    }
-    if($itemType){
-if($itemType=='billets'){ $items->withPath('billets');};
-if($itemType=='billet-trash'){ $items->withPath('trash');};
-if($itemType=='billet-draft'){ $items->withPath('draft');};
-
-    }
-
-    $items->appends([
-      'pageLength' => $pageLength,
-      'searchByTitle' => $searchByTitle,
-      'searchByCategory' => $searchByCategory,
-      'searchByFeaturedState' => $searchByFeaturedState,
-      'searchByPublishedState' => $searchByPublishedState,
-      'searchByUser' => $searchByUser,
-      'fromDate' => $fromDate,
-      'toDate' => $toDate,
-      'sortField' => $sortField,
-      'itemType'=>$itemType,
-      'order' => $order])->links();
-    $numberOfItemSFound=$items->count();
-    if($numberOfItemSFound==0){
-      $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
-    }else{
-      $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
-
-    }
-    $entries=$this->entries;
-    $categories= Category::where('published','<>',2)->get(['id','title']);
-    $users= User::get(['id','name']);
-
-    return compact('items','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
+  if($sortField){
+    $items = $items->orderBy($sortField, $order)->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
+  }else{
+    $items = $items->orderBy('published', 'asc')->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->paginate($pageLength);
+  }
+  if($itemType){
+    if($itemType=='billets'){ $items->withPath('billets');};
+    if($itemType=='billet-trash'){ $items->withPath('trash');};
+    if($itemType=='billet-draft'){ $items->withPath('draft');};
 
   }
+
+  $items->appends([
+    'pageLength' => $pageLength,
+    'searchByTitle' => $searchByTitle,
+    'searchByCategory' => $searchByCategory,
+    'searchByFeaturedState' => $searchByFeaturedState,
+    'searchByPublishedState' => $searchByPublishedState,
+    'searchByUser' => $searchByUser,
+    'fromDate' => $fromDate,
+    'toDate' => $toDate,
+    'sortField' => $sortField,
+    'itemType'=>$itemType,
+    'order' => $order])->links();
+  $numberOfItemSFound=$items->count();
+  if($numberOfItemSFound==0){
+    $tableInfo="Affichage de 0 à ".$numberOfItemSFound." lignes sur ".$items->total();
+  }else{
+    $tableInfo="Affichage de 1 à ".$numberOfItemSFound." lignes sur ".$items->total();
+
+  }
+  $entries=$this->entries;
+  $categories= Category::where('published','<>',2)->get(['id','title']);
+  $users= User::get(['id','name']);
+
+  return compact('items','tableInfo','entries','categories','users','searchByTitle','searchByCategory','searchByFeaturedState','searchByPublishedState','searchByUser','fromDate','toDate');
+
+}
 
   /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-      $sources=Source::where('published',1)->get(['id','title']);
-      $categories=Category::where('published',1)->get(['id','title']);
-      $users=user::all('id','name');
-      $auth_username = Auth::user()->name;
-      return view('billet.billets.administrator.create',['sources'=>$sources, 'categories'=>$categories,'auth_username'=>$auth_username, 'users'=>$users]);
-    }
+  public function create()
+  {
+    $sources=Source::where('published',1)->get(['id','title']);
+    $categories=Category::where('published',1)->get(['id','title']);
+    $users=user::all('id','name');
+    $auth_username = Auth::user()->name;
+    return view('billet.billets.administrator.create',['sources'=>$sources, 'categories'=>$categories,'auth_username'=>$auth_username, 'users'=>$users]);
+  }
 
     /**
      * Store a newly created resource in storage.
@@ -262,68 +282,68 @@ if($itemType=='billet-draft'){ $items->withPath('draft');};
       $billet->introtext = $request->introtext;
       $billet->fulltext =$request->fulltext;
       $billet->source_id = $request->source;
-       $billet->keywords = $request->tags;
+      $billet->keywords = $request->tags;
       $billet->created_by =$request->created_by ?? $request->auth_userid;
       $billet->created_at =now();
       if($request->start_publication_at){
-     $start_at=explode(' ',$request->start_publication_at);
-     $billet->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+       $start_at=explode(' ',$request->start_publication_at);
+       $billet->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
      }else{
       $billet->start_publication_at=$request->start_publication_at;
     }
-     if($request->start_publication_at){
+    if($request->start_publication_at){
      $stop_at=explode(' ',$request->stop_publication_at);
      $billet->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
-     }else{
-      $billet->stop_publication_at=$request->stop_publication_at;
-     }
-
-
-
-      try {
-       DB::transaction(function () use ($billet) {
-         $billet->save();
-         $lastRecord= Billet::latest()->first();
-         $archive= new Archive;
-         $archive->id = $lastRecord->id;
-         $archive->ontitle = $lastRecord->ontitle;
-         $archive->title =$lastRecord->title;
-         $archive->alias =$lastRecord->alias;
-         $archive->category_id = $lastRecord->category_id;
-         $archive->published = $lastRecord->published;
-         $archive->featured =$lastRecord->featured;
-         $archive->image = $lastRecord->image;
-         $archive->image_legend =$lastRecord->image_legend;
-         $archive->introtext = $lastRecord->introtext;
-         $archive->fulltext =$lastRecord->fulltext;
-         $archive->source_id = $lastRecord->source_id;
-         $archive->keywords=$lastRecord->keywords;
-         $archive->created_by =$lastRecord->created_by;
-         $archive->created_at =$lastRecord->created_at;
-         $archive->start_publication_at = $lastRecord->start_publication_at;
-         $archive->stop_publication_at =$lastRecord->stop_publication_at;
-         $archive->save();
-       $oldest = Billet::oldest()->first();
-       $oldest->delete();
-       });
-       
-     } catch (Exception $exc) {
-      session()->flash('message.type', 'danger');
-      session()->flash('message.content', 'Erreur lors de l\'ajout!');
-//           echo $exc->getTraceAsString();
-    }
-
-    session()->flash('message.type', 'success');
-    session()->flash('message.content', 'Billet ajouté avec succès!');
-    
-
-    if ($request->save_close) {
-     // return redirect(session()->get('link'));
-    return redirect()->route('billets.index');
-
    }else{
-    return redirect()->route('billets.create');
+    $billet->stop_publication_at=$request->stop_publication_at;
   }
+
+
+
+  try {
+   DB::transaction(function () use ($billet) {
+     $billet->save();
+     $lastRecord= Billet::latest()->first();
+     $archive= new Archive;
+     $archive->id = $lastRecord->id;
+     $archive->ontitle = $lastRecord->ontitle;
+     $archive->title =$lastRecord->title;
+     $archive->alias =$lastRecord->alias;
+     $archive->category_id = $lastRecord->category_id;
+     $archive->published = $lastRecord->published;
+     $archive->featured =$lastRecord->featured;
+     $archive->image = $lastRecord->image;
+     $archive->image_legend =$lastRecord->image_legend;
+     $archive->introtext = $lastRecord->introtext;
+     $archive->fulltext =$lastRecord->fulltext;
+     $archive->source_id = $lastRecord->source_id;
+     $archive->keywords=$lastRecord->keywords;
+     $archive->created_by =$lastRecord->created_by;
+     $archive->created_at =$lastRecord->created_at;
+     $archive->start_publication_at = $lastRecord->start_publication_at;
+     $archive->stop_publication_at =$lastRecord->stop_publication_at;
+     $archive->save();
+     $oldest = Billet::oldest()->first();
+     $oldest->delete();
+   });
+   
+ } catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de l\'ajout!');
+//           echo $exc->getTraceAsString();
+}
+
+session()->flash('message.type', 'success');
+session()->flash('message.content', 'Billet ajouté avec succès!');
+
+
+if ($request->save_close) {
+     // return redirect(session()->get('link'));
+  return redirect()->route('billets.index');
+
+}else{
+  return redirect()->route('billets.create');
+}
 
 
 }
@@ -336,22 +356,22 @@ if($itemType=='billet-draft'){ $items->withPath('draft');};
      */
     public function show($id)
     {
-         $billet= Billet::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
-       if (blank($billet)) {
-        $billet= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
-       }
-
-        if(blank($billet)){
-dd('billet not find');
-       }
-
-      foreach ($billet as $billet) {
-        # code...
-       $billet->views=$billet->views + 1 ;
-       $billet->save();
-     }
-       return view('billet.billets.public.show',compact('billet'));
+     $billet= Billet::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
+     if (blank($billet)) {
+      $billet= Archive::with(['getAuthor:id,name','getCategory'])->where('id',$id)->get();
     }
+
+    if(blank($billet)){
+      dd('billet not find');
+    }
+
+    foreach ($billet as $billet) {
+        # code...
+     $billet->views=$billet->views + 1 ;
+     $billet->save();
+   }
+   return view('billet.billets.public.show',compact('billet'));
+ }
 
     /**
      * Show the form for editing the specified resource.
@@ -379,9 +399,9 @@ dd('billet not find');
          session()->flash('message.content', 'Billet dejà en cour de modification!');
          return redirect()->route('billets.index');
        }
-    } else{
+     } else{
       return redirect()->route('billet-archives.edit',compact('id'));
-  }
+    }
   }
 
     /**
@@ -424,70 +444,70 @@ dd('billet not find');
      $billet->introtext = $request->introtext;
      $billet->fulltext =$request->fulltext;
      $billet->source_id = $request->source;
-      $billet->keywords = $request->tags;
+     $billet->keywords = $request->tags;
      $billet->created_by =$request->created_by ?? $request->auth_userid;
      $billet->created_at =now();
-      if($request->start_publication_at){
-     $start_at=explode(' ',$request->start_publication_at);
-     $billet->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
+     if($request->start_publication_at){
+       $start_at=explode(' ',$request->start_publication_at);
+       $billet->start_publication_at = date("Y-m-d", strtotime($start_at[0])).' '.$start_at[1];
      }else{
       $billet->start_publication_at=$request->start_publication_at;
     }
-     if($request->start_publication_at){
+    if($request->start_publication_at){
      $stop_at=explode(' ',$request->stop_publication_at);
      $billet->stop_publication_at = date("Y-m-d", strtotime($stop_at[0])).' '.$stop_at[1];
-     }else{
-      $billet->stop_publication_at=$request->stop_publication_at;
-     }
-     $billet->checkout=0;
-
-     try {
-       DB::transaction(function () use ($billet,$request) {
-         $archive= Archive::find($billet->id);
-         $archive->ontitle = $billet->ontitle;
-         $archive->title =$billet->title;
-         $archive->alias =$billet->alias;
-         $archive->category_id = $billet->category_id;
-         $archive->published = $billet->published;
-         $archive->featured =$billet->featured;
-         $archive->image = $billet->image;
-         $archive->image_legend =$billet->image_legend;
-         $archive->introtext = $billet->introtext;
-         $archive->fulltext =$billet->fulltext;
-         $archive->source_id = $billet->source_id;
-         $archive->keywords=$billet->keywords;
-         $archive->created_by =$billet->created_by;
-         $archive->created_at =$billet->created_at;
-         $archive->start_publication_at = $billet->start_publication_at;
-         $archive->stop_publication_at =$billet->stop_publication_at;
-         $archive->checkout=0;
-
-         if ($request->update) {
-           $billet->save();
-           $archive->save();
-           $revision= new  Revision;
-           $revision->type=explode('@', Route::CurrentRouteAction())[1];
-           $revision->user_id=Auth::id();
-           $revision->billet_id=$billet->id;
-           $revision->revised_at=now();
-           $revision->save();
-           session()->flash('message.type', 'success');
-           session()->flash('message.content', 'Billet modifié avec succès!');
-           
-         }else{
-          session()->flash('message.type', 'danger');
-          session()->flash('message.content', 'Modification annulée!');
-        }
-      });
-       
-     } catch (Exception $exc) {
-      session()->flash('message.type', 'danger');
-      session()->flash('message.content', 'Erreur lors de la modification!');
-//           echo $exc->getTraceAsString();
-    }
-    return redirect()->route('billets.index');
-    
+   }else{
+    $billet->stop_publication_at=$request->stop_publication_at;
   }
+  $billet->checkout=0;
+
+  try {
+   DB::transaction(function () use ($billet,$request) {
+     $archive= Archive::find($billet->id);
+     $archive->ontitle = $billet->ontitle;
+     $archive->title =$billet->title;
+     $archive->alias =$billet->alias;
+     $archive->category_id = $billet->category_id;
+     $archive->published = $billet->published;
+     $archive->featured =$billet->featured;
+     $archive->image = $billet->image;
+     $archive->image_legend =$billet->image_legend;
+     $archive->introtext = $billet->introtext;
+     $archive->fulltext =$billet->fulltext;
+     $archive->source_id = $billet->source_id;
+     $archive->keywords=$billet->keywords;
+     $archive->created_by =$billet->created_by;
+     $archive->created_at =$billet->created_at;
+     $archive->start_publication_at = $billet->start_publication_at;
+     $archive->stop_publication_at =$billet->stop_publication_at;
+     $archive->checkout=0;
+
+     if ($request->update) {
+       $billet->save();
+       $archive->save();
+       $revision= new  Revision;
+       $revision->type=explode('@', Route::CurrentRouteAction())[1];
+       $revision->user_id=Auth::id();
+       $revision->billet_id=$billet->id;
+       $revision->revised_at=now();
+       $revision->save();
+       session()->flash('message.type', 'success');
+       session()->flash('message.content', 'Billet modifié avec succès!');
+       
+     }else{
+      session()->flash('message.type', 'danger');
+      session()->flash('message.content', 'Modification annulée!');
+    }
+  });
+   
+ } catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de la modification!');
+//           echo $exc->getTraceAsString();
+}
+return redirect()->route('billets.index');
+
+}
 
     /**
      * Remove the specified resource from storage.
@@ -497,16 +517,16 @@ dd('billet not find');
      */
     public function destroy($id)
     {
-       $revisions= Revision::where('billet_id',$id)->get(['id']);
-   foreach ($revisions as $r) {
-    $r->delete();
-   }
-      $billet=Billet::onlyTrashed()->find($id)->forceDelete();
-      $archive=Archive::onlyTrashed()->find($id)->forceDelete();
-      session()->flash('message.type', 'success');
-      session()->flash('message.content', 'Billet supprimé avec success!');
-      return redirect()->route('billets.trash');
+     $revisions= Revision::where('billet_id',$id)->get(['id']);
+     foreach ($revisions as $r) {
+      $r->delete();
     }
+    $billet=Billet::onlyTrashed()->find($id)->forceDelete();
+    $archive=Archive::onlyTrashed()->find($id)->forceDelete();
+    session()->flash('message.type', 'success');
+    session()->flash('message.content', 'Billet supprimé avec success!');
+    return redirect()->route('billets.trash');
+  }
     /**
      * put the specified resource in the draft.
      *
@@ -545,27 +565,27 @@ dd('billet not find');
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-  public function putInTrash($id)
-  {
-    try {
-     DB::transaction(function () use ($id) {
-      $billet=Billet::find($id)->delete();
-      $archive=Archive::find($id)->delete();
-      $revision= new  Revision;
-      $revision->type=explode('@', Route::CurrentRouteAction())[1];
-      $revision->user_id=Auth::id();
-      $revision->billet_id=$id;
-      $revision->revised_at=now();
-      $revision->save();
-    });
-     session()->flash('message.type', 'success');
-     session()->flash('message.content', 'Billet mis en corbeille!');
-   } catch (Exception $exc) {
-    session()->flash('message.type', 'danger');
-    session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
+public function putInTrash($id)
+{
+  try {
+   DB::transaction(function () use ($id) {
+    $billet=Billet::find($id)->delete();
+    $archive=Archive::find($id)->delete();
+    $revision= new  Revision;
+    $revision->type=explode('@', Route::CurrentRouteAction())[1];
+    $revision->user_id=Auth::id();
+    $revision->billet_id=$id;
+    $revision->revised_at=now();
+    $revision->save();
+  });
+   session()->flash('message.type', 'success');
+   session()->flash('message.content', 'Billet mis en corbeille!');
+ } catch (Exception $exc) {
+  session()->flash('message.type', 'danger');
+  session()->flash('message.content', 'Erreur lors de la mise en corbeille!');
 //           echo $exc->getTraceAsString();
-  }
-    return redirect()->route('billets.index');
+}
+return redirect()->route('billets.index');
 }
 /**
      * restore the specified resource from the trash.
@@ -604,17 +624,17 @@ return redirect()->route('billets.trash');
      */
 public function inTrash(Request $request)
 {
-$view='billet.billets.administrator.trash';
+  $view='billet.billets.administrator.trash';
   $queryWithPaginate=Billet::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
-->join('users', 'billets.created_by', '=', 'users.id')
-      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
-      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')
-            ->orderBy('billets.id', 'desc')->paginate($this->defaultPageLength);
-        $queryWithOutPaginate =Billet::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
-->join('users', 'billets.created_by', '=', 'users.id')
-      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
-      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author');
-       $controllerMethodUrl=action('Billet\BilletController@inTrash');
+  ->join('users', 'billets.created_by', '=', 'users.id')
+  ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+  ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')
+  ->orderBy('billets.id', 'desc')->paginate($this->defaultPageLength);
+  $queryWithOutPaginate =Billet::onlyTrashed()->with(['getAuthor:id,name','getCategory'])
+  ->join('users', 'billets.created_by', '=', 'users.id')
+  ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+  ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author');
+  $controllerMethodUrl=action('Billet\BilletController@inTrash');
   $actions=Billet::trashActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
   return view($view,$result,$actions);
@@ -628,15 +648,15 @@ public function inDraft( Request $request)
 {
   $view='billet.billets.administrator.draft';
   $queryWithPaginate=Billet::with(['getAuthor:id,name','getCategory'])
-->join('users', 'billets.created_by', '=', 'users.id')
-      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
-      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')
+  ->join('users', 'billets.created_by', '=', 'users.id')
+  ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+  ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')
   ->where('billets.published',2)
   ->orderBy('billets.id', 'desc')->paginate($this->defaultPageLength);
   $queryWithOutPaginate =Billet::with(['getAuthor:id,name','getCategory'])
   ->join('users', 'billets.created_by', '=', 'users.id')
-      ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
-      ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->where('billets.published',2);
+  ->join('billet_categories', 'billets.category_id', '=', 'billet_categories.id')
+  ->select('billets.id','billets.title','billets.category_id','billets.published','billets.featured','billets.source_id','billets.created_by','billets.created_at','billets.image','billets.views', 'billet_categories.title as category','users.name as author')->where('billets.published',2);
   $controllerMethodUrl=action('Billet\BilletController@inDraft');
   $actions=Billet::draftActions();
   $result=$this->itemsList($request,$queryWithPaginate,$queryWithOutPaginate,$controllerMethodUrl);
