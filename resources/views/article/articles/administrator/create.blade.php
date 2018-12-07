@@ -24,7 +24,7 @@
 		<label for="title">{{('Titre:')}}</label>
 		<input type="text" name="title" id="title" placeholder="Titre"  value="{{ old('title') }}" required autofocus>
 	</div>
-	<label for="category">{{('category:')}}</label>
+	<label for="category">{{('categorie:')}}</label>
 	<select  name="category" >
 		<option> </option>
 		@foreach($categories as $category)
@@ -32,11 +32,11 @@
 		@endforeach
 	</select>
 	<div>
-		<label for="published">{{('Published:')}}</label>
+		<label for="published">{{('Publié:')}}</label>
 		<input type="checkbox" name="published" value="{{ 1 }}" @if(old('published')) checked @endif>
 	</div>
 	<div>
-		<label for="featured">{{('Featured:')}}</label>
+		<label for="featured">{{('En vedette:')}}</label>
 		<input type="checkbox" name="featured" value="{{ 1 }}" @if(old('featured')) checked @endif>
 	</div>
 	<div>
@@ -44,18 +44,13 @@
 		<input type="file" name="image" value="{{ old('image') }}" >
 	</div>
 	<div>
-		<label for="image_legend">{{('Image caption:')}}</label>
+		<label for="image_legend">{{('Legende:')}}</label>
 		<input type="text" name="image_legend"  value="{{ old('image_legend') }}">
 	</div>
 
 	<div>
 		<label for="video">{{('Video:')}}</label>
 		<input type="text" name="video" value="{{ old('video') }}" >
-	</div>
-
-	<div>
-		<label for="gallery_photo">{{('Creer une gallerie photos:')}}</label>
-		<input type="text" name="gallery_photo" value="{{ old('gallery_photo') }}" >
 	</div>
 
 	<div>
@@ -89,11 +84,11 @@
 	</div>
 
 	<div>
-		<label for="start_publication_at">{{('Star publication at:')}}</label>
+		<label for="start_publication_at">{{('Debut de publication:')}}</label>
 		<input type="text" name="start_publication_at" value="{{ old('start_publication_at') }}" class="datepicker">
 	</div>
 	<div>
-		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
+		<label for="stop_publication_at">{{('Fin de publication:')}}</label>
 		<input type="text" name="stop_publication_at"  value="{{ old('stop_publication_at') }}" class="datepicker">
 	</div>
 	<div class="uk-margin">
@@ -109,7 +104,10 @@
     	<li>
 		<textarea name="fulltext" id="fulltext" >{{ old('fulltext') }}</textarea>
 	</li>
-        <li>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</li>
+        <li>
+		<label for="gallery_photo">{{('Creer une gallerie photos:')}}</label>
+		<input type="text" name="gallery_photo" value="{{ old('gallery_photo') }}" >
+    </li>
         <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur, sed do eiusmod.</li>
         <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur, sed do eiusmod.</li>
         
@@ -132,31 +130,7 @@
 <script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 <script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.js"></script>
-<script>var editor = new Jodit('#fulltext');</script>
-<script type="text/javascript">
-$('.jodit_wysiwyg,#title,#introtext').on('keyup input click',function(e){
-loadIframeContent();
- });
-
- 	$('.jodit_toolbar').on('click',function(e){
- 		loadIframeContent();
- 	});	
-function loadIframeContent(){
-	var title='<h2>'+ $('#title').val() +'</h2>';
-	var introtext='<div>'+  $('#introtext').val() +'</div>';
-   	var html =title + introtext + $("#fulltext").val();
-    var iframe = document.getElementById("previewIframe");
-    iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(html);
-}; loadIframeContent();
-
-// var $doc = $('#previewIframe');
-// var title='titre';
-// var introtext='introtext';
-// $doc.ready(function() {
-
-//     $doc.contents().find("body").append(doc.(title+' '+introtext);
-// });
-</script>
+<script type="text/javascript" src="{{ asset('js/custom-jodit.js') }}"></script>
 
 
 @endsection

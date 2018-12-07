@@ -25,9 +25,21 @@ class Resource extends Model
         'title',
     ];
 
+/**
+*get actions for a resource
+*@param
+*@return item collection
+*
+**/
     public function getActions() {
         return $this->belongsToMany('App\Models\User\Action', 'resource_action_map',  'resource_id','action_id');
     }
+/**
+*get permissions for ths resource
+*@param
+*@return item collection
+*
+**/
     public function getPermissions() {
         return $this->hasMany('App\Models\User\Permission', 'resource_id');
     }

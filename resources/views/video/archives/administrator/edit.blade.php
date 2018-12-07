@@ -3,7 +3,9 @@
 @section('css')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.css">
+
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Modifier une video ') }}</h3>@endsection 
@@ -21,7 +23,7 @@
 		<label for="title">{{('Titre:')}}</label>
 		<input type="text" name="title" placeholder="Titre"  value="{{$video->title }}" required autofocus>
 	</div>
-	<label for="category">{{('category:')}}</label>
+	<label for="category">{{('categorie:')}}</label>
 	<select  name="category" >
 		<option> </option>
 		@foreach($categories as $category)
@@ -29,11 +31,11 @@
 		@endforeach
 	</select>
 	<div>
-		<label for="published">{{('Published:')}}</label>
+		<label for="published">{{('Publié:')}}</label>
 		<input type="checkbox" name="published" value="{{ 1 }}" @if($video->published == 1)  checked @endif >
 	</div>
 	<div>
-		<label for="featured">{{('Featured:')}}</label>
+		<label for="featured">{{('En vedette:')}}</label>
 		<input type="checkbox" name="featured" value="{{ 1 }}" @if($video->featured == 1)  checked="" @endif>
 	</div>
 	<div>
@@ -74,7 +76,7 @@
 		</select>
 	</div>
 	<div>
-	<label for="editor">{{('editor:')}}</label>
+	<label for="editor">{{('Monteur:')}}</label>
 	    <select name="editor">
 			<option></option>
 			@foreach ($users as $user)
@@ -83,11 +85,11 @@
 		</select>
 	</div>
 	<div>
-		<label for="start_publication_at">{{('Star publication at:')}}</label>
+		<label for="start_publication_at">{{('Dedut de publication:')}}</label>
 		<input type="text" name="start_publication_at" class="datepicker"  @if(isset($video->start_publication_at)) value='{{ date("d-m-Y H:i:s", strtotime($video->start_publication_at))}}' @endif autocomplete="off"  >
 	</div>
 	<div>
-		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
+		<label for="stop_publication_at">{{('Fin de publication :')}}</label>
 		<input type="text" name="stop_publication_at"  class="datepicker"  @if(isset($video->stop_publication_at)) value='{{ date("d-m-Y H:i:s", strtotime($video->stop_publication_at))}}' @endif autocomplete="off" >
 	</div>
 
@@ -100,5 +102,7 @@
 <script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/custom-jodit.js') }}"></script>
 @endsection
 @endsection

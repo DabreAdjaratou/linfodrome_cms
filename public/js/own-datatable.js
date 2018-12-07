@@ -1,12 +1,19 @@
  $(document).ready(function() {
 
-$('#dataTable').DataTable({
-  "paging":   false,
-        "ordering": false,
-        "info":     false,
-        "searching": false,
-        responsive: true
-});
+// $('#dataTable').DataTable({
+//   "paging":   false,
+//         "ordering": false,
+//         "info":     false,
+//         "searching": false,
+//         responsive: true
+// });
+
+/**
+*
+*search and sort the table
+*@param $tring sortField
+*@return Illuminate\Http\response
+*/
     function searchAndSort(sortField){
 
       var entries="";
@@ -50,10 +57,6 @@ if (itemType=='video-archives'|| itemType=='video-archive-trash' || itemType=='v
     var routeUrl=route('video-archives.search-and-sort');
 };
 
-
-
-
-
       var data= '{"entries":"'+ entries + '","searchByTitle":"'+ searchByTitle + '","searchByCategory":"'+ searchByCategory + '","searchByFeaturedState":'+ searchByFeaturedState + ',"searchByPublishedState":'+ searchByPublishedState + ',"searchByUser":"'+ searchByUser + '","sortField":"'+ sortField+'","order":"'+ order+'","fromDate":"'+ fromDate+'","toDate":"'+ toDate+'","itemType":"'+ itemType+'"}'; 
       $.ajax({
         headers: {
@@ -85,6 +88,12 @@ if (itemType=='video-archives'|| itemType=='video-archive-trash' || itemType=='v
 
     });
 
+/**
+*
+*sort the table
+*@param $tring sortField
+*@return 
+*/
 function tableSort (){
 
     $('.tableSort').on('click',function(e){
@@ -108,7 +117,12 @@ changeUrl(url)
    });
   };tableSort();
   
-
+/**
+*
+*set url of a page 
+*@param $tring url
+*@return Illuminate\Http\response
+*/
 function changeUrl(url)
 {
   var newUrl=url.split('?');
@@ -116,6 +130,7 @@ function changeUrl(url)
  document.title=newUrl[0];
 }
 
+// jquery plugin select2
     $("#searchByUser").select2();
   });
 

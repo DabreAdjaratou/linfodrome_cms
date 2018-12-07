@@ -18,7 +18,7 @@
 		<label for="title">{{('Titre:')}}</label>
 		<input type="text" name="title" placeholder="Titre"  value="{{ old('title') }}" required autofocus>
 	</div>
-	<label for="category">{{('category:')}}</label>
+	<label for="category">{{('categorie:')}}</label>
 	<select  name="category" >
 		<option> </option>
 		@foreach($categories as $category)
@@ -26,11 +26,11 @@
 		@endforeach
 	</select>
 	<div>
-		<label for="published">{{('Published:')}}</label>
+		<label for="published">{{('Publié:')}}</label>
 		<input type="checkbox" name="published" value="{{ 1 }}" @if(old('published')) checked @endif>
 	</div>
 	<div>
-		<label for="featured">{{('Featured:')}}</label>
+		<label for="featured">{{('En vedette:')}}</label>
 		<input type="checkbox" name="featured" value="{{ 1 }}" @if(old('featured')) checked @endif>
 	</div>
 	<div>
@@ -65,7 +65,7 @@
 		</select>
 	</div>
 	<div>
-	<label for="editor">{{('editor:')}}</label>
+	<label for="editor">{{('Monteur:')}}</label>
 	    <select name="editor">
 			<option></option>
 			@foreach ($users as $user)
@@ -74,11 +74,11 @@
 		</select>
 	</div>
 	<div>
-		<label for="start_publication_at">{{('Star publication at:')}}</label>
+		<label for="start_publication_at">{{('Debut de publication:')}}</label>
 		<input type="text" name="start_publication_at" class="datepicker"  value="{{ old('start_publication_at') }}" >
 	</div>
 	<div>
-		<label for="stop_publication_at">{{('Stop publication at:')}}</label>
+		<label for="stop_publication_at">{{('Fin de publication:')}}</label>
 		<input type="text" name="stop_publication_at" class="datepicker"  value="{{ old('stop_publication_at') }}">
 	</div>
 

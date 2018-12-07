@@ -29,27 +29,53 @@ class Video extends Model
     protected $fillable = [
         'title','category_id','published','featured','image','code','description','created_by','cameraman','editor','created_at','start_publication_at','stop_publication_at','keywords',
     ];
-    
+    /**
+*get item's category
+*@param
+*@return item collection
+*
+**/
      public function getCategory()
     {
         return $this->belongsTo('App\Models\Video\Category','category_id');
     }
-
+/**
+*get item's author
+*@param
+*@return item collection
+*
+**/
    public function getAuthor()
     {
         return $this->belongsTo('App\Models\User\User','created_by');
     }
-
+/**
+*get item's editor
+*@param
+*@return item collection
+*
+**/
     public function getEditor()
     {
         return $this->belongsTo('App\Models\User\User','editor');
     }
-
+/**
+*get item's cameraman
+*@param
+*@return item collection
+*
+**/
     public function getCameraman()
     {
         return $this->belongsTo('App\Models\User\User','cameraman');
     }
 
+/**
+*get item's revisions
+*@param
+*@return item collection
+*
+**/
     public function getRevision()
     {
        return $this->hasMany('App\Models\Video\Revision','video_id');
@@ -157,7 +183,12 @@ if($publishedState==1){
     {
         return $query->whereBetween('videos.created_at',[$fromDate,$toDate]);
     }     
-
+/**
+* get datatable actions for index view
+*@param
+*@return string actions titles $actionTitles, string actions $action
+*
+*/
 
     public  static function indexActions()
     {
@@ -167,7 +198,12 @@ if($publishedState==1){
       </td>';
         return compact('actionTitles','actions');
     }
-
+/**
+* get datatable actions for trash view
+*@param
+*@return string actions titles $actionTitles, string actions $action
+*
+*/
      public  static function trashActions()
     {
      $actionTitles='<th>Supprimer</th><th>Restaurer</th>';
@@ -180,7 +216,12 @@ if($publishedState==1){
       </td>';
         return compact('actionTitles','actions');
     }
-
+/**
+* get datatable actions for drafr view
+*@param
+*@return string actions titles $actionTitles, string actions $action
+*
+*/
      public  static function draftActions()
     {
       $actionTitles='<th>Modifier</th><th>Corbeille</th>';

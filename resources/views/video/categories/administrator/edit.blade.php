@@ -19,7 +19,7 @@
 
 	</div>
 	<div>	
-		<label for="published">{{('Published:')}}</label>
+		<label for="published">{{('Publié:')}}</label>
 		<input type="checkbox" name="published" value="{{1}}" @if($category->published==1) checked @endif class="uk-checkbox">
 	</div>
 </form>

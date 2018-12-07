@@ -21,17 +21,34 @@ use SoftDeletes;
      */
     public $timestamps = false;
 
+/**
+*get permission's action
+*@param
+*@return item collection
+*
+**/
 public function getAction(){
 
 return $this->belongsTo('App\Models\User\Action', 'action_id');
-}    //
-
+}    
+/**
+*get permission's access level
+*@param
+*@return item collection
+*
+**/
 public function getAccessLevel(){
 
 return $this->belongsTo('App\Models\User\AccessLevel', 'access_level_id');
 	
 }
 
+/**
+*get permission's resource
+*@param
+*@return item collection
+*
+**/
 public function getResource(){
 
 return $this->belongsTo('App\Models\User\Resource', 'resource_id');

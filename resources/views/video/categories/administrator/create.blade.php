@@ -20,7 +20,7 @@
 <input type="text" name="title" placeholder="Titre de la Categorie" value="{{ old('title') }}" required autofocus>
 </div>
 		<div>	
-		<label for="published">{{('Published:')}}</label>
+		<label for="published">{{('Publié:')}}</label>
 		<input type="checkbox" name="published" value="{{ 1 }}" @if(old('published')) checked @endif>
 	</div>
 

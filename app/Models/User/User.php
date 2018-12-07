@@ -36,75 +36,66 @@ class User extends Authenticatable
       'password', 'remember_token',
     ];
 
+/**
+*get user's groups
+*@param
+*@return item collection
+*
+**/
     public function getGroups()
     {
       return $this->belongsToMany('App\Models\User\Group', 'user_usergroup_map', 'user_id', 'user_group_id');
     }
 
+
+/**
+*check if a user has a right to access to a resource'action
+*@param int $id, string $resource, string $action
+*@return boolean
+*
+**/
     public static function getPermissions($id,$resource,$action)
     {
-      $userData = User::with(['getGroups.getAccessLevels.getPermissions.getResource','getGroups.getAccessLevels.getPermissions.getAction'])->where('id', $id)->get(['id']);
+      $userData = User::with(['getGroups'])->where('id', $id)->get(['id']);
+      $userPermissions=collect([]);
       foreach ($userData as $data) {
        foreach ($data->getGroups as $group) {
-        if(blank($group->getAccessLevels)){
-       $parentPermissions=Group::getPermissionsIfNoAccessLevel($group->id);
-           $action=Action::where('title',$action)->get(['id','title'])->toArray();
-           $resource=Resource::where('title',$resource)->get(['id','title']);
-           for ($i=0; $i <count($parentPermissions) ; $i++) { 
-             if ($parentPermissions[$i][0]['resource_id']==$resource[0]['id'] && $parentPermissions[$i][0]['action_id']==$action[0]['id'] && $parentPermissions[$i][0]['access_level_id']==$parentPermissions[$i][1]) {
-                     return true;
-            }
-    }
-    }else{
-
- foreach ($group->getAccessLevels as $access) {
-         foreach ($access->getPermissions  as $permission) {
-          $access_level= $access->title;
-          $permission_resource= $permission->getResource->title;
-          $permission_action= $permission->getAction->title;
-          if ($permission_resource==$resource && $permission_action==$action) {
-            return true;
-          }else{
-           $parentPermissions=Group::getPermissions($group->id);
-           $actionTitle=Action::where('title',$action)->get(['id','title'])->toArray();
-           $resourceTitle=Resource::where('title',$resource)->get(['id','title'])->toArray();
-//           dd($parentPermissions);
-           for ($i=0; $i <count($parentPermissions) ; $i++) {
-             if ($parentPermissions[$i]['resource_id']==$resourceTitle[0]['id'] && $parentPermissions[$i]['action_id']==$actionTitle[0]['id'] && $parentPermissions[$i]['access_level_id']==$access->id) {
-                           
-                 return true;
-        }
-            }
-          }
+        $groupPermission=Group::getPermissions($group->id);
+        foreach ($groupPermission as $p) {
+          $userPermissions->push($p);
         }
       }
+      for ($i=0; $i <count($userPermissions) ; $i++) {
+        $permission_resource= $userPermissions[$i]->getResource->title;
+        $permission_action= $userPermissions[$i]->getAction->title;
+        $requestedAction=Action::where('title',$action)->get(['id','title']);
+        $requestedResource=Resource::where('title',$resource)->get(['id','title']);
 
+        if ($userPermissions[$i]['resource_id']==$requestedResource[0]['id'] && $userPermissions[$i]['action_id']==$requestedAction[0]['id']) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-      
-      
-  } 
-}
-}
-return false;
-}  
-
-public static function isAdmin($id) {
-  $userData = User::with(['getGroups.getAccessLevels'])->where('id', $id)->get(['id']);
-  foreach ($userData as $data) {
-   foreach ($data->getGroups as $group) {
-    foreach ($group->getAccessLevels as $acces) {
-     foreach ($acces as $a) {
-       if(strcasecmp($group->title, 'Manager')==0){
+/**
+*grant all right to a admin group and remove all right to public group
+*@param int $id
+*@return boolean
+*
+**/
+  public static function isAdmin($id) {
+    $userData = User::with(['getGroups'])->where('id', $id)->get(['id']);
+    foreach ($userData as $data) {
+     foreach ($data->getGroups as $group) {
+      if(strcasecmp($group->title, 'guest')==0){
         return true;
       }elseif(strcasecmp($group->title, 'public')==0){
         return false;
       }
-
     }
-
   }
-}
-}
 }
 
 }
