@@ -124,8 +124,21 @@ if ($validator->fails()) {
     public function edit($id)
     {
         $accessLevel=Accesslevel::find($id);
+        $accessLevels=Accesslevel::all();
         $resources=Resource::with('getActions','getPermissions')->get(['id','title']);
-        return view('user.permissions.administrator.edit',compact('resources','accessLevel'));
+        $permissions= Permission::where('access_level_id',$id)->get();
+        $permissions2= Permission::where('access_level_id','<>',$id)->get();
+        // for($i=0;$i<sizeof($permissions); $i++) {
+        //     $permissions[$i]=array_merge($permissions[$i],array('type'=>'checked'));
+        //     # code...
+        // }
+        //  for($i=0;$i<sizeof($permissions2); $i++) {
+        //     $permissions2[$i]=array_merge($permissions2[$i],array('type'=>''));
+        //     # code...
+        // }
+        // $permissions3=array_merge($permissions,$permissions2);
+        // dd($permissions2);
+        return view('user.permissions.administrator.edit',compact('resources','accessLevel'/*,'permissions3'*/,'permissions','permissions2','accessLevels'));
     }
 
     /**

@@ -3,6 +3,8 @@
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{asset('css/tagify.css')}}" />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.css">
+
 @endsection
 @section('content')
 @section('pageTitle') <h3> {{ ('Mettre en ligne une video ') }}</h3>@endsection 
@@ -92,5 +94,7 @@
 <script type="text/javascript" src="{{asset('js/jQuery.tagify.js')}}" ></script>
 <script type="text/javascript" src="{{asset('js/custom-tagify.js')}}" ></script>
 <script type="text/javascript" src="{{ asset('js/custom-datepicker.js') }}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/custom-jodit.js') }}"></script>
 @endsection
 @endsection

@@ -1,6 +1,7 @@
 @extends('layouts.administrator.master')
 @section('title', 'Edit a  permission')
 @section('css')
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 @endsection
 @section('content')
 @section('pageTitle') <h3> Modifier une permission</h3>@endsection 
@@ -23,21 +24,34 @@
 			<td>
 				{{ $resource->title }}
 			</td>
-			@foreach($resource->getActions as $action)
+				
+				
 
-			<td>
-				<label for="action"> {{ $action->title }} </label>
-				@php  $permissionActions=[];@endphp
-				@foreach($resource->getPermissions as $permission)
-				@php $permissionActions[]=$permission->action_id; @endphp
-				@endforeach
-				@if(in_array($action->id,$permissionActions))
+				@foreach($resource->getActions as $action)
+				<td>
+				<label for="action" id="{{ $resource->id.'-'.$action->id }}"> {{ $action->title }} </label>
+				@foreach($permissions as $permission)
+				@if($permission->resource_id==$resource->id && $action->id == $permission->action_id)
 				<input type="checkbox" name="{{ $resource->title}}[]" value="{{$action->id}}" class="uk-checkbox" checked>
-				@else
-				<input type="checkbox" name="{{ $resource->title}}[]" value="{{$action->id}}" class="uk-checkbox">
+				<script type="">
+					var id='<?php echo "#".$resource->id."-".$action->id ; ?>';
+					// console.log($(id)[0].nextElementSibling);
+					if($(id)[0].nextElementSibling){
+
+					console.log('ddd');
+					}else{
+					console.log('ff');
+
+					}
+				</script>
 				@endif
+				@endforeach
+					<input type="checkbox" name="{{ $resource->title}}[]" value="{{$action->id}}" class="uk-checkbox">
+				
+				
+
+			@endforeach 
 			</td>
-			@endforeach
 
 		</tr>
 		@endforeach

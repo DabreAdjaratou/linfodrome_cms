@@ -34,6 +34,17 @@ class Action extends Model
         return $this->belongsToMany('App\Models\User\Resource', 'resource_action_map', 'action_id', 'resource_id');
     }
 
+/**
+* get permissions that belongs to an action
+*@param
+*@return collection of items
+*
+*/
+    public function getPermissions()
+    {
+        return $this->hasMany('App\Models\User\Permission', 'action_id');
+    }
+
 
 	
 }

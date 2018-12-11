@@ -23,7 +23,7 @@
 	<tbody>
 		@foreach($accessLevels as $accessLevel)
 		<tr>
-			<td> <a href="">{{ ucfirst($accessLevel->title) }}</a></td>
+			<td> <a href="{{ route('access-levels.edit',['access-level'=>$accessLevel]) }}">{{ ucfirst($accessLevel->title) }}</a></td>
 			<td>@foreach ($accessLevel->getGroups as $group)
 				{{ ucfirst($group->title) }}
 			@endforeach </td>
